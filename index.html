@@ -457,7 +457,7 @@ async function fetchReliefWeb() {
 }
 
 async function fetchGDELT(query, type, limit=8) {
-  const gdeltUrl=`https://api.gdeltproject.org/api/v2/geo/geo?query=${encodeURIComponent(query)}&format=json&maxrecords=${limit}&timespan=24h&SOURCELANG=english`;
+  const gdeltUrl=`https://api.gdeltproject.org/api/v2/geo/geo?query=${encodeURIComponent(query)}&format=json&maxrecords=${limit}×pan=24h&SOURCELANG=english`;
   const d = await get(proxy(gdeltUrl),12000);
   return dedupeByTitle((d.articles||[]).map((a,i)=>{
     const geo=a.geolocation; let lat,lng,locName;
@@ -519,7 +519,7 @@ async function fetchMultiSourceNews() {
 
 // Raw GDELT fetch that returns partial objects (no id, allows caller to assign)
 async function fetchGDELTRaw(query, type, limit=4) {
-  const gdeltUrl=`https://api.gdeltproject.org/api/v2/geo/geo?query=${encodeURIComponent(query)}&format=json&maxrecords=${limit}&timespan=24h&SOURCELANG=english`;
+  const gdeltUrl=`https://api.gdeltproject.org/api/v2/geo/geo?query=${encodeURIComponent(query)}&format=json&maxrecords=${limit}×pan=24h&SOURCELANG=english`;
   const d = await get(proxy(gdeltUrl),12000);
   return (d.articles||[]).map((a)=>{
     const geo=a.geolocation; let lat,lng,locName;
@@ -977,9 +977,9 @@ function selectEvent(id) {
   }
 
   document.getElementById('d-body').innerHTML=`
-    <div class="d-cat" style="color:${c}">${ico} &nbsp;${ev.type.toUpperCase()} ${liveLabel}</div>
+    <div class="d-cat" style="color:${c}">${ico}  ${ev.type.toUpperCase()} ${liveLabel}</div>
     <div class="d-title">${ev.title}</div>
-    <div class="d-where">📍 ${ev.location}&nbsp;·&nbsp;<span style="color:var(--muted)">${ev.age}</span></div>
+    <div class="d-where">📍 ${ev.location} · <span style="color:var(--muted)">${ev.age}</span></div>
     ${statsHtml}
     <div class="d-lbl">Brief</div>
     <div class="d-brief">${(ev.brief||'No details available.').replace(/\n/g,'<br>')}</div>
