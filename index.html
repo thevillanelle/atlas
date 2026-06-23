@@ -441,7 +441,7 @@ async function fetchUSGS() {
   const d = await get('https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&minmagnitude=5.0&limit=25&orderby=time',12000);
   return (d.features||[]).map((f,i)=>{
     const mag=f.properties.mag||0, place=f.properties.place||'Unknown', depth=f.geometry.coordinates[2]||0, tsunami=f.properties.tsunami===1;
-    return {id:'usgs_'+i,type:'disaster',title:`M${mag.toFixed(1)} Earthquake — ${place}`,location:place,lat:f.geometry.coordinates[1],lng:f.geometry.coordinates[0],severity:mag>=7.5?5:mag>=6.5?4:mag>=6?3:2,age:timeAgo(f.properties.time),brief:`A M${mag.toFixed(1)} earthquake occurred ${place} at ${depth.toFixed(0)} km depth.`+(tsunami?' ⚠️ Tsunami advisory issued.':'')+(f.properties.alert?` PAGER: ${f.properties.alert.toUpperCase()}.':''),stats:[{label:'Magnitude',val:`M${mag.toFixed(1)}`},{label:'Depth',val:`${depth.toFixed(0)} km`}],sources:[{n:'USGS',a:timeAgo(f.properties.time)}],tags:['Earthquake','USGS',tsunami?'Tsunami':'Natural Disaster'],_live:true};
+    return {id:'usgs_'+i,type:'disaster',title:`M${mag.toFixed(1)} Earthquake — ${place}`,location:place,lat:f.geometry.coordinates[1],lng:f.geometry.coordinates[0],severity:mag>=7.5?5:mag>=6.5?4:mag>=6?3:2,age:timeAgo(f.properties.time),brief:`A M${mag.toFixed(1)} earthquake occurred ${place} at ${depth.toFixed(0)} km depth.`+(tsunami?' ⚠️ Tsunami advisory issued.':'')+(f.properties.alert?` PAGER: ${f.properties.alert.toUpperCase()}.`:''),stats:[{label:'Magnitude',val:`M${mag.toFixed(1)}`},{label:'Depth',val:`${depth.toFixed(0)} km`}],sources:[{n:'USGS',a:timeAgo(f.properties.time)}],tags:['Earthquake','USGS',tsunami?'Tsunami':'Natural Disaster'],_live:true};
   });
 }
 
