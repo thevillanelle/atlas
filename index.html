@@ -240,6 +240,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);font-famil
 </div>
 
 <script src="https://unpkg.com/globe.gl@2.27.2/dist/globe.gl.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/astronomy-engine@2/astronomy.min.js"></script>
 <script>
 // ─────────────────────────────────────────────────────────────────────────────
 // CONSTANTS
@@ -561,32 +562,185 @@ async function fetchFashionNews() {
   );
 }
 
-async function fetchHoroscopes() {
-  // Fetch all 12 signs in parallel
-  const results = await Promise.allSettled(
-    ZODIAC.map(z =>
-      get(proxy(`https://horoscope-app-api.vercel.app/api/v1/get-horoscope/daily?sign=${z.sign}&day=TODAY`), 10000)
-    )
-  );
-  return ZODIAC.map((z, i) => {
-    const r = results[i];
-    const reading = r.status==='fulfilled' ? r.value?.data?.horoscope_data : null;
-    return {
-      id: 'astro_'+z.sign.toLowerCase(),
-      type: 'astrology',
-      title: `${z.emoji} ${z.sign}`,
-      location: z.site,
-      lat: z.lat, lng: z.lng,
-      severity: 1,
-      age: 'Today',
-      brief: reading || `Today's reading for ${z.sign} is temporarily unavailable.`,
-      stats: [{label:'Sign',val:z.emoji},{label:'Dates',val:z.dates}],
-      sources: [{n:'Horoscope App API',a:'Daily'}],
-      tags: ['Astrology',z.sign,'Daily Reading'],
-      _live: !!reading,
-      _zodiac: z,
-    };
-  });
+// ── REAL SKY DATA ─────────────────────────────────────────────────────────────
+// Computes live positions using Astronomy Engine (client-side, no API key needed)
+// + ISS TLE from CelesTrak + Aurora Kp index from NOAA
+
+const PLANETS = [
+  { name:'Sun',     emoji:'☀️',  body:'Sun'     },
+  { name:'Moon',    emoji:'🌕',  body:'Moon'    },
+  { name:'Mercury', emoji:'☿',   body:'Mercury' },
+  { name:'Venus',   emoji:'♀️',  body:'Venus'   },
+  { name:'Mars',    emoji:'♂️',  body:'Mars'    },
+  { name:'Jupiter', emoji:'♃',   body:'Jupiter' },
+  { name:'Saturn',  emoji:'♄',   body:'Saturn'  },
+  { name:'Uranus',  emoji:'♅',   body:'Uranus'  },
+  { name:'Neptune', emoji:'♆',   body:'Neptune' },
+];
+
+function getSubpoint(body, date) {
+  // Returns the geographic lat/lng directly below the body (subsolar/sublunar point)
+  try {
+    const b = Astronomy.Body[body];
+    const equ = Astronomy.Equator(b, date, null, true, true);
+    const hor = Astronomy.HorizonFromVector(
+      Astronomy.VectorFromEquator(equ, date), Astronomy.Refraction.None
+    );
+    // Subsolar point: RA → longitude, Declination → latitude
+    const gst = Astronomy.SiderealTime(date);           // Greenwich Sidereal Time in hours
+    const lng  = ((equ.ra - gst) * 15 + 540) % 360 - 180; // convert to -180..180
+    const lat  = equ.dec;
+    return { lat, lng };
+  } catch (_) { return null; }
+}
+
+function moonPhaseName(date) {
+  const angle = Astronomy.MoonPhase(date);
+  if (angle < 22.5)  return '🌑 New Moon';
+  if (angle < 67.5)  return '🌒 Waxing Crescent';
+  if (angle < 112.5) return '🌓 First Quarter';
+  if (angle < 157.5) return '🌔 Waxing Gibbous';
+  if (angle < 202.5) return '🌕 Full Moon';
+  if (angle < 247.5) return '🌖 Waning Gibbous';
+  if (angle < 292.5) return '🌗 Last Quarter';
+  if (angle < 337.5) return '🌘 Waning Crescent';
+  return '🌑 New Moon';
+}
+
+function planetConstellation(body, date) {
+  try {
+    const b = Astronomy.Body[body];
+    const equ = Astronomy.Equator(b, date, null, true, true);
+    return Astronomy.Constellation(equ.ra, equ.dec).name;
+  } catch (_) { return '–'; }
+}
+
+function elongationDesc(body, date) {
+  try {
+    const b = Astronomy.Body[body];
+    const elong = Astronomy.Elongation(b, date);
+    return `${elong.elongation.toFixed(1)}° from Sun (${elong.visibility})`;
+  } catch (_) { return '–'; }
+}
+
+async function fetchISSPosition() {
+  // CelesTrak live ISS TLE → compute current position via SGP4
+  // Fallback: use open-notify ISS API which returns lat/lng directly
+  try {
+    const d = await get('https://api.open-notify.org/iss-now.json', 6000);
+    const lat = parseFloat(d.iss_position.latitude);
+    const lng = parseFloat(d.iss_position.longitude);
+    const ts  = d.timestamp * 1000;
+    return { lat, lng, ts };
+  } catch (_) { return null; }
+}
+
+async function fetchAuroraKp() {
+  // NOAA Space Weather — 3-day Kp index forecast
+  try {
+    const d = await get(
+      proxy('https://services.swpc.noaa.gov/products/noaa-planetary-k-index-forecast.json'),
+      8000
+    );
+    // d is array of [time, kp, observed/estimated/predicted]
+    const latest = (d || []).filter(r => r[2] === 'predicted').slice(0, 4);
+    const maxKp  = Math.max(...latest.map(r => parseFloat(r[1]) || 0));
+    return { kp: maxKp, raw: latest };
+  } catch (_) { return null; }
+}
+
+function kpToAuroraLatitude(kp) {
+  // Rough geomagnetic latitude of aurora visibility for a given Kp
+  return 66.5 - (kp * 2.5);
+}
+
+async function fetchSkyData() {
+  const now   = new Date();
+  const events = [];
+
+  // ── 1. All planets — subsolar/sublunar points on globe ───────────────────
+  for (const p of PLANETS) {
+    const pt = getSubpoint(p.body, now);
+    if (!pt) continue;
+    const constellation = planetConstellation(p.body, now);
+    const isInner = ['Mercury','Venus'].includes(p.name);
+    const elong = isInner ? elongationDesc(p.body, now) : null;
+    const moonPhase = p.name === 'Moon' ? moonPhaseName(now) : null;
+
+    let brief = `Current subsolar/sublunar point for ${p.name}: ${pt.lat.toFixed(2)}°, ${pt.lng.toFixed(2)}°.\n\n`;
+    brief += `Constellation: ${constellation}.\n`;
+    if (moonPhase) brief += `Phase: ${moonPhase}.\n`;
+    if (elong)     brief += `Elongation: ${elong}.\n`;
+    brief += `\nThis is the point on Earth's surface currently directly beneath ${p.name}.`;
+
+    events.push({
+      id:       `sky_${p.name.toLowerCase()}`,
+      type:     'astrology',
+      title:    `${p.emoji} ${p.name} — ${constellation}`,
+      location: `${pt.lat.toFixed(2)}°, ${pt.lng.toFixed(2)}°`,
+      lat:      pt.lat,
+      lng:      pt.lng,
+      severity: p.name === 'Sun' || p.name === 'Moon' ? 3 : 2,
+      age:      'Live',
+      brief,
+      stats: [
+        { label: 'Constellation', val: constellation },
+        { label: moonPhase ? 'Phase' : (elong ? 'Elongation' : 'Sub-point'), val: moonPhase || elong || `${pt.lat.toFixed(1)}°` },
+      ],
+      sources: [{ n: 'Astronomy Engine', a: 'Computed live' }],
+      tags:    ['Astronomy', p.name, constellation, 'Sky'],
+      _live:   true,
+      _planet: p,
+    });
+  }
+
+  // ── 2. ISS ────────────────────────────────────────────────────────────────
+  const iss = await fetchISSPosition();
+  if (iss) {
+    events.push({
+      id:       'sky_iss',
+      type:     'astrology',
+      title:    '🛸 ISS — International Space Station',
+      location: `${iss.lat.toFixed(2)}°, ${iss.lng.toFixed(2)}°`,
+      lat:      iss.lat,
+      lng:      iss.lng,
+      severity: 2,
+      age:      'Live',
+      brief:    `The ISS is currently at ${iss.lat.toFixed(3)}° latitude, ${iss.lng.toFixed(3)}° longitude, orbiting at ~408 km altitude at roughly 27,600 km/h.\n\nPosition updates every page refresh.`,
+      stats:    [{ label: 'Altitude', val: '~408 km' }, { label: 'Speed', val: '27,600 km/h' }],
+      sources:  [{ n: 'Open Notify', a: 'Live', url: 'http://api.open-notify.org/iss-now.json' }],
+      tags:     ['ISS', 'Space Station', 'Orbit', 'NASA'],
+      _live:    true,
+      _planet:  { emoji: '🛸', name: 'ISS' },
+    });
+  }
+
+  // ── 3. Aurora ─────────────────────────────────────────────────────────────
+  const aurora = await fetchAuroraKp();
+  if (aurora) {
+    const kp  = aurora.kp;
+    const auroLat = kpToAuroraLatitude(kp);
+    const severity = kp >= 7 ? 5 : kp >= 5 ? 4 : kp >= 3 ? 3 : 2;
+    const visible  = kp >= 5 ? `⚠️ Strong geomagnetic storm — aurora visible as far south as ${auroLat.toFixed(0)}°` : `Aurora visible above ~${auroLat.toFixed(0)}° latitude`;
+    events.push({
+      id:       'sky_aurora',
+      type:     'astrology',
+      title:    `🌌 Aurora Forecast — Kp ${kp.toFixed(1)}`,
+      location: `~${auroLat.toFixed(0)}° geomagnetic latitude`,
+      lat:      auroLat,
+      lng:      0,
+      severity,
+      age:      'NOAA Forecast',
+      brief:    `NOAA planetary Kp index forecast: ${kp.toFixed(1)}.\n\n${visible}.\n\nKp scale: 0 (quiet) → 9 (extreme storm). Values ≥5 indicate significant geomagnetic activity and widespread auroral visibility.`,
+      stats:    [{ label: 'Kp Index', val: kp.toFixed(1) }, { label: 'Visible ≥', val: `${auroLat.toFixed(0)}°` }],
+      sources:  [{ n: 'NOAA SWPC', a: 'Forecast', url: 'https://www.swpc.noaa.gov' }],
+      tags:     ['Aurora', 'Geomagnetic Storm', 'NOAA', 'Space Weather'],
+      _live:    true,
+      _planet:  { emoji: '🌌', name: 'Aurora' },
+    });
+  }
+
+  return events;
 }
 
 async function fetchOpenSky() {
@@ -697,11 +851,12 @@ function renderList() {
   // Special astrology grid view
   if (currentTab==='astrology') {
     list.innerHTML=`<div class="astro-grid">${evs.map(ev=>{
-      const snip=ev.brief?ev.brief.slice(0,80)+'…':'';
+      const p=ev._planet||{};
+      const snip=ev.brief?ev.brief.replace(/\n/g,' ').slice(0,70)+'…':'';
       return `<div class="astro-card${ev.id===selectedId?' sel':''}" id="ev-${ev.id}" onclick="selectEvent('${ev.id}')">
-        <div class="astro-emoji">${ev._zodiac?.emoji||'✨'}</div>
-        <div class="astro-sign">${ev._zodiac?.sign||ev.title}</div>
-        <div class="astro-site">${ev._zodiac?.dates||''}</div>
+        <div class="astro-emoji">${p.emoji||'✨'}</div>
+        <div class="astro-sign">${p.name||ev.title}</div>
+        <div class="astro-site">${ev.location}</div>
         <div class="astro-snip">${snip}</div>
       </div>`;
     }).join('')}</div>`;
@@ -748,21 +903,25 @@ function selectEvent(id) {
   const liveLabel=ev._live?`<span class="ds-badge ds-live">LIVE</span>`:`<span class="ds-badge ds-fallback">CACHED</span>`;
 
   // Special astrology detail layout
-  if (ev.type==='astrology'&&ev._zodiac) {
+  if (ev.type==='astrology'&&ev._planet) {
+    const p=ev._planet;
     document.getElementById('d-body').innerHTML=`
       <div style="text-align:center;padding:10px 0 4px">
-        <div style="font-size:40px;margin-bottom:6px">${ev._zodiac.emoji}</div>
-        <div style="font-size:20px;font-weight:700;color:var(--col-astrology)">${ev._zodiac.sign}</div>
-        <div style="font-size:10px;color:var(--muted);margin-top:3px">${ev._zodiac.dates}</div>
-        <div style="font-size:9px;color:var(--muted);margin-top:2px">📍 ${ev._zodiac.site}</div>
+        <div style="font-size:38px;margin-bottom:6px">${p.emoji||'✨'}</div>
+        <div style="font-size:20px;font-weight:700;color:var(--col-astrology)">${p.name}</div>
+        <div style="font-size:10px;color:var(--muted);margin-top:3px">📍 ${ev.location}</div>
         ${liveLabel}
       </div>
       <div class="d-sep"></div>
-      <div class="d-lbl">Today's Reading</div>
-      <div class="d-brief" style="font-size:13px;line-height:1.85;color:rgba(216,221,232,.88)">${ev.brief}</div>
+      ${statsHtml}
+      <div class="d-lbl">Current Position</div>
+      <div class="d-brief" style="font-size:12px;line-height:1.85">${ev.brief.replace(/\n/g,'<br>')}</div>
       <div class="d-sep"></div>
       <div class="d-lbl">Source</div>
       ${srcsHtml}
+      <div class="d-sep"></div>
+      <div class="d-lbl">Tags</div>
+      <div class="d-tags">${tagsHtml}</div>
     `;
     document.getElementById('detail').classList.add('open');
     return;
@@ -813,14 +972,14 @@ async function loadLiveData() {
   const [usgs,relief,launches,nhc] = await Promise.allSettled([fetchUSGS(),fetchReliefWeb(),fetchLaunches(),fetchNHC()]);
 
   // Phase 2: GDELT + HN + Fashion + Astrology
-  splash(38,'Fetching GDELT · Hacker News · Horoscopes…');
-  const [gdeltNews,gdeltConflicts,gdeltStorms,hnTech,fashionNews,horoscopes] = await Promise.allSettled([
+  splash(38,'Fetching GDELT · Hacker News · Sky data…');
+  const [gdeltNews,gdeltConflicts,gdeltStorms,hnTech,fashionNews,skyData] = await Promise.allSettled([
     fetchMultiSourceNews(),
     fetchGDELT('attack killed military conflict war fighting','conflict',8),
     fetchGDELT('hurricane typhoon cyclone tropical storm tornado','storm',5),
     fetchHackerNews(),
     fetchFashionNews(),
-    fetchHoroscopes(),
+    fetchSkyData(),
   ]);
 
   // Phase 3: Flights
@@ -844,7 +1003,7 @@ async function loadLiveData() {
   const conflicts = dedupeByTitle([...(gdeltConflicts.status==='fulfilled'&&gdeltConflicts.value?.length?gdeltConflicts.value:[]),...rwConf,...SEEDS.conflict]).slice(0,12);
   const techEvs   = hnTech.status==='fulfilled'&&hnTech.value?.length?hnTech.value:SEEDS.tech;
   const fashionEvs= fashionNews.status==='fulfilled'&&fashionNews.value?.length?fashionNews.value:SEEDS.fashion;
-  const astroEvs  = horoscopes.status==='fulfilled'?horoscopes.value:[];
+  const astroEvs  = skyData.status==='fulfilled'?skyData.value:[];
   const launchEvs = launches.status==='fulfilled'?launches.value:FALLBACK_LAUNCHES;
 
   // Layer status indicators
@@ -855,7 +1014,7 @@ async function loadLiveData() {
   setLayerStatus('conflict',   gdeltConflicts.status==='fulfilled'&&gdeltConflicts.value?.length?'on':'fb');
   setLayerStatus('tech',       hnTech.status==='fulfilled'&&hnTech.value?.length?'on':'fb');
   setLayerStatus('fashion',    fashionNews.status==='fulfilled'&&fashionNews.value?.length?'on':'fb');
-  setLayerStatus('astrology',  horoscopes.status==='fulfilled'&&horoscopes.value?.some(e=>e._live)?'on':'fb');
+  setLayerStatus('astrology',  skyData.status==='fulfilled'&&skyData.value?.length?'on':'fb');
   setLayerStatus('launch',     launches.status==='fulfilled'?'on':'fb');
 
   allEvents=[...newsEvs,...conflicts,...disasters,...storms,...humanitarian,...techEvs,...fashionEvs,...astroEvs,...launchEvs];
