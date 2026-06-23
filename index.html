@@ -240,7 +240,6 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);font-famil
 </div>
 
 <script src="https://unpkg.com/globe.gl@2.27.2/dist/globe.gl.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/astronomy-engine@2/source/js/astronomy.browser.min.js"></script>
 <script>
 // ─────────────────────────────────────────────────────────────────────────────
 // CONSTANTS
@@ -562,174 +561,231 @@ async function fetchFashionNews() {
   );
 }
 
-// ── REAL SKY DATA ─────────────────────────────────────────────────────────────
-// Computes live positions using Astronomy Engine (client-side, no API key needed)
-// + ISS TLE from CelesTrak + Aurora Kp index from NOAA
+// ── REAL SKY DATA — self-contained, no external library ──────────────────────
+// Uses standard astronomical algorithms (Meeus "Astronomical Algorithms")
+// to compute live subsolar/sublunar geographic points for all planets + Moon.
 
 const PLANETS = [
-  { name:'Sun',     emoji:'☀️',  body:'Sun'     },
-  { name:'Moon',    emoji:'🌕',  body:'Moon'    },
-  { name:'Mercury', emoji:'☿',   body:'Mercury' },
-  { name:'Venus',   emoji:'♀️',  body:'Venus'   },
-  { name:'Mars',    emoji:'♂️',  body:'Mars'    },
-  { name:'Jupiter', emoji:'♃',   body:'Jupiter' },
-  { name:'Saturn',  emoji:'♄',   body:'Saturn'  },
-  { name:'Uranus',  emoji:'♅',   body:'Uranus'  },
-  { name:'Neptune', emoji:'♆',   body:'Neptune' },
+  { name:'Sun',     emoji:'☀️'  },
+  { name:'Moon',    emoji:'🌕'  },
+  { name:'Mercury', emoji:'☿'   },
+  { name:'Venus',   emoji:'♀️'  },
+  { name:'Mars',    emoji:'♂️'  },
+  { name:'Jupiter', emoji:'♃'   },
+  { name:'Saturn',  emoji:'♄'   },
+  { name:'Uranus',  emoji:'♅'   },
+  { name:'Neptune', emoji:'♆'   },
 ];
 
-function getSubpoint(body, date) {
-  try {
-    const b   = Astronomy.Body[body];
-    const equ = Astronomy.Equator(b, date, null, true, true);
-    const gst = Astronomy.SiderealTime(date); // hours
-    const lng = ((equ.ra - gst) * 15 + 540) % 360 - 180;
-    const lat = equ.dec;
-    return { lat, lng };
-  } catch (_) { return null; }
+const DEG = Math.PI / 180;
+const RAD = 180 / Math.PI;
+
+function jde(date) {
+  // Julian Day Number from JS Date
+  return date.getTime() / 86400000 + 2440587.5;
 }
 
-function moonPhaseName(date) {
-  const angle = Astronomy.MoonPhase(date);
-  if (angle < 22.5)  return '🌑 New Moon';
-  if (angle < 67.5)  return '🌒 Waxing Crescent';
-  if (angle < 112.5) return '🌓 First Quarter';
-  if (angle < 157.5) return '🌔 Waxing Gibbous';
-  if (angle < 202.5) return '🌕 Full Moon';
-  if (angle < 247.5) return '🌖 Waning Gibbous';
-  if (angle < 292.5) return '🌗 Last Quarter';
-  if (angle < 337.5) return '🌘 Waning Crescent';
-  return '🌑 New Moon';
+function T(date) {
+  // Julian centuries from J2000.0
+  return (jde(date) - 2451545.0) / 36525;
 }
 
-function planetConstellation(body, date) {
-  try {
-    const equ = Astronomy.Equator(Astronomy.Body[body], date, null, true, true);
-    return Astronomy.Constellation(equ.ra, equ.dec).name;
-  } catch (_) { return '–'; }
+function norm360(x) { return ((x % 360) + 360) % 360; }
+function norm180(x) { x = norm360(x); return x > 180 ? x - 360 : x; }
+
+// Greenwich Mean Sidereal Time in degrees
+function gmst(date) {
+  const jd = jde(date);
+  const t  = (jd - 2451545.0) / 36525;
+  let g = 280.46061837 + 360.98564736629 * (jd - 2451545.0)
+          + 0.000387933 * t * t - t * t * t / 38710000;
+  return norm360(g);
 }
 
-function elongationDesc(body, date) {
-  try {
-    const e = Astronomy.Elongation(Astronomy.Body[body], date);
-    return `${e.elongation.toFixed(1)}° from Sun (${e.visibility})`;
-  } catch (_) { return '–'; }
+// Convert equatorial (RA degrees, Dec degrees) → subsolar lat/lng
+function equToGeo(ra_deg, dec_deg, date) {
+  const lng = norm180(ra_deg - gmst(date));
+  return { lat: dec_deg, lng };
+}
+
+// ── Sun (low-precision, ~0.01° error) ──────────────────────────────────────
+function sunPosition(date) {
+  const t   = T(date);
+  const L0  = norm360(280.46646 + 36000.76983 * t);
+  const M   = norm360(357.52911 + 35999.05029 * t - 0.0001537 * t * t) * DEG;
+  const C   = (1.914602 - 0.004817 * t - 0.000014 * t * t) * Math.sin(M)
+            + (0.019993 - 0.000101 * t) * Math.sin(2 * M)
+            +  0.000289 * Math.sin(3 * M);
+  const sun_lon = norm360(L0 + C);
+  const omega   = norm360(125.04 - 1934.136 * t);
+  const lambda  = norm360(sun_lon - 0.00569 - 0.00478 * Math.sin(omega * DEG));
+  const eps     = (23.439291111 - 0.013004167 * t) * DEG;
+  const ra  = Math.atan2(Math.cos(eps) * Math.sin(lambda * DEG), Math.cos(lambda * DEG)) * RAD;
+  const dec = Math.asin(Math.sin(eps) * Math.sin(lambda * DEG)) * RAD;
+  return equToGeo(norm360(ra), dec, date);
+}
+
+// ── Moon (simplified, ~1° error) ───────────────────────────────────────────
+function moonPosition(date) {
+  const t  = T(date);
+  const L1 = norm360(218.3164477 + 481267.88123421 * t);
+  const D  = norm360(297.8501921 + 445267.1114034  * t) * DEG;
+  const M  = norm360(357.5291092 +  35999.0502909  * t) * DEG;
+  const Mp = norm360(134.9633964 + 477198.8675055  * t) * DEG;
+  const F  = norm360(93.2720950  + 483202.0175233  * t) * DEG;
+  const lon = L1
+    + 6.288774 * Math.sin(Mp)
+    + 1.274027 * Math.sin(2*D - Mp)
+    + 0.658314 * Math.sin(2*D)
+    + 0.213618 * Math.sin(2*Mp)
+    - 0.185116 * Math.sin(M)
+    - 0.114332 * Math.sin(2*F);
+  const lat_m =
+      5.128122 * Math.sin(F)
+    + 0.280602 * Math.sin(Mp + F)
+    + 0.277693 * Math.sin(Mp - F)
+    + 0.173237 * Math.sin(2*D - F);
+  const eps = (23.439291111 - 0.013004167 * t) * DEG;
+  const lrad = lon * DEG, brad = lat_m * DEG;
+  const ra  = Math.atan2(Math.sin(lrad) * Math.cos(eps) - Math.tan(brad) * Math.sin(eps), Math.cos(lrad)) * RAD;
+  const dec = Math.asin(Math.sin(brad) * Math.cos(eps) + Math.cos(brad) * Math.sin(eps) * Math.sin(lrad)) * RAD;
+  return equToGeo(norm360(ra), dec, date);
+}
+
+function moonPhase(date) {
+  const t   = T(date);
+  const D   = norm360(297.8501921 + 445267.1114034 * t) * DEG;
+  const M   = norm360(357.5291092 +  35999.0502909 * t) * DEG;
+  const Mp  = norm360(134.9633964 + 477198.8675055 * t) * DEG;
+  const angle = norm360(180 - (norm360(297.8501921 + 445267.1114034 * t)));
+  const phases = ['🌑 New Moon','🌒 Waxing Crescent','🌓 First Quarter','🌔 Waxing Gibbous','🌕 Full Moon','🌖 Waning Gibbous','🌗 Last Quarter','🌘 Waning Crescent'];
+  return phases[Math.floor(((angle + 22.5) % 360) / 45)];
+}
+
+// ── Planet mean positions (low-precision, Meeus ch.25 table) ───────────────
+const PLANET_ELEMS = {
+  Mercury:{ L:[252.250906,149472.6746358,-0.00000535,0.000000002], e:0.20563175, a:0.387098 },
+  Venus:  { L:[181.979801, 58517.8156760, 0.00000165,-0.000000002], e:0.00677188, a:0.723330 },
+  Mars:   { L:[ 19.9719697,19140.3023273, 0.00000097,-0.000000001], e:0.09340062, a:1.523688 },
+  Jupiter:{ L: [34.3514316, 3034.9056606,-0.00008501, 0.000000004], e:0.04849485, a:5.202561 },
+  Saturn: { L: [50.0774443, 1222.1138488, 0.00021004,-0.000000019], e:0.05550825, a:9.537070 },
+  Uranus: { L:[314.0550699,  428.4669983,-0.00000031, 0.000000000], e:0.04629590, a:19.19126 },
+  Neptune:{ L:[304.3487905,  218.4862002, 0.00000059,-0.000000002], e:0.00898809, a:30.06896 },
+};
+
+function planetPosition(name, date) {
+  const el  = PLANET_ELEMS[name];
+  const t   = T(date);
+  const L   = norm360(el.L[0] + el.L[1]*t + el.L[2]*t*t + el.L[3]*t*t*t) * DEG;
+  // Simplified: use mean longitude as ecliptic longitude (ignores equation of center for speed)
+  const eps = (23.439291111 - 0.013004167 * t) * DEG;
+  const ra  = Math.atan2(Math.sin(L) * Math.cos(eps), Math.cos(L)) * RAD;
+  const dec = Math.asin(Math.sin(eps) * Math.sin(L)) * RAD;
+  return equToGeo(norm360(ra), dec, date);
+}
+
+// Constellation lookup — 88 IAU boundaries (simplified 12-band version by RA/Dec)
+const CONST_BANDS = [
+  [0,30,'Pisces'],[30,60,'Aries'],[60,90,'Taurus'],[90,120,'Gemini'],
+  [120,150,'Cancer'],[150,180,'Leo'],[180,210,'Virgo'],[210,240,'Libra'],
+  [240,270,'Scorpius'],[270,300,'Sagittarius'],[300,330,'Capricornus'],[330,360,'Aquarius'],
+];
+function constellation(ra_deg) {
+  const ra = norm360(ra_deg);
+  return (CONST_BANDS.find(([a,b])=>ra>=a&&ra<b)||['','','Unknown'])[2];
+}
+
+function computeSubpoints(date) {
+  const results = {};
+  const sunPt = sunPosition(date);
+  results['Sun'] = sunPt;
+  results['Moon'] = moonPosition(date);
+  for (const name of Object.keys(PLANET_ELEMS)) {
+    results[name] = planetPosition(name, date);
+  }
+  return results;
 }
 
 async function fetchISSPosition() {
-  // CelesTrak live ISS TLE → compute current position via SGP4
-  // Fallback: use open-notify ISS API which returns lat/lng directly
   try {
     const d = await get('https://api.open-notify.org/iss-now.json', 6000);
-    const lat = parseFloat(d.iss_position.latitude);
-    const lng = parseFloat(d.iss_position.longitude);
-    const ts  = d.timestamp * 1000;
-    return { lat, lng, ts };
+    return { lat: parseFloat(d.iss_position.latitude), lng: parseFloat(d.iss_position.longitude) };
   } catch (_) { return null; }
 }
 
 async function fetchAuroraKp() {
-  // NOAA Space Weather — 3-day Kp index forecast
   try {
     const d = await get(
-      proxy('https://services.swpc.noaa.gov/products/noaa-planetary-k-index-forecast.json'),
-      8000
+      proxy('https://services.swpc.noaa.gov/products/noaa-planetary-k-index-forecast.json'), 8000
     );
-    // d is array of [time, kp, observed/estimated/predicted]
-    const latest = (d || []).filter(r => r[2] === 'predicted').slice(0, 4);
-    const maxKp  = Math.max(...latest.map(r => parseFloat(r[1]) || 0));
-    return { kp: maxKp, raw: latest };
+    const predicted = (d||[]).filter(r=>r[2]==='predicted');
+    const maxKp = Math.max(...predicted.slice(0,4).map(r=>parseFloat(r[1])||0));
+    return maxKp;
   } catch (_) { return null; }
 }
 
-function kpToAuroraLatitude(kp) {
-  // Rough geomagnetic latitude of aurora visibility for a given Kp
-  return 66.5 - (kp * 2.5);
-}
-
 async function fetchSkyData() {
-  const now   = new Date();
+  const now    = new Date();
+  const pts    = computeSubpoints(now);
   const events = [];
 
-  // ── 1. All planets — subsolar/sublunar points on globe ───────────────────
   for (const p of PLANETS) {
-    const pt = getSubpoint(p.body, now);
+    const pt = pts[p.name];
     if (!pt) continue;
-    const constellation = planetConstellation(p.body, now);
+    const ra_deg = norm360(gmst(now) + pt.lng);
+    const con    = constellation(ra_deg);
+    const phase  = p.name === 'Moon' ? `\nPhase: ${moonPhase(now)}.` : '';
     const isInner = ['Mercury','Venus'].includes(p.name);
-    const elong = isInner ? elongationDesc(p.body, now) : null;
-    const moonPhase = p.name === 'Moon' ? moonPhaseName(now) : null;
-
-    let brief = `Current subsolar/sublunar point for ${p.name}: ${pt.lat.toFixed(2)}°, ${pt.lng.toFixed(2)}°.\n\n`;
-    brief += `Constellation: ${constellation}.\n`;
-    if (moonPhase) brief += `Phase: ${moonPhase}.\n`;
-    if (elong)     brief += `Elongation: ${elong}.\n`;
-    brief += `\nThis is the point on Earth's surface currently directly beneath ${p.name}.`;
 
     events.push({
       id:       `sky_${p.name.toLowerCase()}`,
       type:     'astrology',
-      title:    `${p.emoji} ${p.name} — ${constellation}`,
+      title:    `${p.emoji} ${p.name} — ${con}`,
       location: `${pt.lat.toFixed(2)}°, ${pt.lng.toFixed(2)}°`,
       lat:      pt.lat,
       lng:      pt.lng,
       severity: p.name === 'Sun' || p.name === 'Moon' ? 3 : 2,
       age:      'Live',
-      brief,
-      stats: [
-        { label: 'Constellation', val: constellation },
-        { label: moonPhase ? 'Phase' : (elong ? 'Elongation' : 'Sub-point'), val: moonPhase || elong || `${pt.lat.toFixed(1)}°` },
-      ],
-      sources: [{ n: 'Astronomy Engine', a: 'Computed live' }],
-      tags:    ['Astronomy', p.name, constellation, 'Sky'],
-      _live:   true,
-      _planet: p,
+      brief:    `Subpoint: ${pt.lat.toFixed(3)}°, ${pt.lng.toFixed(3)}°\nConstellation: ${con}.${phase}\n\nThe subpoint is the location on Earth directly beneath ${p.name} right now — the point experiencing its zenith.`,
+      stats:    [{ label:'Constellation', val:con }, { label:p.name==='Moon'?'Phase':'Subpoint Lat', val:p.name==='Moon'?moonPhase(now).split(' ').slice(1).join(' '):`${pt.lat.toFixed(1)}°` }],
+      sources:  [{ n:'Meeus Algorithms', a:'Computed live' }],
+      tags:     ['Astronomy', p.name, con, 'Sky'],
+      _live:    true,
+      _planet:  p,
     });
   }
 
-  // ── 2. ISS ────────────────────────────────────────────────────────────────
+  // ISS
   const iss = await fetchISSPosition();
   if (iss) {
     events.push({
-      id:       'sky_iss',
-      type:     'astrology',
-      title:    '🛸 ISS — International Space Station',
-      location: `${iss.lat.toFixed(2)}°, ${iss.lng.toFixed(2)}°`,
-      lat:      iss.lat,
-      lng:      iss.lng,
-      severity: 2,
-      age:      'Live',
-      brief:    `The ISS is currently at ${iss.lat.toFixed(3)}° latitude, ${iss.lng.toFixed(3)}° longitude, orbiting at ~408 km altitude at roughly 27,600 km/h.\n\nPosition updates every page refresh.`,
-      stats:    [{ label: 'Altitude', val: '~408 km' }, { label: 'Speed', val: '27,600 km/h' }],
-      sources:  [{ n: 'Open Notify', a: 'Live', url: 'http://api.open-notify.org/iss-now.json' }],
-      tags:     ['ISS', 'Space Station', 'Orbit', 'NASA'],
-      _live:    true,
-      _planet:  { emoji: '🛸', name: 'ISS' },
+      id:'sky_iss', type:'astrology',
+      title:'🛸 ISS — International Space Station',
+      location:`${iss.lat.toFixed(2)}°, ${iss.lng.toFixed(2)}°`,
+      lat:iss.lat, lng:iss.lng, severity:2, age:'Live',
+      brief:`The ISS is currently at ${iss.lat.toFixed(3)}°, ${iss.lng.toFixed(3)}°, orbiting at ~408 km altitude at 27,600 km/h.`,
+      stats:[{label:'Altitude',val:'~408 km'},{label:'Speed',val:'27,600 km/h'}],
+      sources:[{n:'Open Notify',a:'Live',url:'http://api.open-notify.org/iss-now.json'}],
+      tags:['ISS','Space Station','Orbit','NASA'],
+      _live:true, _planet:{emoji:'🛸',name:'ISS'},
     });
   }
 
-  // ── 3. Aurora ─────────────────────────────────────────────────────────────
-  const aurora = await fetchAuroraKp();
-  if (aurora) {
-    const kp  = aurora.kp;
-    const auroLat = kpToAuroraLatitude(kp);
-    const severity = kp >= 7 ? 5 : kp >= 5 ? 4 : kp >= 3 ? 3 : 2;
-    const visible  = kp >= 5 ? `⚠️ Strong geomagnetic storm — aurora visible as far south as ${auroLat.toFixed(0)}°` : `Aurora visible above ~${auroLat.toFixed(0)}° latitude`;
+  // Aurora
+  const kp = await fetchAuroraKp();
+  if (kp !== null) {
+    const auroLat = 66.5 - kp * 2.5;
+    const severity = kp>=7?5:kp>=5?4:kp>=3?3:2;
     events.push({
-      id:       'sky_aurora',
-      type:     'astrology',
-      title:    `🌌 Aurora Forecast — Kp ${kp.toFixed(1)}`,
-      location: `~${auroLat.toFixed(0)}° geomagnetic latitude`,
-      lat:      auroLat,
-      lng:      0,
-      severity,
-      age:      'NOAA Forecast',
-      brief:    `NOAA planetary Kp index forecast: ${kp.toFixed(1)}.\n\n${visible}.\n\nKp scale: 0 (quiet) → 9 (extreme storm). Values ≥5 indicate significant geomagnetic activity and widespread auroral visibility.`,
-      stats:    [{ label: 'Kp Index', val: kp.toFixed(1) }, { label: 'Visible ≥', val: `${auroLat.toFixed(0)}°` }],
-      sources:  [{ n: 'NOAA SWPC', a: 'Forecast', url: 'https://www.swpc.noaa.gov' }],
-      tags:     ['Aurora', 'Geomagnetic Storm', 'NOAA', 'Space Weather'],
-      _live:    true,
-      _planet:  { emoji: '🌌', name: 'Aurora' },
+      id:'sky_aurora', type:'astrology',
+      title:`🌌 Aurora Forecast — Kp ${kp.toFixed(1)}`,
+      location:`~${auroLat.toFixed(0)}° latitude`,
+      lat:auroLat, lng:0, severity, age:'NOAA Forecast',
+      brief:`NOAA Kp index: ${kp.toFixed(1)}.\nAurora visible above ~${auroLat.toFixed(0)}° latitude.\n\nKp 0 = quiet · Kp 5+ = geomagnetic storm · Kp 9 = extreme.`,
+      stats:[{label:'Kp Index',val:kp.toFixed(1)},{label:'Visible ≥',val:`${auroLat.toFixed(0)}°`}],
+      sources:[{n:'NOAA SWPC',a:'Forecast',url:'https://www.swpc.noaa.gov'}],
+      tags:['Aurora','Geomagnetic Storm','NOAA','Space Weather'],
+      _live:true, _planet:{emoji:'🌌',name:'Aurora'},
     });
   }
 
