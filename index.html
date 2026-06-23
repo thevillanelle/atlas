@@ -1,0 +1,871 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ATLAS — Global Intelligence Feed</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#050810;
+  --glass:rgba(6,11,24,0.90);
+  --glass2:rgba(10,16,32,0.96);
+  --border:rgba(255,255,255,0.07);
+  --border2:rgba(255,255,255,0.12);
+  --text:#d8dde8;
+  --muted:#4e5a72;
+  --accent:#3b82f6;
+  --col-news:#ef4444;
+  --col-conflict:#f97316;
+  --col-disaster:#eab308;
+  --col-storm:#60a5fa;
+  --col-humanitarian:#ec4899;
+  --col-flight:#10b981;
+  --col-launch:#a78bfa;
+  --col-crypto:#f59e0b;
+}
+html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);font-family:'Inter',sans-serif;color:var(--text)}
+#globe-wrap{position:fixed;inset:0;z-index:0}
+
+/* ── SPLASH ──────────────────────────────────────────── */
+#splash{
+  position:fixed;inset:0;z-index:9999;background:var(--bg);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;
+  transition:opacity .6s ease
+}
+#splash.out{opacity:0;pointer-events:none}
+.sp-logo{font-family:'Space Mono',monospace;font-size:30px;font-weight:700;letter-spacing:8px;color:#fff}
+.sp-logo em{color:var(--accent);font-style:normal}
+.sp-sub{font-size:10px;color:var(--muted);letter-spacing:4px;text-transform:uppercase;font-family:'Space Mono',monospace}
+.sp-bar{width:220px;height:2px;background:rgba(255,255,255,.06);border-radius:2px;overflow:hidden}
+.sp-fill{height:100%;background:linear-gradient(90deg,var(--accent),#818cf8);width:0;border-radius:2px;transition:width .12s linear}
+.sp-msg{font-size:10px;color:var(--muted);font-family:'Space Mono',monospace;letter-spacing:1px}
+
+/* ── TOPBAR ──────────────────────────────────────────── */
+#topbar{
+  position:fixed;top:0;left:0;right:0;z-index:300;
+  height:48px;background:var(--glass);border-bottom:1px solid var(--border);
+  backdrop-filter:blur(24px) saturate(180%);
+  display:flex;align-items:center;padding:0 16px;gap:14px
+}
+.t-logo{font-family:'Space Mono',monospace;font-size:15px;font-weight:700;letter-spacing:5px;color:#fff;flex-shrink:0}
+.t-logo em{color:var(--accent);font-style:normal}
+.t-sep{width:1px;height:20px;background:var(--border2);flex-shrink:0}
+.t-live{display:flex;align-items:center;gap:5px;font-size:9px;font-weight:700;letter-spacing:2px;color:#10b981;flex-shrink:0}
+.t-pulse{width:6px;height:6px;border-radius:50%;background:#10b981;animation:tp 1.6s ease infinite}
+@keyframes tp{0%,100%{opacity:1}50%{opacity:.25}}
+.t-summary{font-size:11px;color:var(--muted);font-family:'Space Mono',monospace;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.t-spacer{flex:1}
+#t-clock{font-size:11px;color:var(--muted);font-family:'Space Mono',monospace;flex-shrink:0}
+
+/* ── PANEL TOGGLE ────────────────────────────────────── */
+#ptoggle{
+  position:fixed;top:60px;left:300px;z-index:202;
+  width:20px;height:34px;background:var(--glass);
+  border:1px solid var(--border);border-left:none;
+  border-radius:0 6px 6px 0;cursor:pointer;color:var(--muted);
+  display:flex;align-items:center;justify-content:center;font-size:10px;
+  backdrop-filter:blur(20px);transition:left .35s cubic-bezier(.4,0,.2,1);
+  outline:none;user-select:none
+}
+#ptoggle:hover{color:var(--text)}
+#ptoggle.closed{left:0}
+
+/* ── LEFT PANEL ──────────────────────────────────────── */
+#panel{
+  position:fixed;top:48px;left:0;bottom:36px;z-index:200;
+  width:300px;background:var(--glass);border-right:1px solid var(--border);
+  backdrop-filter:blur(24px) saturate(180%);
+  display:flex;flex-direction:column;
+  transition:transform .35s cubic-bezier(.4,0,.2,1)
+}
+#panel.hidden{transform:translateX(-300px)}
+
+#ph{padding:11px 13px 9px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px}
+#ph-title{font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--muted)}
+#ph-count{font-size:10px;font-family:'Space Mono',monospace;color:var(--accent);margin-left:auto}
+
+#ps{padding:7px 10px;border-bottom:1px solid var(--border)}
+#ps input{
+  width:100%;background:rgba(255,255,255,.04);border:1px solid var(--border);
+  border-radius:7px;padding:6px 11px;font-size:11px;color:var(--text);
+  outline:none;font-family:'Inter',sans-serif;transition:border .2s
+}
+#ps input:focus{border-color:rgba(59,130,246,.4)}
+#ps input::placeholder{color:var(--muted)}
+
+#tabs{display:flex;border-bottom:1px solid var(--border);overflow-x:auto}
+#tabs::-webkit-scrollbar{display:none}
+.tab{
+  flex-shrink:0;padding:7px 11px;font-size:9px;font-weight:700;letter-spacing:.5px;
+  text-transform:uppercase;color:var(--muted);cursor:pointer;
+  border-bottom:2px solid transparent;transition:all .18s;white-space:nowrap
+}
+.tab:hover{color:var(--text)}
+.tab.on{color:var(--text);border-bottom-color:var(--accent)}
+
+#evlist{flex:1;overflow-y:auto;padding:5px}
+#evlist::-webkit-scrollbar{width:3px}
+#evlist::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
+
+.ev{
+  padding:8px 10px;border-radius:8px;cursor:pointer;margin-bottom:3px;
+  border:1px solid transparent;transition:all .12s
+}
+.ev:hover{background:rgba(255,255,255,.04)}
+.ev.sel{background:rgba(59,130,246,.09);border-color:rgba(59,130,246,.22)}
+.ev-row{display:flex;align-items:flex-start;gap:7px}
+.ev-ico{font-size:12px;flex-shrink:0;margin-top:1px;line-height:1.3}
+.ev-body{flex:1;min-width:0}
+.ev-name{font-size:11.5px;font-weight:500;line-height:1.4;margin-bottom:3px;color:var(--text)}
+.ev-foot{display:flex;align-items:center;gap:5px}
+.ev-tag{
+  font-size:8px;font-weight:700;padding:1px 5px;border-radius:3px;
+  letter-spacing:.5px;text-transform:uppercase;flex-shrink:0
+}
+.ev-loc{font-size:9.5px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1}
+.ev-age{font-size:9px;color:var(--muted);flex-shrink:0;font-family:'Space Mono',monospace}
+
+#wl{border-top:1px solid var(--border);padding:9px 11px}
+.wl-hdr{font-size:8px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:6px;display:flex;align-items:center}
+.wl-add{margin-left:auto;font-size:9px;color:var(--accent);cursor:pointer;padding:2px 6px;border:1px solid rgba(59,130,246,.3);border-radius:4px;transition:background .15s}
+.wl-add:hover{background:rgba(59,130,246,.1)}
+.wl-tags{display:flex;flex-wrap:wrap;gap:4px}
+.wl-tag{
+  font-size:9px;padding:3px 8px;border-radius:14px;
+  background:rgba(255,255,255,.04);border:1px solid var(--border);
+  cursor:pointer;transition:all .15s;color:var(--muted)
+}
+.wl-tag:hover{border-color:var(--accent);color:var(--accent)}
+.wl-tag.on{background:rgba(59,130,246,.14);border-color:var(--accent);color:var(--accent)}
+
+.ev-empty{padding:24px 16px;text-align:center;color:var(--muted);font-size:11px}
+
+/* ── LAYER CONTROLS ──────────────────────────────────── */
+#lctrl{
+  position:fixed;top:60px;right:12px;z-index:200;
+  background:var(--glass);border:1px solid var(--border);border-radius:11px;
+  padding:9px;backdrop-filter:blur(24px);
+  display:flex;flex-direction:column;gap:3px;min-width:148px
+}
+.lc-hdr{font-size:8px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--muted);padding:1px 5px 4px}
+.lc-row{
+  display:flex;align-items:center;gap:7px;padding:4px 6px;border-radius:6px;
+  cursor:pointer;transition:background .12s;font-size:10.5px;font-weight:500;user-select:none
+}
+.lc-row:hover{background:rgba(255,255,255,.05)}
+.lc-row.off{opacity:.28}
+.lc-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+.lc-n{font-size:9px;color:var(--muted);margin-left:auto;font-family:'Space Mono',monospace}
+
+/* ── DETAIL DRAWER ───────────────────────────────────── */
+#detail{
+  position:fixed;top:48px;right:0;bottom:36px;z-index:250;
+  width:360px;background:var(--glass2);border-left:1px solid var(--border);
+  backdrop-filter:blur(28px);
+  display:flex;flex-direction:column;
+  transform:translateX(370px);transition:transform .35s cubic-bezier(.4,0,.2,1)
+}
+#detail.open{transform:translateX(0)}
+#d-close{
+  position:absolute;top:11px;right:11px;
+  width:24px;height:24px;border-radius:50%;
+  background:rgba(255,255,255,.07);border:none;cursor:pointer;
+  color:var(--text);font-size:12px;
+  display:flex;align-items:center;justify-content:center;
+  transition:background .15s
+}
+#d-close:hover{background:rgba(255,255,255,.14)}
+#d-body{flex:1;overflow-y:auto;padding:16px}
+#d-body::-webkit-scrollbar{width:3px}
+#d-body::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
+.d-cat{font-size:8px;font-weight:700;letter-spacing:2px;text-transform:uppercase;margin-bottom:5px}
+.d-title{font-size:16px;font-weight:700;line-height:1.3;margin-bottom:9px}
+.d-where{font-size:10.5px;color:var(--muted);margin-bottom:13px;display:flex;align-items:center;gap:4px}
+.d-sep{height:1px;background:var(--border);margin:13px 0}
+.d-lbl{font-size:8px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:7px}
+.d-brief{font-size:12px;line-height:1.75;color:rgba(216,221,232,.78)}
+.d-stats{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:13px}
+.d-stat{background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:7px;padding:8px 10px}
+.d-stat-lbl{font-size:8px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:3px}
+.d-stat-val{font-size:14px;font-weight:700;font-family:'Space Mono',monospace}
+.d-src{display:flex;align-items:center;gap:6px;padding:6px 8px;border-radius:7px;background:rgba(255,255,255,.03);margin-bottom:4px;font-size:11px}
+.d-src-dot{width:5px;height:5px;border-radius:50%;flex-shrink:0}
+.d-src-name{font-weight:500}
+.d-src-age{margin-left:auto;color:var(--muted);font-size:9.5px;font-family:'Space Mono',monospace}
+.d-tags{display:flex;flex-wrap:wrap;gap:4px;margin-top:4px}
+.d-tag-pill{font-size:9px;padding:2px 7px;border-radius:4px;background:rgba(255,255,255,.05);color:var(--muted)}
+
+/* ── MARKERS ─────────────────────────────────────────── */
+.marker{position:relative;cursor:pointer;width:22px;height:22px}
+.m-dot{
+  position:absolute;top:50%;left:50%;
+  transform:translate(-50%,-50%);
+  width:8px;height:8px;border-radius:50%;
+  background:var(--mc);box-shadow:0 0 8px var(--mc);z-index:2
+}
+.m-ring{
+  position:absolute;top:50%;left:50%;
+  transform:translate(-50%,-50%);
+  width:22px;height:22px;border-radius:50%;
+  border:1.5px solid var(--mc);
+  animation:mring 2.8s ease-out infinite;z-index:1
+}
+.m-ring2{animation-delay:.9s}
+@keyframes mring{
+  0%{transform:translate(-50%,-50%) scale(.35);opacity:.9}
+  100%{transform:translate(-50%,-50%) scale(1.7);opacity:0}
+}
+.marker.sev5 .m-dot{width:11px;height:11px;box-shadow:0 0 12px var(--mc)}
+.marker.sev5 .m-ring{width:28px;height:28px}
+
+/* ── TICKER ──────────────────────────────────────────── */
+#ticker{
+  position:fixed;bottom:0;left:0;right:0;z-index:300;
+  height:36px;background:var(--glass);border-top:1px solid var(--border);
+  backdrop-filter:blur(24px);display:flex;align-items:center;overflow:hidden
+}
+.tk-label{
+  flex-shrink:0;padding:0 13px;font-size:8px;font-weight:700;letter-spacing:2px;
+  color:var(--col-crypto);text-transform:uppercase;
+  border-right:1px solid var(--border);height:100%;display:flex;align-items:center;gap:6px
+}
+.tk-track{flex:1;overflow:hidden;height:100%;position:relative}
+.tk-inner{
+  display:flex;align-items:center;height:100%;
+  white-space:nowrap;position:absolute;left:0;
+  animation:tscroll 55s linear infinite
+}
+@keyframes tscroll{from{left:0}to{left:-50%}}
+.tk-item{display:inline-flex;align-items:center;gap:4px;padding:0 18px;font-size:10.5px;font-family:'Space Mono',monospace}
+.tk-sym{font-weight:700;color:var(--text)}
+.tk-px{color:var(--muted)}
+.tk-up{color:#10b981}
+.tk-dn{color:#ef4444}
+.tk-div{color:rgba(255,255,255,.08);padding:0 2px}
+</style>
+</head>
+<body>
+
+<!-- SPLASH -->
+<div id="splash">
+  <div class="sp-logo">ATL<em>A</em>S</div>
+  <div class="sp-sub">Global Intelligence Feed</div>
+  <div class="sp-bar"><div class="sp-fill" id="sfill"></div></div>
+  <div class="sp-msg" id="smsg">Initializing Earth…</div>
+</div>
+
+<!-- GLOBE -->
+<div id="globe-wrap"></div>
+
+<!-- TOPBAR -->
+<div id="topbar">
+  <div class="t-logo">ATL<em>A</em>S</div>
+  <div class="t-sep"></div>
+  <div class="t-live"><div class="t-pulse"></div>LIVE</div>
+  <div class="t-sep"></div>
+  <div class="t-summary" id="t-summary">Loading…</div>
+  <div class="t-spacer"></div>
+  <div id="t-clock"></div>
+</div>
+
+<!-- PANEL TOGGLE -->
+<button id="ptoggle" onclick="togglePanel()">‹</button>
+
+<!-- LEFT PANEL -->
+<div id="panel">
+  <div id="ph">
+    <span id="ph-title">Intelligence Feed</span>
+    <span id="ph-count">0 events</span>
+  </div>
+  <div id="ps">
+    <input type="text" id="sinput" placeholder="Search events, locations, tags…" oninput="onSearch()">
+  </div>
+  <div id="tabs">
+    <div class="tab on" data-tab="all" onclick="setTab(this)">All</div>
+    <div class="tab" data-tab="news" onclick="setTab(this)">News</div>
+    <div class="tab" data-tab="conflict" onclick="setTab(this)">Conflicts</div>
+    <div class="tab" data-tab="disaster" onclick="setTab(this)">Disasters</div>
+    <div class="tab" data-tab="storm" onclick="setTab(this)">Storms</div>
+    <div class="tab" data-tab="humanitarian" onclick="setTab(this)">Aid</div>
+    <div class="tab" data-tab="launch" onclick="setTab(this)">Launches</div>
+  </div>
+  <div id="evlist"></div>
+  <div id="wl">
+    <div class="wl-hdr">
+      Watchlist
+      <span class="wl-add" onclick="addWatchTag()">+ Add</span>
+    </div>
+    <div class="wl-tags" id="wl-tags"></div>
+  </div>
+</div>
+
+<!-- LAYER CONTROLS -->
+<div id="lctrl">
+  <div class="lc-hdr">Layers</div>
+  <div class="lc-row" data-layer="news" onclick="toggleLayer(this)">
+    <div class="lc-dot" style="background:var(--col-news)"></div><span>Breaking News</span><span class="lc-n" id="lc-news">0</span>
+  </div>
+  <div class="lc-row" data-layer="conflict" onclick="toggleLayer(this)">
+    <div class="lc-dot" style="background:var(--col-conflict)"></div><span>Conflicts</span><span class="lc-n" id="lc-conflict">0</span>
+  </div>
+  <div class="lc-row" data-layer="disaster" onclick="toggleLayer(this)">
+    <div class="lc-dot" style="background:var(--col-disaster)"></div><span>Disasters</span><span class="lc-n" id="lc-disaster">0</span>
+  </div>
+  <div class="lc-row" data-layer="storm" onclick="toggleLayer(this)">
+    <div class="lc-dot" style="background:var(--col-storm)"></div><span>Storms</span><span class="lc-n" id="lc-storm">0</span>
+  </div>
+  <div class="lc-row" data-layer="humanitarian" onclick="toggleLayer(this)">
+    <div class="lc-dot" style="background:var(--col-humanitarian)"></div><span>Humanitarian</span><span class="lc-n" id="lc-humanitarian">0</span>
+  </div>
+  <div class="lc-row" data-layer="flight" onclick="toggleLayer(this)">
+    <div class="lc-dot" style="background:var(--col-flight)"></div><span>Live Flights</span><span class="lc-n" id="lc-flight">0</span>
+  </div>
+  <div class="lc-row" data-layer="launch" onclick="toggleLayer(this)">
+    <div class="lc-dot" style="background:var(--col-launch)"></div><span>Launches</span><span class="lc-n" id="lc-launch">0</span>
+  </div>
+</div>
+
+<!-- DETAIL DRAWER -->
+<div id="detail">
+  <button id="d-close" onclick="closeDetail()">✕</button>
+  <div id="d-body"></div>
+</div>
+
+<!-- TICKER -->
+<div id="ticker">
+  <div class="tk-label">
+    <svg width="10" height="10" viewBox="0 0 10 10"><circle cx="5" cy="5" r="4" fill="none" stroke="currentColor" stroke-width="1.5"/><line x1="5" y1="2" x2="5" y2="5.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><line x1="5" y1="5.5" x2="7" y2="7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+    Markets
+  </div>
+  <div class="tk-track"><div class="tk-inner" id="tk-inner"></div></div>
+</div>
+
+<script src="https://unpkg.com/globe.gl@2.27.2/dist/globe.gl.min.js"></script>
+<script>
+// ─────────────────────────────────────────────────────────────────────────────
+// DATA
+// ─────────────────────────────────────────────────────────────────────────────
+
+const COLORS = {
+  news:'#ef4444', conflict:'#f97316', disaster:'#eab308',
+  storm:'#60a5fa', humanitarian:'#ec4899', flight:'#10b981', launch:'#a78bfa'
+};
+const ICONS = {
+  news:'📰', conflict:'⚔️', disaster:'🌊', storm:'🌀',
+  humanitarian:'🏥', flight:'✈️', launch:'🚀'
+};
+
+const SEED = [
+  // NEWS
+  { id:'n1', type:'news', title:'G7 Leaders Agree on Cross-Border AI Safety Framework', location:'Bari, Italy', lat:41.12, lng:16.87, severity:2, age:'2h ago',
+    brief:'Leaders from the G7 nations reached a preliminary agreement on establishing cross-border AI governance standards, focusing on frontier model safety evaluations, transparency requirements, and liability frameworks. The framework builds on the Hiroshima AI Process and is expected to influence upcoming EU AI Act implementation guidance.',
+    stats:[{label:'Nations',val:'G7'},{label:'Scope',val:'Frontier AI'}],
+    sources:[{n:'Reuters',a:'2h'},{n:'Financial Times',a:'3h'},{n:'Associated Press',a:'2h'}],
+    tags:['AI','Policy','G7','Technology'] },
+  { id:'n2', type:'news', title:'OPEC+ Extends Production Cuts Through Q3 2024', location:'Vienna, Austria', lat:48.21, lng:16.37, severity:1, age:'4h ago',
+    brief:'The OPEC+ coalition voted to extend production cuts of 3.66 million barrels per day through the third quarter, citing concerns over weak demand growth from China and elevated global inventories. Brent crude futures rose 1.4% following the announcement. Saudi Arabia will maintain its voluntary 1 mb/d cut.',
+    stats:[{label:'Cut',val:'3.66 mb/d'},{label:'Brent',val:'+1.4%'}],
+    sources:[{n:'Bloomberg',a:'4h'},{n:'Reuters',a:'4h'},{n:'CNBC',a:'5h'}],
+    tags:['Energy','OPEC','Oil','Markets'] },
+  { id:'n3', type:'news', title:'PLA Conducts Unannounced Naval Drills in Taiwan Strait', location:'Taiwan Strait', lat:24.0, lng:119.5, severity:3, age:'1h ago',
+    brief:'The People\'s Liberation Army Navy initiated unannounced naval exercises in the Taiwan Strait involving 14 vessels including Type 055 destroyers and amphibious landing ships. Taiwan\'s Defense Ministry confirmed tracking. The USS Theodore Roosevelt carrier strike group repositioned toward the region.',
+    stats:[{label:'Vessels',val:'14'},{label:'Duration',val:'72h est.'}],
+    sources:[{n:'Reuters',a:'1h'},{n:'S. China Morning Post',a:'2h'},{n:'Defense News',a:'1h'}],
+    tags:['Military','Taiwan','China','Pacific'] },
+  { id:'n4', type:'news', title:'WHO Declares Mpox Emergency Ended in West Africa', location:'Geneva, Switzerland', lat:46.2, lng:6.15, severity:1, age:'6h ago',
+    brief:'The World Health Organization officially declared the end of the mpox PHEIC in West Africa after a 90-day sustained decline in case counts. Enhanced surveillance systems will remain active. The WHO emphasized the importance of maintaining vaccination coverage.',
+    sources:[{n:'WHO',a:'6h'},{n:'BBC News',a:'7h'},{n:'Reuters',a:'6h'}],
+    tags:['Health','WHO','Disease','Africa'] },
+  { id:'n5', type:'news', title:'Amazon Deforestation Rate Falls 45% Year-on-Year', location:'Brasília, Brazil', lat:-15.78, lng:-47.93, severity:1, age:'8h ago',
+    brief:'Brazil\'s INPE reported a 45% decline in Amazon deforestation rates compared to the same period last year, attributing improvement to increased enforcement and satellite monitoring. The government aims for zero deforestation by 2030.',
+    sources:[{n:'INPE',a:'8h'},{n:'The Guardian',a:'9h'},{n:'Al Jazeera',a:'8h'}],
+    tags:['Environment','Amazon','Brazil','Climate'] },
+
+  // CONFLICTS
+  { id:'c1', type:'conflict', title:'Gaza: Aid Corridor Negotiations Stall; Death Toll Rises', location:'Gaza Strip', lat:31.35, lng:34.31, severity:5, age:'30m ago',
+    brief:'Ceasefire negotiations mediated by Qatar and Egypt have stalled after disagreements over the scope of a proposed humanitarian corridor. The UN reports 340+ aid trucks have been blocked from entering northern Gaza over 72 hours. The Gaza Health Ministry reports over 37,000 fatalities since October 2023 with the humanitarian situation deteriorating sharply.',
+    stats:[{label:'Displaced',val:'1.7M'},{label:'Aid Blocked',val:'72h+'}],
+    sources:[{n:'UN OCHA',a:'1h'},{n:'Al Jazeera',a:'30m'},{n:'BBC News',a:'45m'},{n:'Reuters',a:'1h'}],
+    tags:['Gaza','Palestine','Israel','Humanitarian'] },
+  { id:'c2', type:'conflict', title:'Ukraine: Kharkiv Shelling Intensifies, NATO Meets', location:'Kharkiv, Ukraine', lat:49.99, lng:36.23, severity:5, age:'45m ago',
+    brief:'Russian forces have intensified artillery and Shahed drone strikes on Kharkiv Oblast, with 14 confirmed strikes in 24 hours targeting civilian infrastructure. Ukrainian air defense intercepted 8 of 11 drones overnight. NATO allies are in emergency session to discuss accelerated weapons delivery packages including air defense systems.',
+    stats:[{label:'Strikes (24h)',val:'14'},{label:'Intercepted',val:'8/11'}],
+    sources:[{n:'Reuters',a:'45m'},{n:'Kyiv Post',a:'1h'},{n:'ISW',a:'2h'},{n:'AP',a:'1h'}],
+    tags:['Ukraine','Russia','War','NATO'] },
+  { id:'c3', type:'conflict', title:'Sudan: RSF Advances Threaten Last Darfur Stronghold', location:'El Fasher, Sudan', lat:13.63, lng:25.35, severity:4, age:'3h ago',
+    brief:'The Rapid Support Forces have taken control of two additional districts surrounding El Fasher, the last major city in Darfur not under RSF control. The UN warns of potential mass atrocities with ~800,000 civilians sheltering in the city. The African Union called an emergency session of its Peace and Security Council.',
+    stats:[{label:'Civilians',val:'~800K'},{label:'Risk',val:'CRITICAL'}],
+    sources:[{n:'UN OCHA',a:'3h'},{n:'Reuters',a:'4h'},{n:'BBC Africa',a:'3h'}],
+    tags:['Sudan','Darfur','RSF','Atrocity Risk'] },
+  { id:'c4', type:'conflict', title:'Myanmar: Resistance Forces Seize Mandalay Districts', location:'Mandalay, Myanmar', lat:21.97, lng:96.08, severity:3, age:'5h ago',
+    brief:'Three Brotherhood Alliance resistance forces captured three more townships in Mandalay Division, degrading junta territorial control significantly. The NUG government-in-exile claims 67% of Myanmar\'s territory is now outside military control.',
+    sources:[{n:'Irrawaddy',a:'5h'},{n:'Reuters',a:'6h'},{n:'AP',a:'5h'}],
+    tags:['Myanmar','Burma','Resistance','SEAsia'] },
+  { id:'c5', type:'conflict', title:'Mali: JNIM Attack Kills 20 at Market in Ménaka', location:'Ménaka, Mali', lat:15.92, lng:2.4, severity:3, age:'7h ago',
+    brief:'Jihadist group JNIM carried out a coordinated attack on a market in Ménaka, killing at least 20 civilians and wounding 35. The attack follows the withdrawal of French forces and increased Wagner Group involvement in the region.',
+    sources:[{n:'Reuters',a:'7h'},{n:'Le Monde',a:'8h'},{n:'Al Jazeera',a:'7h'}],
+    tags:['Mali','Sahel','JNIM','Terrorism'] },
+
+  // DISASTERS
+  { id:'d1', type:'disaster', title:'M6.8 Earthquake Strikes Off Miyazaki Coast, Japan', location:'Miyazaki, Japan', lat:31.91, lng:131.42, severity:4, age:'1h ago',
+    brief:'A magnitude 6.8 earthquake struck off the coast of Miyazaki Prefecture at 23km depth. Japan Meteorological Agency issued and subsequently lifted a tsunami advisory. At least 8 injured, 45,000 households without power. Shinkansen and highway services suspended pending inspection.',
+    stats:[{label:'Magnitude',val:'M6.8'},{label:'Depth',val:'23 km'}],
+    sources:[{n:'JMA',a:'1h'},{n:'NHK World',a:'1h'},{n:'USGS',a:'2h'}],
+    tags:['Earthquake','Japan','Natural Disaster','Tsunami'] },
+  { id:'d2', type:'disaster', title:'Monsoon Flooding Displaces 200K in Bangladesh', location:'Sylhet, Bangladesh', lat:24.89, lng:91.87, severity:4, age:'12h ago',
+    brief:'Flash monsoon flooding in Sylhet and Sunamganj districts has displaced approximately 200,000 people. The Surma and Kushiyara rivers are at 10-year highs. BWDB projects water levels rising for another 48–72 hours. UNDP and Red Crescent teams have been deployed.',
+    stats:[{label:'Displaced',val:'200K'},{label:'Districts',val:'12'}],
+    sources:[{n:'BWDB',a:'12h'},{n:'Reuters',a:'13h'},{n:'UNDP',a:'14h'}],
+    tags:['Flooding','Bangladesh','Monsoon','Displacement'] },
+  { id:'d3', type:'disaster', title:'Wildfire Burns 15,000 Acres in Riverside County, CA', location:'Riverside County, CA', lat:33.75, lng:-116.97, severity:3, age:'4h ago',
+    brief:'The Cabazon Fire in Riverside County has grown to 15,000 acres at 0% containment, driven by Santa Ana winds gusting to 65 mph. Evacuation orders affect 8,500 residents. CAL FIRE deployed 12 air tankers and 2,400 firefighters.',
+    stats:[{label:'Acres',val:'15,000'},{label:'Contained',val:'0%'}],
+    sources:[{n:'CAL FIRE',a:'4h'},{n:'LA Times',a:'5h'},{n:'NWS',a:'4h'}],
+    tags:['Wildfire','California','USA','Emergency'] },
+  { id:'d4', type:'disaster', title:'Etna Eruptive Activity Increases; Catania Airport Disrupted', location:'Sicily, Italy', lat:37.75, lng:15.01, severity:2, age:'18h ago',
+    brief:'Mount Etna entered a new eruptive phase with lava advancing 2km from summit craters. Catania airport briefly suspended operations due to ash fall. Italy\'s INGV raised the volcanic alert to Orange. Ash is forecast to drift toward the Ionian coast.',
+    sources:[{n:'INGV',a:'18h'},{n:'Reuters',a:'19h'},{n:'ENAC',a:'20h'}],
+    tags:['Volcano','Italy','Etna','Aviation'] },
+
+  // STORMS
+  { id:'s1', type:'storm', title:'Beryl Rapidly Intensifies to Category 2; Windward Islands Warning', location:'Caribbean Sea', lat:13.5, lng:-59.5, severity:4, age:'2h ago',
+    brief:'Tropical Storm Beryl rapidly intensified to Category 2 with maximum sustained winds of 105 mph. NHC issued hurricane warnings for Barbados, St. Vincent, and the Grenadines. The storm is forecast to reach Category 3 before landfall in 36 hours. Evacuations are underway.',
+    stats:[{label:'Max Winds',val:'105 mph'},{label:'Category',val:'2 → 3↑'}],
+    sources:[{n:'NHC',a:'2h'},{n:'Weather.com',a:'2h'},{n:'Reuters',a:'3h'}],
+    tags:['Hurricane','Caribbean','Beryl','Evacuation'] },
+  { id:'s2', type:'storm', title:'EF-2 Tornadoes Kill 9 in Houston Metro Area', location:'Houston, Texas', lat:29.76, lng:-95.37, severity:3, age:'10h ago',
+    brief:'A severe thunderstorm system produced 4 confirmed EF-2 tornadoes across the Houston metropolitan area, killing 9 and injuring 67. Over 340,000 customers remain without power. FEMA pre-positioned disaster response teams; the Texas Governor declared a state of emergency.',
+    stats:[{label:'Fatalities',val:'9'},{label:'Without Power',val:'340K'}],
+    sources:[{n:'NWS',a:'10h'},{n:'Houston Chronicle',a:'11h'},{n:'FEMA',a:'12h'}],
+    tags:['Tornado','Texas','Severe Weather','USA'] },
+  { id:'s3', type:'storm', title:'Cyclone Remal Makes Landfall at Bangladesh–Myanmar Border', location:'Bay of Bengal', lat:21.4, lng:90.5, severity:4, age:'8h ago',
+    brief:'Cyclone Remal made landfall near the Bangladesh-Myanmar border with 135 km/h winds. Storm surges of 2–3 metres have been reported along coastal zones. Pre-emptive evacuations moved 800,000 people to cyclone shelters. Bangladesh Meteorological Department warns of severe inland flooding.',
+    stats:[{label:'Winds',val:'135 km/h'},{label:'Evacuated',val:'800K'}],
+    sources:[{n:'BMD',a:'8h'},{n:'Reuters',a:'9h'},{n:'UN OCHA',a:'10h'}],
+    tags:['Cyclone','Bangladesh','Myanmar','Storm Surge'] },
+
+  // HUMANITARIAN
+  { id:'h1', type:'humanitarian', title:'Yemen: Famine Conditions Declared in 4 Governorates', location:'Hodeidah, Yemen', lat:14.8, lng:42.95, severity:5, age:'1d ago',
+    brief:'The UN WFP classified four Yemeni governorates as IPC Phase 5 (famine). An estimated 2.7 million people face catastrophic food insecurity. Funding gaps have forced WFP to cut rations by 50% for 8 million beneficiaries, the largest humanitarian funding crisis of the year.',
+    stats:[{label:'At Risk',val:'2.7M'},{label:'Ration Cut',val:'50%'}],
+    sources:[{n:'WFP',a:'1d'},{n:'UN OCHA',a:'1d'},{n:'Reuters',a:'1d'}],
+    tags:['Yemen','Famine','Food Security','Crisis'] },
+  { id:'h2', type:'humanitarian', title:'DR Congo: Cholera Kills 67 in South Kivu Outbreak', location:'Bukavu, DR Congo', lat:-2.49, lng:28.86, severity:3, age:'2d ago',
+    brief:'A cholera outbreak in South Kivu has recorded 1,847 cases and 67 deaths in 14 days. MSF teams are operational across 3 treatment centres. Clean water disruption from population displacement is identified as the primary transmission vector.',
+    stats:[{label:'Cases (14d)',val:'1,847'},{label:'Deaths',val:'67'}],
+    sources:[{n:'MSF',a:'2d'},{n:'WHO',a:'2d'},{n:'Reuters',a:'2d'}],
+    tags:['DRC','Congo','Cholera','MSF'] },
+  { id:'h3', type:'humanitarian', title:'Haiti: Gang Control Blocks Aid for 5th Consecutive Day', location:'Port-au-Prince, Haiti', lat:18.54, lng:-72.34, severity:4, age:'6h ago',
+    brief:'Gang violence in Port-au-Prince has blocked humanitarian aid corridors for the 5th consecutive day. 1.6 million face food insecurity; 580,000 are internally displaced. The Kenyan-led MSS Mission has formally requested additional force authorization from the UN Security Council.',
+    stats:[{label:'Displaced',val:'580K'},{label:'Aid Blocked',val:'5 days'}],
+    sources:[{n:'UN OCHA',a:'6h'},{n:'Reuters',a:'7h'},{n:'AP',a:'6h'}],
+    tags:['Haiti','Gangs','Displacement','MSS Mission'] },
+  { id:'h4', type:'humanitarian', title:'Syria: 14th Year — 13.8M Remain Displaced', location:'Idlib, Syria', lat:35.93, lng:36.63, severity:3, age:'2d ago',
+    brief:'UNHCR reports 13.8 million Syrians remain displaced — 6.8M internally, 7M as refugees — entering the 14th year of crisis. 2024 humanitarian operations face a 68% funding gap, forcing cuts to health, water, and education programs.',
+    sources:[{n:'UNHCR',a:'2d'},{n:'WFP',a:'2d'},{n:'MSF',a:'3d'}],
+    tags:['Syria','Refugees','UNHCR','Displacement'] },
+];
+
+const FLIGHTS = [
+  {id:'f1',s:'JFK',d:'LHR',sLat:40.64,sLng:-73.78,dLat:51.48,dLng:-0.46},
+  {id:'f2',s:'LAX',d:'NRT',sLat:33.94,sLng:-118.41,dLat:35.76,dLng:140.39},
+  {id:'f3',s:'DXB',d:'SIN',sLat:25.25,sLng:55.36,dLat:1.36,dLng:103.99},
+  {id:'f4',s:'CDG',d:'GRU',sLat:49.01,sLng:2.55,dLat:-23.43,dLng:-46.47},
+  {id:'f5',s:'SYD',d:'LAX',sLat:-33.95,sLng:151.18,dLat:33.94,dLng:-118.41},
+  {id:'f6',s:'FRA',d:'PEK',sLat:50.03,sLng:8.57,dLat:40.08,dLng:116.58},
+  {id:'f7',s:'ORD',d:'MEX',sLat:41.98,sLng:-87.91,dLat:19.43,dLng:-99.07},
+  {id:'f8',s:'AMS',d:'JNB',sLat:52.31,sLng:4.77,dLat:-26.13,dLng:28.24},
+  {id:'f9',s:'HND',d:'SFO',sLat:35.55,sLng:139.78,dLat:37.62,dLng:-122.38},
+  {id:'f10',s:'IST',d:'BOM',sLat:40.98,sLng:28.81,dLat:19.09,dLng:72.87},
+  {id:'f11',s:'YYZ',d:'LHR',sLat:43.68,sLng:-79.63,dLat:51.48,dLng:-0.46},
+  {id:'f12',s:'GRU',d:'MAD',sLat:-23.43,sLng:-46.47,dLat:40.47,dLng:-3.56},
+  {id:'f13',s:'DEL',d:'LHR',sLat:28.57,sLng:77.12,dLat:51.48,dLng:-0.46},
+  {id:'f14',s:'SIN',d:'SYD',sLat:1.36,sLng:103.99,dLat:-33.95,dLng:151.18},
+  {id:'f15',s:'DFW',d:'CDG',sLat:32.9,sLng:-97.04,dLat:49.01,dLng:2.55},
+  {id:'f16',s:'NBO',d:'DXB',sLat:-1.32,sLng:36.93,dLat:25.25,dLng:55.36},
+  {id:'f17',s:'PEK',d:'LAX',sLat:40.08,sLng:116.58,dLat:33.94,dLng:-118.41},
+  {id:'f18',s:'SCL',d:'MIA',sLat:-33.39,sLng:-70.79,dLat:25.79,dLng:-80.29},
+  {id:'f19',s:'DOH',d:'JFK',sLat:25.27,sLng:51.61,dLat:40.64,dLng:-73.78},
+  {id:'f20',s:'CGK',d:'AMS',sLat:-6.13,sLng:106.66,dLat:52.31,dLng:4.77},
+];
+
+// Fallback launch data
+const FALLBACK_LAUNCHES = [
+  { id:'l0', type:'launch', title:'SpaceX Falcon 9 — Starlink Group 8-5', location:'Cape Canaveral, FL', lat:28.61, lng:-80.6, severity:2, age:'In 2 days',
+    brief:'SpaceX Falcon 9 carrying 23 Starlink v2 Mini satellites to low Earth orbit. Launch from SLC-40, Cape Canaveral Space Force Station. Booster B1058 targeting its 14th flight.',
+    sources:[{n:'SpaceX',a:'Upcoming'},{n:'Space Devs',a:'Scheduled'}], tags:['SpaceX','Falcon 9','Starlink','LEO'] },
+  { id:'l1', type:'launch', title:'Rocket Lab Electron — NROL Mission', location:'Mahia, New Zealand', lat:-39.26, lng:177.86, severity:2, age:'In 5 days',
+    brief:'Rocket Lab Electron launching NRO reconnaissance payload for the US National Reconnaissance Office from Launch Complex 1A at Mahia Peninsula.',
+    sources:[{n:'Rocket Lab',a:'Upcoming'},{n:'NRO',a:'Scheduled'}], tags:['Rocket Lab','Electron','NRO','Recon'] },
+  { id:'l2', type:'launch', title:'Ariane 6 — Inaugural Commercial Mission', location:'Kourou, French Guiana', lat:5.24, lng:-52.77, severity:2, age:'In 8 days',
+    brief:'First operational Ariane 6 (A64 configuration) mission carrying commercial and ESA institutional payloads to geostationary transfer orbit from ELA-4 at the Guiana Space Centre.',
+    sources:[{n:'ESA',a:'Upcoming'},{n:'ArianeGroup',a:'Scheduled'}], tags:['Ariane 6','ESA','GTO','Commercial'] },
+];
+
+// ─────────────────────────────────────────────────────────────────────────────
+// STATE
+// ─────────────────────────────────────────────────────────────────────────────
+
+let allEvents = [...SEED];
+let currentTab = 'all';
+let searchQ = '';
+let selectedId = null;
+let panelOpen = true;
+let watchTags = ['Gaza','Ukraine','Climate','AI','Markets','China'];
+const layerVis = {news:true,conflict:true,disaster:true,storm:true,humanitarian:true,flight:true,launch:true};
+let globe;
+
+let tickerData = [
+  {sym:'BTC',px:'68,420',chg:'+2.14%',up:true},
+  {sym:'ETH',px:'3,841',chg:'+1.87%',up:true},
+  {sym:'SOL',px:'174.32',chg:'+4.20%',up:true},
+  {sym:'XRP',px:'0.5142',chg:'-0.82%',up:false},
+  {sym:'ADA',px:'0.4231',chg:'+1.10%',up:true},
+  {sym:'EUR/USD',px:'1.0842',chg:'+0.12%',up:true},
+  {sym:'GBP/USD',px:'1.2741',chg:'+0.08%',up:true},
+  {sym:'USD/JPY',px:'157.32',chg:'-0.23%',up:false},
+  {sym:'USD/CNY',px:'7.241',chg:'+0.05%',up:true},
+  {sym:'GOLD',px:'2,341',chg:'+0.64%',up:true},
+  {sym:'OIL (WTI)',px:'82.14',chg:'-1.20%',up:false},
+  {sym:'BTC.D',px:'54.2%',chg:'+0.3%',up:true},
+];
+
+// ─────────────────────────────────────────────────────────────────────────────
+// GLOBE
+// ─────────────────────────────────────────────────────────────────────────────
+
+function initGlobe() {
+  globe = Globe({ animateIn: false })
+    .globeImageUrl('//unpkg.com/three-globe/example/img/earth-night.jpg')
+    .bumpImageUrl('//unpkg.com/three-globe/example/img/earth-topology.png')
+    .backgroundImageUrl('//unpkg.com/three-globe/example/img/night-sky.png')
+    .showAtmosphere(true)
+    .atmosphereColor('rgba(60,100,255,0.18)')
+    .atmosphereAltitude(0.18)
+    .htmlElementsData([])
+    .htmlElement(d => buildMarker(d))
+    .htmlLat(d => d.lat)
+    .htmlLng(d => d.lng)
+    .htmlAltitude(0.01)
+    .arcsData([])
+    .arcStartLat(d => d.sLat).arcStartLng(d => d.sLng)
+    .arcEndLat(d => d.dLat).arcEndLng(d => d.dLng)
+    .arcColor(() => ['rgba(16,185,129,0)','rgba(16,185,129,0.65)','rgba(16,185,129,0)'])
+    .arcDashLength(0.32).arcDashGap(0.14)
+    .arcDashAnimateTime(2400).arcStroke(0.35)
+    (document.getElementById('globe-wrap'));
+
+  globe.width(window.innerWidth).height(window.innerHeight);
+  window.addEventListener('resize', () => globe.width(window.innerWidth).height(window.innerHeight));
+
+  globe.controls().autoRotate = true;
+  globe.controls().autoRotateSpeed = 0.22;
+  globe.controls().enableDamping = true;
+  globe.pointOfView({ lat:20, lng:15, altitude:2.2 }, 0);
+}
+
+function buildMarker(d) {
+  const el = document.createElement('div');
+  el.className = 'marker' + (d.severity >= 4 ? ' sev5' : '');
+  el.style.cssText = `--mc:${COLORS[d.type]||'#fff'};width:22px;height:22px;cursor:pointer`;
+  el.title = d.title;
+  const delay = (Math.random() * 2).toFixed(2);
+  el.innerHTML = `<div class="m-ring" style="animation-delay:${delay}s"></div><div class="m-ring m-ring2" style="animation-delay:${(+delay+.9).toFixed(2)}s"></div><div class="m-dot"></div>`;
+  el.addEventListener('click', e => { e.stopPropagation(); selectEvent(d.id); });
+  return el;
+}
+
+function refreshGlobe() {
+  const visEvs = getFiltered().filter(e => layerVis[e.type]);
+  globe.htmlElementsData(visEvs);
+  globe.arcsData(layerVis.flight ? FLIGHTS : []);
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// FILTER / LIST
+// ─────────────────────────────────────────────────────────────────────────────
+
+function getFiltered() {
+  let evs = allEvents;
+  if (currentTab !== 'all') evs = evs.filter(e => e.type === currentTab);
+  if (searchQ) {
+    const q = searchQ.toLowerCase();
+    evs = evs.filter(e =>
+      e.title.toLowerCase().includes(q) ||
+      e.location.toLowerCase().includes(q) ||
+      (e.tags||[]).some(t => t.toLowerCase().includes(q))
+    );
+  }
+  return evs.sort((a,b) => (b.severity||0) - (a.severity||0));
+}
+
+function renderList() {
+  const evs = getFiltered();
+  document.getElementById('ph-count').textContent = evs.length + ' events';
+  document.getElementById('t-summary').textContent =
+    `${allEvents.length} events · ${allEvents.filter(e=>e.type==='conflict').length} conflicts · ${allEvents.filter(e=>e.type==='disaster').length} disasters · ${allEvents.filter(e=>e.type==='storm').length} storms`;
+
+  ['news','conflict','disaster','storm','humanitarian','launch'].forEach(t => {
+    const el = document.getElementById('lc-'+t);
+    if (el) el.textContent = allEvents.filter(e=>e.type===t).length;
+  });
+  document.getElementById('lc-flight').textContent = FLIGHTS.length;
+
+  const list = document.getElementById('evlist');
+  if (!evs.length) {
+    list.innerHTML = '<div class="ev-empty">No events match your filters</div>'; return;
+  }
+  list.innerHTML = evs.map(ev => {
+    const c = COLORS[ev.type]||'#fff';
+    const ico = ICONS[ev.type]||'●';
+    return `<div class="ev${ev.id===selectedId?' sel':''}" id="ev-${ev.id}" onclick="selectEvent('${ev.id}')">
+      <div class="ev-row">
+        <div class="ev-ico">${ico}</div>
+        <div class="ev-body">
+          <div class="ev-name">${ev.title}</div>
+          <div class="ev-foot">
+            <span class="ev-tag" style="background:${c}1a;color:${c}">${ev.type.toUpperCase()}</span>
+            <span class="ev-loc">${ev.location}</span>
+            <span class="ev-age">${ev.age}</span>
+          </div>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// SELECT / DETAIL
+// ─────────────────────────────────────────────────────────────────────────────
+
+function selectEvent(id) {
+  selectedId = id;
+  const ev = allEvents.find(e => e.id === id);
+  if (!ev) return;
+
+  globe.controls().autoRotate = false;
+  globe.pointOfView({ lat: ev.lat, lng: ev.lng, altitude: 1.6 }, 1200);
+  setTimeout(() => globe.controls().autoRotate = true, 5000);
+
+  document.querySelectorAll('.ev').forEach(el => el.classList.remove('sel'));
+  document.getElementById('ev-' + id)?.classList.add('sel');
+
+  const c = COLORS[ev.type]||'#fff';
+  const ico = ICONS[ev.type]||'●';
+
+  const statsHtml = (ev.stats||[]).length ? `
+    <div class="d-stats">${ev.stats.map(s=>`
+      <div class="d-stat">
+        <div class="d-stat-lbl">${s.label||''}</div>
+        <div class="d-stat-val" style="color:${c}">${s.val}</div>
+      </div>`).join('')}
+    </div>` : '';
+
+  const srcsHtml = (ev.sources||[]).map(s=>
+    `<div class="d-src"><div class="d-src-dot" style="background:${c}"></div><span class="d-src-name">${s.n}</span><span class="d-src-age">${s.a}</span></div>`
+  ).join('') || '<div class="d-src" style="color:var(--muted);font-size:11px">No sources listed</div>';
+
+  const tagsHtml = (ev.tags||[]).map(t=>`<span class="d-tag-pill">${t}</span>`).join('');
+
+  document.getElementById('d-body').innerHTML = `
+    <div class="d-cat" style="color:${c}">${ico} &nbsp;${ev.type.toUpperCase()}</div>
+    <div class="d-title">${ev.title}</div>
+    <div class="d-where">📍 ${ev.location}&nbsp;·&nbsp;<span style="color:var(--muted)">${ev.age}</span></div>
+    ${statsHtml}
+    <div class="d-lbl">Brief</div>
+    <div class="d-brief">${ev.brief||'No details available.'}</div>
+    <div class="d-sep"></div>
+    <div class="d-lbl">Sources</div>
+    ${srcsHtml}
+    <div class="d-sep"></div>
+    <div class="d-lbl">Tags</div>
+    <div class="d-tags">${tagsHtml}</div>
+  `;
+  document.getElementById('detail').classList.add('open');
+}
+
+function closeDetail() {
+  document.getElementById('detail').classList.remove('open');
+  selectedId = null;
+  document.querySelectorAll('.ev').forEach(el => el.classList.remove('sel'));
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// TABS, SEARCH, LAYERS, PANEL
+// ─────────────────────────────────────────────────────────────────────────────
+
+function setTab(el) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('on'));
+  el.classList.add('on');
+  currentTab = el.dataset.tab;
+  renderList(); refreshGlobe();
+}
+
+function onSearch() {
+  searchQ = document.getElementById('sinput').value.trim();
+  // deactivate watchlist tags if manually typing
+  if (searchQ) document.querySelectorAll('.wl-tag').forEach(t => t.classList.remove('on'));
+  renderList(); refreshGlobe();
+}
+
+function toggleLayer(el) {
+  const l = el.dataset.layer;
+  layerVis[l] = !layerVis[l];
+  el.classList.toggle('off', !layerVis[l]);
+  refreshGlobe();
+}
+
+function togglePanel() {
+  panelOpen = !panelOpen;
+  document.getElementById('panel').classList.toggle('hidden', !panelOpen);
+  const t = document.getElementById('ptoggle');
+  t.textContent = panelOpen ? '‹' : '›';
+  t.classList.toggle('closed', !panelOpen);
+  t.style.left = panelOpen ? '300px' : '0';
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// WATCHLIST
+// ─────────────────────────────────────────────────────────────────────────────
+
+function renderWatchlist() {
+  document.getElementById('wl-tags').innerHTML = watchTags.map(t =>
+    `<div class="wl-tag" onclick="watchFilter('${t}')">${t}</div>`
+  ).join('');
+}
+
+function watchFilter(tag) {
+  const inp = document.getElementById('sinput');
+  const alreadyActive = inp.value === tag;
+  inp.value = alreadyActive ? '' : tag;
+  searchQ = alreadyActive ? '' : tag;
+  document.querySelectorAll('.wl-tag').forEach(el => {
+    el.classList.toggle('on', el.textContent === tag && !alreadyActive);
+  });
+  renderList(); refreshGlobe();
+}
+
+function addWatchTag() {
+  const tag = prompt('Add topic to watchlist (e.g. "Taiwan", "Floods", "SpaceX"):');
+  if (tag?.trim()) { watchTags.push(tag.trim()); renderWatchlist(); }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// TICKER
+// ─────────────────────────────────────────────────────────────────────────────
+
+function renderTicker() {
+  const items = [...tickerData, ...tickerData]; // seamless loop
+  document.getElementById('tk-inner').innerHTML = items.map(d =>
+    `<div class="tk-item">
+      <span class="tk-sym">${d.sym}</span>
+      <span class="tk-px">${d.px}</span>
+      <span class="${d.up?'tk-up':'tk-dn'}">${d.chg}</span>
+    </div><span class="tk-div">|</span>`
+  ).join('');
+}
+
+async function fetchCrypto() {
+  try {
+    const r = await fetch(
+      'https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum,solana,ripple,cardano&vs_currencies=usd&include_24hr_change=true',
+      { signal: AbortSignal.timeout(6000) }
+    );
+    const d = await r.json();
+    const map = {bitcoin:'BTC',ethereum:'ETH',solana:'SOL',ripple:'XRP',cardano:'ADA'};
+    const prices = {BTC:[d.bitcoin?.usd,d.bitcoin?.usd_24h_change],ETH:[d.ethereum?.usd,d.ethereum?.usd_24h_change],SOL:[d.solana?.usd,d.solana?.usd_24h_change],XRP:[d.ripple?.usd,d.ripple?.usd_24h_change],ADA:[d.cardano?.usd,d.cardano?.usd_24h_change]};
+    const cryptoItems = Object.entries(prices).filter(([,v])=>v[0]).map(([sym,[px,ch]])=>({
+      sym, px: px > 100 ? px.toLocaleString('en',{maximumFractionDigits:2}) : px.toFixed(4),
+      chg: (ch>=0?'+':'')+ch.toFixed(2)+'%', up: ch >= 0
+    }));
+    const fxItems = tickerData.filter(d => !['BTC','ETH','SOL','XRP','ADA'].includes(d.sym));
+    tickerData = [...cryptoItems, ...fxItems];
+    renderTicker();
+  } catch(_) {}
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// LAUNCHES
+// ─────────────────────────────────────────────────────────────────────────────
+
+async function fetchLaunches() {
+  try {
+    const r = await fetch(
+      'https://ll.thespacedevs.com/2.2.0/launch/upcoming/?format=json&limit=5&mode=list',
+      { signal: AbortSignal.timeout(8000) }
+    );
+    const d = await r.json();
+    const parsed = (d.results||[]).map((l,i) => {
+      const lat = parseFloat(l.pad?.latitude);
+      const lng = parseFloat(l.pad?.longitude);
+      if (!lat || !lng) return null;
+      const net = l.net ? new Date(l.net) : null;
+      const diff = net ? Math.floor((net - Date.now()) / 86400000) : null;
+      const age = diff === null ? 'TBD' : diff <= 0 ? 'Imminent' : diff === 0 ? 'Today' : `In ${diff}d`;
+      return {
+        id:'l'+i, type:'launch',
+        title: l.name || 'Upcoming Launch',
+        location: l.pad?.location?.name || 'Launch Site',
+        lat, lng, severity:2, age,
+        brief:`${l.name}. Vehicle: ${l.rocket?.configuration?.full_name||'Unknown'}. Provider: ${l.launch_service_provider?.name||'Unknown'}. Window: ${net ? net.toUTCString() : 'TBD'}.`,
+        sources:[{n:l.launch_service_provider?.name||'Provider',a:age}],
+        tags:['Launch', l.launch_service_provider?.name||'Space'].slice(0,2)
+      };
+    }).filter(Boolean);
+    return parsed.length ? parsed : FALLBACK_LAUNCHES;
+  } catch(_) { return FALLBACK_LAUNCHES; }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// CLOCK
+// ─────────────────────────────────────────────────────────────────────────────
+
+function tickClock() {
+  const now = new Date();
+  document.getElementById('t-clock').textContent =
+    now.toISOString().replace('T',' ').substring(0,19) + ' UTC';
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// INIT
+// ─────────────────────────────────────────────────────────────────────────────
+
+function splash(pct, msg) {
+  document.getElementById('sfill').style.width = pct + '%';
+  document.getElementById('smsg').textContent = msg;
+}
+
+async function init() {
+  splash(8, 'Initializing Earth…');
+  initGlobe();
+
+  splash(35, 'Fetching launches…');
+  const launches = await fetchLaunches();
+  allEvents = [...SEED, ...launches];
+
+  splash(60, 'Fetching market data…');
+  await fetchCrypto();
+
+  splash(85, 'Rendering feed…');
+  renderList();
+  renderTicker();
+  renderWatchlist();
+  refreshGlobe();
+
+  splash(100, 'Ready');
+  setTimeout(() => {
+    document.getElementById('splash').classList.add('out');
+    setTimeout(() => document.getElementById('splash')?.remove(), 700);
+  }, 500);
+
+  tickClock();
+  setInterval(tickClock, 1000);
+  setInterval(fetchCrypto, 60000);
+}
+
+init();
+</script>
+</body>
+</html>
