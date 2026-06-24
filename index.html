@@ -1324,6 +1324,7 @@ async function toggleIRL() {
 var MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
 
 function toggleHistBar() {
+  if (histMode) { exitHistMode(); return; }
   var bar = document.getElementById('hist-bar');
   var btn = document.getElementById('hist-btn');
   var open = bar.classList.toggle('open');
