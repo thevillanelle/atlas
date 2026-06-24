@@ -708,7 +708,13 @@ function buildMarker(d) {
   el.title = d.title;
   var delay = (Math.random()*2).toFixed(2);
   el.innerHTML = '<div class="m-ring" style="animation-delay:'+delay+'s"></div><div class="m-ring m-ring2" style="animation-delay:'+(+delay+.9).toFixed(2)+'s"></div><div class="m-dot"></div>';
-  el.addEventListener('click', function(e){e.stopPropagation(); selectEvent(d.id);});
+  var _mdTime, _mdX, _mdY;
+  el.addEventListener('mousedown', function(e){_mdTime=Date.now();_mdX=e.clientX;_mdY=e.clientY;});
+  el.addEventListener('mouseup', function(e){
+    if(Date.now()-_mdTime<300&&Math.abs(e.clientX-_mdX)<6&&Math.abs(e.clientY-_mdY)<6){
+      e.stopPropagation();selectEvent(d.id);
+    }
+  });
   return el;
 }
 
@@ -819,10 +825,14 @@ function selectEvent(id) {
     return;
   }
 
+  var readBtn = ev.url
+    ? '<a href="'+ev.url+'" target="_blank" style="display:flex;align-items:center;justify-content:center;gap:7px;margin:14px 0;padding:10px 16px;background:rgba(59,130,246,.15);border:1px solid rgba(59,130,246,.35);border-radius:8px;color:#60a5fa;font-size:12px;font-weight:700;letter-spacing:.5px;text-decoration:none;transition:background .15s" onmouseover="this.style.background=\'rgba(59,130,246,.25)\'" onmouseout="this.style.background=\'rgba(59,130,246,.15)\'">&#x2197; READ FULL ARTICLE</a>'
+    : '';
   document.getElementById('d-body').innerHTML =
     '<div class="d-cat" style="color:'+c+'">'+ico+' '+ev.type.toUpperCase()+' '+liveLabel+'</div>' +
     '<div class="d-title">'+ev.title+'</div>' +
     '<div class="d-where">\uD83D\uDCCD '+ev.location+' &middot; <span style="color:var(--muted)">'+ev.age+'</span></div>' +
+    readBtn+
     statsHtml+
     '<div class="d-lbl">Brief</div>' +
     '<div class="d-brief">'+(ev.brief||'No details.').replace(/\n/g,'<br>')+'</div>' +
