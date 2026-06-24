@@ -899,8 +899,9 @@ function refreshGlobe() {
 // FILTER / LIST
 // =============================================================================
 function getFiltered() {
-  // Sidebar: when history layer is loaded + visible, show only historical events
-  if (histEvents.length && layerVis.history) return histEvents;
+  // Sidebar: clear as soon as History bar is open (blank slate for lookup)
+  var histBarOpen = document.getElementById('hist-bar') && document.getElementById('hist-bar').classList.contains('open');
+  if (histBarOpen) return histEvents; // empty [] until events load, then shows them
   var evs = allEvents;
   if (currentTab !== 'all') evs = evs.filter(function(e){return e.type===currentTab;});
   if (searchQ) {
@@ -1060,7 +1061,26 @@ function cycleTheme() { themeMode = (themeMode + 1) % 3; applyThemeMode(); }
 function toggleDay() { cycleTheme(); }
 function setTab(el){document.querySelectorAll('.tab').forEach(function(t){t.classList.remove('on');});el.classList.add('on');currentTab=el.dataset.tab;renderList();refreshGlobe();}
 function onSearch(){searchQ=document.getElementById('sinput').value.trim();if(searchQ)document.querySelectorAll('.wl-tag').forEach(function(t){t.classList.remove('on');});renderList();refreshGlobe();}
-function toggleLayer(el){var l=el.dataset.layer;layerVis[l]=!layerVis[l];el.classList.toggle('off',!layerVis[l]);refreshGlobe();}
+function toggleLayer(el){
+  var l=el.dataset.layer;
+  // History and flight stay as simple toggles
+  if(l==='history'||l==='flight'){layerVis[l]=!layerVis[l];el.classList.toggle('off',!layerVis[l]);refreshGlobe();return;}
+  // All other layers: isolate on click, reset to all-on if already isolated
+  var contentLayers=['news','conflict','disaster','storm','humanitarian','tech','fashion','astrology','launch','connection','launch'];
+  var activeCount=contentLayers.filter(function(k){return layerVis[k];}).length;
+  if(layerVis[l]&&activeCount===1){
+    // Already isolated — reset all on
+    contentLayers.forEach(function(k){layerVis[k]=true;});
+  } else {
+    // Isolate to this layer
+    contentLayers.forEach(function(k){layerVis[k]=k===l;});
+  }
+  document.querySelectorAll('.lc-row').forEach(function(row){
+    var rl=row.dataset.layer;
+    if(rl&&rl!=='history'&&rl!=='flight')row.classList.toggle('off',!layerVis[rl]);
+  });
+  refreshGlobe();
+}
 function togglePanel(){panelOpen=!panelOpen;document.getElementById('panel').classList.toggle('hidden',!panelOpen);var t=document.getElementById('ptoggle');t.innerHTML=panelOpen?'&#8249;':'&#8250;';t.classList.toggle('closed',!panelOpen);t.style.left=panelOpen?'300px':'0';}
 function renderWatchlist(){document.getElementById('wl-tags').innerHTML=watchTags.map(function(t){return '<div class="wl-tag" onclick="watchFilter(\''+t+'\')">'+t+'</div>';}).join('');}
 function watchFilter(tag){var inp=document.getElementById('sinput');var active=inp.value===tag;inp.value=active?'':tag;searchQ=active?'':tag;document.querySelectorAll('.wl-tag').forEach(function(el){el.classList.toggle('on',el.textContent===tag&&!active);});renderList();refreshGlobe();}
@@ -1336,6 +1356,8 @@ function toggleHistBar() {
   var btn = document.getElementById('hist-btn');
   var open = bar.classList.toggle('open');
   btn.classList.toggle('active', open);
+  if (!open) { histEvents = []; layerVis.history = false; refreshGlobe(); }
+  renderList();
 }
 
 async function loadHistory() {
