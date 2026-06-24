@@ -13,13 +13,10 @@
   --text:#d8dde8;--muted:#4e5a72;--accent:#3b82f6;
   --col-news:#ef4444;--col-conflict:#f97316;--col-disaster:#eab308;
   --col-storm:#60a5fa;--col-humanitarian:#ec4899;--col-flight:#10b981;
-  --col-launch:#a78bfa;--col-crypto:#f59e0b;
-  --col-tech:#06b6d4;--col-fashion:#f472b6;--col-astrology:#c084fc;
+  --col-launch:#a78bfa;--col-tech:#06b6d4;--col-fashion:#f472b6;--col-astrology:#c084fc;
 }
 html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);font-family:'Inter',sans-serif;color:var(--text)}
 #globe-wrap{position:fixed;inset:0;z-index:0}
-
-/* SPLASH */
 #splash{position:fixed;inset:0;z-index:9999;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;transition:opacity .6s ease}
 #splash.out{opacity:0;pointer-events:none}
 .sp-logo{font-family:'Space Mono',monospace;font-size:30px;font-weight:700;letter-spacing:8px;color:#fff}
@@ -28,8 +25,6 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);font-famil
 .sp-bar{width:220px;height:2px;background:rgba(255,255,255,.06);border-radius:2px;overflow:hidden}
 .sp-fill{height:100%;background:linear-gradient(90deg,var(--accent),#818cf8);width:0;border-radius:2px;transition:width .2s ease}
 .sp-msg{font-size:10px;color:var(--muted);font-family:'Space Mono',monospace;letter-spacing:1px;min-height:14px}
-
-/* TOPBAR */
 #topbar{position:fixed;top:0;left:0;right:0;z-index:300;height:48px;background:var(--glass);border-bottom:1px solid var(--border);backdrop-filter:blur(24px) saturate(180%);display:flex;align-items:center;padding:0 16px;gap:14px}
 .t-logo{font-family:'Space Mono',monospace;font-size:15px;font-weight:700;letter-spacing:5px;color:#fff;flex-shrink:0}
 .t-logo em{color:var(--accent);font-style:normal}
@@ -40,13 +35,9 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);font-famil
 .t-summary{font-size:11px;color:var(--muted);font-family:'Space Mono',monospace;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .t-spacer{flex:1}
 #t-clock{font-size:11px;color:var(--muted);font-family:'Space Mono',monospace;flex-shrink:0}
-
-/* PANEL TOGGLE */
 #ptoggle{position:fixed;top:60px;left:300px;z-index:202;width:20px;height:34px;background:var(--glass);border:1px solid var(--border);border-left:none;border-radius:0 6px 6px 0;cursor:pointer;color:var(--muted);display:flex;align-items:center;justify-content:center;font-size:10px;backdrop-filter:blur(20px);transition:left .35s cubic-bezier(.4,0,.2,1);outline:none;user-select:none}
 #ptoggle:hover{color:var(--text)}
 #ptoggle.closed{left:0}
-
-/* LEFT PANEL */
 #panel{position:fixed;top:48px;left:0;bottom:36px;z-index:200;width:300px;background:var(--glass);border-right:1px solid var(--border);backdrop-filter:blur(24px) saturate(180%);display:flex;flex-direction:column;transition:transform .35s cubic-bezier(.4,0,.2,1)}
 #panel.hidden{transform:translateX(-300px)}
 #ph{padding:11px 13px 9px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px}
@@ -84,8 +75,6 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);font-famil
 .wl-tag{font-size:9px;padding:3px 8px;border-radius:14px;background:rgba(255,255,255,.04);border:1px solid var(--border);cursor:pointer;transition:all .15s;color:var(--muted)}
 .wl-tag:hover{border-color:var(--accent);color:var(--accent)}
 .wl-tag.on{background:rgba(59,130,246,.14);border-color:var(--accent);color:var(--accent)}
-
-/* ASTROLOGY CARDS */
 .astro-grid{display:grid;grid-template-columns:1fr 1fr;gap:5px;padding:5px}
 .astro-card{padding:9px 8px;border-radius:9px;background:rgba(255,255,255,.03);border:1px solid var(--border);cursor:pointer;transition:all .15s;text-align:center}
 .astro-card:hover{background:rgba(192,132,252,.07);border-color:rgba(192,132,252,.25)}
@@ -94,8 +83,6 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);font-famil
 .astro-sign{font-size:10px;font-weight:700;color:var(--text);margin-bottom:2px}
 .astro-site{font-size:8px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .astro-snip{font-size:9px;color:rgba(192,132,252,.7);margin-top:4px;line-height:1.4;text-align:left;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
-
-/* LAYER CONTROLS */
 #lctrl{position:fixed;top:60px;right:12px;z-index:200;background:var(--glass);border:1px solid var(--border);border-radius:11px;padding:9px;backdrop-filter:blur(24px);display:flex;flex-direction:column;gap:3px;min-width:158px}
 .lc-hdr{font-size:8px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--muted);padding:1px 5px 4px}
 .lc-row{display:flex;align-items:center;gap:7px;padding:4px 6px;border-radius:6px;cursor:pointer;transition:background .12s;font-size:10.5px;font-weight:500;user-select:none}
@@ -106,8 +93,6 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);font-famil
 .lc-live{width:5px;height:5px;border-radius:50%;flex-shrink:0;background:var(--muted)}
 .lc-live.on{background:#10b981}
 .lc-live.fb{background:#f59e0b}
-
-/* DETAIL DRAWER */
 #detail{position:fixed;top:48px;right:0;bottom:36px;z-index:250;width:360px;background:var(--glass2);border-left:1px solid var(--border);backdrop-filter:blur(28px);display:flex;flex-direction:column;transform:translateX(370px);transition:transform .35s cubic-bezier(.4,0,.2,1)}
 #detail.open{transform:translateX(0)}
 #d-close{position:absolute;top:11px;right:11px;width:24px;height:24px;border-radius:50%;background:rgba(255,255,255,.07);border:none;cursor:pointer;color:var(--text);font-size:12px;display:flex;align-items:center;justify-content:center;transition:background .15s}
@@ -136,8 +121,6 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);font-famil
 .ds-badge{display:inline-flex;align-items:center;gap:3px;font-size:8px;font-weight:700;letter-spacing:1px;padding:2px 5px;border-radius:3px;text-transform:uppercase;vertical-align:middle;margin-left:4px}
 .ds-live{background:rgba(16,185,129,.15);color:#10b981;border:1px solid rgba(16,185,129,.25)}
 .ds-fallback{background:rgba(245,158,11,.12);color:#f59e0b;border:1px solid rgba(245,158,11,.2)}
-
-/* MARKERS */
 .marker{position:relative;cursor:pointer;width:22px;height:22px}
 .m-dot{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:8px;height:8px;border-radius:50%;background:var(--mc);box-shadow:0 0 8px var(--mc);z-index:2}
 .m-ring{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:22px;height:22px;border-radius:50%;border:1.5px solid var(--mc);animation:mring 2.8s ease-out infinite;z-index:1}
@@ -145,12 +128,8 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);font-famil
 @keyframes mring{0%{transform:translate(-50%,-50%) scale(.35);opacity:.9}100%{transform:translate(-50%,-50%) scale(1.7);opacity:0}}
 .marker.sev5 .m-dot{width:11px;height:11px;box-shadow:0 0 14px var(--mc)}
 .marker.sev5 .m-ring{width:28px;height:28px}
-/* Astrology markers use a star shape */
-.marker.astro .m-dot{border-radius:2px;transform:translate(-50%,-50%) rotate(45deg)}
-
-/* TICKER */
 #ticker{position:fixed;bottom:0;left:0;right:0;z-index:300;height:36px;background:var(--glass);border-top:1px solid var(--border);backdrop-filter:blur(24px);display:flex;align-items:center;overflow:hidden}
-.tk-label{flex-shrink:0;padding:0 13px;font-size:8px;font-weight:700;letter-spacing:2px;color:var(--col-crypto);text-transform:uppercase;border-right:1px solid var(--border);height:100%;display:flex;align-items:center;gap:6px}
+.tk-label{flex-shrink:0;padding:0 13px;font-size:8px;font-weight:700;letter-spacing:2px;color:#f59e0b;text-transform:uppercase;border-right:1px solid var(--border);height:100%;display:flex;align-items:center;gap:6px}
 .tk-track{flex:1;overflow:hidden;height:100%;position:relative}
 .tk-inner{display:flex;align-items:center;height:100%;white-space:nowrap;position:absolute;left:0;animation:tscroll 60s linear infinite}
 @keyframes tscroll{from{left:0}to{left:-50%}}
@@ -163,16 +142,13 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);font-famil
 </style>
 </head>
 <body>
-
 <div id="splash">
   <div class="sp-logo">ATL<em>A</em>S</div>
   <div class="sp-sub">Global Intelligence Feed</div>
   <div class="sp-bar"><div class="sp-fill" id="sfill"></div></div>
   <div class="sp-msg" id="smsg">Initializing…</div>
 </div>
-
 <div id="globe-wrap"></div>
-
 <div id="topbar">
   <div class="t-logo">ATL<em>A</em>S</div>
   <div class="t-sep"></div>
@@ -182,28 +158,21 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);font-famil
   <div class="t-spacer"></div>
   <div id="t-clock"></div>
 </div>
-
-<button id="ptoggle" onclick="togglePanel()">‹</button>
-
+<button id="ptoggle" onclick="togglePanel()">&#8249;</button>
 <div id="panel">
-  <div id="ph">
-    <span id="ph-title">Intelligence Feed</span>
-    <span id="ph-count">–</span>
-  </div>
-  <div id="ps">
-    <input type="text" id="sinput" placeholder="Search events, locations, tags…" oninput="onSearch()">
-  </div>
+  <div id="ph"><span id="ph-title">Intelligence Feed</span><span id="ph-count">–</span></div>
+  <div id="ps"><input type="text" id="sinput" placeholder="Search events, locations, tags…" oninput="onSearch()"></div>
   <div id="tabs">
-    <div class="tab on" data-tab="all"          onclick="setTab(this)">All</div>
-    <div class="tab"    data-tab="news"          onclick="setTab(this)">News</div>
-    <div class="tab"    data-tab="tech"          onclick="setTab(this)">Tech</div>
-    <div class="tab"    data-tab="fashion"       onclick="setTab(this)">Fashion</div>
-    <div class="tab"    data-tab="astrology"     onclick="setTab(this)">✨ Sky</div>
-    <div class="tab"    data-tab="conflict"      onclick="setTab(this)">Conflicts</div>
-    <div class="tab"    data-tab="disaster"      onclick="setTab(this)">Disasters</div>
-    <div class="tab"    data-tab="storm"         onclick="setTab(this)">Storms</div>
-    <div class="tab"    data-tab="humanitarian"  onclick="setTab(this)">Aid</div>
-    <div class="tab"    data-tab="launch"        onclick="setTab(this)">Launches</div>
+    <div class="tab on"  data-tab="all"         onclick="setTab(this)">All</div>
+    <div class="tab"     data-tab="news"         onclick="setTab(this)">News</div>
+    <div class="tab"     data-tab="tech"         onclick="setTab(this)">Tech</div>
+    <div class="tab"     data-tab="fashion"      onclick="setTab(this)">Fashion</div>
+    <div class="tab"     data-tab="astrology"    onclick="setTab(this)">&#10024; Sky</div>
+    <div class="tab"     data-tab="conflict"     onclick="setTab(this)">Conflicts</div>
+    <div class="tab"     data-tab="disaster"     onclick="setTab(this)">Disasters</div>
+    <div class="tab"     data-tab="storm"        onclick="setTab(this)">Storms</div>
+    <div class="tab"     data-tab="humanitarian" onclick="setTab(this)">Aid</div>
+    <div class="tab"     data-tab="launch"       onclick="setTab(this)">Launches</div>
   </div>
   <div id="evlist"><div class="ev-empty">Loading…</div></div>
   <div id="wl">
@@ -211,568 +180,78 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);font-famil
     <div class="wl-tags" id="wl-tags"></div>
   </div>
 </div>
-
 <div id="lctrl">
   <div class="lc-hdr">Layers</div>
-  <div class="lc-row" data-layer="news"          onclick="toggleLayer(this)"><div class="lc-dot" style="background:var(--col-news)"></div><span>Breaking News</span><div class="lc-live" id="ls-news"></div><span class="lc-n" id="lc-news">–</span></div>
-  <div class="lc-row" data-layer="conflict"      onclick="toggleLayer(this)"><div class="lc-dot" style="background:var(--col-conflict)"></div><span>Conflicts</span><div class="lc-live" id="ls-conflict"></div><span class="lc-n" id="lc-conflict">–</span></div>
-  <div class="lc-row" data-layer="disaster"      onclick="toggleLayer(this)"><div class="lc-dot" style="background:var(--col-disaster)"></div><span>Disasters</span><div class="lc-live" id="ls-disaster"></div><span class="lc-n" id="lc-disaster">–</span></div>
-  <div class="lc-row" data-layer="storm"         onclick="toggleLayer(this)"><div class="lc-dot" style="background:var(--col-storm)"></div><span>Storms</span><div class="lc-live" id="ls-storm"></div><span class="lc-n" id="lc-storm">–</span></div>
-  <div class="lc-row" data-layer="humanitarian"  onclick="toggleLayer(this)"><div class="lc-dot" style="background:var(--col-humanitarian)"></div><span>Humanitarian</span><div class="lc-live" id="ls-humanitarian"></div><span class="lc-n" id="lc-humanitarian">–</span></div>
-  <div class="lc-row" data-layer="tech"          onclick="toggleLayer(this)"><div class="lc-dot" style="background:var(--col-tech)"></div><span>Tech</span><div class="lc-live" id="ls-tech"></div><span class="lc-n" id="lc-tech">–</span></div>
-  <div class="lc-row" data-layer="fashion"       onclick="toggleLayer(this)"><div class="lc-dot" style="background:var(--col-fashion)"></div><span>Fashion</span><div class="lc-live" id="ls-fashion"></div><span class="lc-n" id="lc-fashion">–</span></div>
-  <div class="lc-row" data-layer="astrology"     onclick="toggleLayer(this)"><div class="lc-dot" style="background:var(--col-astrology)"></div><span>Astrology</span><div class="lc-live" id="ls-astrology"></div><span class="lc-n" id="lc-astrology">–</span></div>
-  <div class="lc-row" data-layer="flight"        onclick="toggleLayer(this)"><div class="lc-dot" style="background:var(--col-flight)"></div><span>Live Flights</span><div class="lc-live" id="ls-flight"></div><span class="lc-n" id="lc-flight">–</span></div>
-  <div class="lc-row" data-layer="launch"        onclick="toggleLayer(this)"><div class="lc-dot" style="background:var(--col-launch)"></div><span>Launches</span><div class="lc-live" id="ls-launch"></div><span class="lc-n" id="lc-launch">–</span></div>
+  <div class="lc-row" data-layer="news"         onclick="toggleLayer(this)"><div class="lc-dot" style="background:var(--col-news)"></div><span>Breaking News</span><div class="lc-live" id="ls-news"></div><span class="lc-n" id="lc-news">–</span></div>
+  <div class="lc-row" data-layer="conflict"     onclick="toggleLayer(this)"><div class="lc-dot" style="background:var(--col-conflict)"></div><span>Conflicts</span><div class="lc-live" id="ls-conflict"></div><span class="lc-n" id="lc-conflict">–</span></div>
+  <div class="lc-row" data-layer="disaster"     onclick="toggleLayer(this)"><div class="lc-dot" style="background:var(--col-disaster)"></div><span>Disasters</span><div class="lc-live" id="ls-disaster"></div><span class="lc-n" id="lc-disaster">–</span></div>
+  <div class="lc-row" data-layer="storm"        onclick="toggleLayer(this)"><div class="lc-dot" style="background:var(--col-storm)"></div><span>Storms</span><div class="lc-live" id="ls-storm"></div><span class="lc-n" id="lc-storm">–</span></div>
+  <div class="lc-row" data-layer="humanitarian" onclick="toggleLayer(this)"><div class="lc-dot" style="background:var(--col-humanitarian)"></div><span>Humanitarian</span><div class="lc-live" id="ls-humanitarian"></div><span class="lc-n" id="lc-humanitarian">–</span></div>
+  <div class="lc-row" data-layer="tech"         onclick="toggleLayer(this)"><div class="lc-dot" style="background:var(--col-tech)"></div><span>Tech</span><div class="lc-live" id="ls-tech"></div><span class="lc-n" id="lc-tech">–</span></div>
+  <div class="lc-row" data-layer="fashion"      onclick="toggleLayer(this)"><div class="lc-dot" style="background:var(--col-fashion)"></div><span>Fashion</span><div class="lc-live" id="ls-fashion"></div><span class="lc-n" id="lc-fashion">–</span></div>
+  <div class="lc-row" data-layer="astrology"    onclick="toggleLayer(this)"><div class="lc-dot" style="background:var(--col-astrology)"></div><span>Sky</span><div class="lc-live" id="ls-astrology"></div><span class="lc-n" id="lc-astrology">–</span></div>
+  <div class="lc-row" data-layer="flight"       onclick="toggleLayer(this)"><div class="lc-dot" style="background:var(--col-flight)"></div><span>Live Flights</span><div class="lc-live" id="ls-flight"></div><span class="lc-n" id="lc-flight">–</span></div>
+  <div class="lc-row" data-layer="launch"       onclick="toggleLayer(this)"><div class="lc-dot" style="background:var(--col-launch)"></div><span>Launches</span><div class="lc-live" id="ls-launch"></div><span class="lc-n" id="lc-launch">–</span></div>
 </div>
-
 <div id="detail">
-  <button id="d-close" onclick="closeDetail()">✕</button>
+  <button id="d-close" onclick="closeDetail()">&#x2715;</button>
   <div id="d-body"></div>
 </div>
-
 <div id="ticker">
-  <div class="tk-label">
-    <svg width="10" height="10" viewBox="0 0 10 10"><circle cx="5" cy="5" r="4" fill="none" stroke="currentColor" stroke-width="1.5"/><line x1="5" y1="2" x2="5" y2="5.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><line x1="5" y1="5.5" x2="7" y2="7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
-    Markets
-  </div>
+  <div class="tk-label">Markets</div>
   <div class="tk-track"><div class="tk-inner" id="tk-inner"></div></div>
 </div>
-
 <script src="https://unpkg.com/globe.gl@2.27.2/dist/globe.gl.min.js"></script>
 <script>
-// ─────────────────────────────────────────────────────────────────────────────
+// =============================================================================
 // CONSTANTS
-// ─────────────────────────────────────────────────────────────────────────────
-
+// =============================================================================
 const COLORS = {
-  news:'#ef4444', conflict:'#f97316', disaster:'#eab308',
-  storm:'#60a5fa', humanitarian:'#ec4899', flight:'#10b981',
-  launch:'#a78bfa', tech:'#06b6d4', fashion:'#f472b6', astrology:'#c084fc',
+  news:'#ef4444',conflict:'#f97316',disaster:'#eab308',storm:'#60a5fa',
+  humanitarian:'#ec4899',flight:'#10b981',launch:'#a78bfa',
+  tech:'#06b6d4',fashion:'#f472b6',astrology:'#c084fc'
 };
 const ICONS = {
-  news:'📰', conflict:'⚔️', disaster:'🌊', storm:'🌀',
-  humanitarian:'🏥', flight:'✈️', launch:'🚀',
-  tech:'💻', fashion:'👗', astrology:'✨',
+  news:'📰',conflict:'⚔️',disaster:'🌊',storm:'🌀',humanitarian:'🏥',
+  flight:'✈️',launch:'🚀',tech:'💻',fashion:'👗',astrology:'✨'
 };
 
+// Country centroids
 const CC = {
-  'Afghanistan':[33.93,67.71],'Algeria':[28.03,1.66],'Angola':[-11.2,17.87],
-  'Argentina':[-38.42,-63.62],'Australia':[-25.27,133.78],'Bangladesh':[23.68,90.35],
-  'Brazil':[-14.24,-51.93],'Cambodia':[12.57,104.99],'Cameroon':[7.37,12.35],
-  'Canada':[56.13,-106.35],'Central African Republic':[6.61,20.94],'Chad':[15.45,18.73],
-  'Chile':[-35.68,-71.54],'China':[35.86,104.20],'Colombia':[4.57,-74.30],
-  'Congo':[4.04,21.76],'Democratic Republic of the Congo':[-4.03,21.76],'DR Congo':[-4.03,21.76],
-  'Egypt':[26.82,30.80],'Ethiopia':[9.15,40.49],'France':[46.23,2.21],
-  'Gaza':[31.35,34.31],'Germany':[51.17,10.45],'Greece':[39.07,21.82],
-  'Haiti':[18.97,-72.29],'India':[20.59,78.96],'Indonesia':[-0.79,113.92],
-  'Iran':[32.43,53.69],'Iraq':[33.22,43.68],'Israel':[31.05,34.85],
-  'Italy':[41.87,12.57],'Japan':[36.2,138.25],'Jordan':[30.59,36.24],
-  'Kenya':[-0.02,37.91],'Lebanon':[33.85,35.86],'Libya':[26.34,17.23],
-  'Mali':[17.57,-3.99],'Mexico':[23.63,-102.55],'Morocco':[31.79,-7.09],
-  'Myanmar':[21.91,95.96],'Nepal':[28.39,84.12],'Niger':[17.61,8.08],
-  'Nigeria':[9.08,8.68],'North Korea':[40.34,127.51],'Pakistan':[30.38,69.35],
-  'Palestine':[31.35,34.31],'Peru':[-9.19,-75.02],'Philippines':[12.88,121.77],
-  'Russia':[61.52,105.32],'Saudi Arabia':[23.89,45.08],'Somalia':[5.15,46.2],
-  'South Africa':[-30.56,22.94],'South Sudan':[6.88,31.31],'Sudan':[12.86,30.22],
-  'Syria':[34.80,38.99],'Taiwan':[23.7,120.96],'Thailand':[15.87,100.99],
-  'Turkey':[38.96,35.24],'Uganda':[1.37,32.29],'Ukraine':[48.38,31.17],
-  'United Kingdom':[55.38,-3.44],'United States':[37.09,-95.71],'USA':[37.09,-95.71],
-  'UK':[55.38,-3.44],'Venezuela':[6.42,-66.59],'Vietnam':[14.06,108.28],
-  'Yemen':[15.55,48.52],'Zimbabwe':[-19.02,29.15],
-  // Fashion capitals
-  'Paris':[48.86,2.35],'Milan':[45.46,9.19],'London':[51.51,-0.13],
-  'New York':[40.71,-74.01],'Tokyo':[35.69,139.69],
+  Afghanistan:[33.93,67.71],Algeria:[28.03,1.66],Angola:[-11.2,17.87],
+  Argentina:[-38.42,-63.62],Australia:[-25.27,133.78],Bangladesh:[23.68,90.35],
+  Brazil:[-14.24,-51.93],Cambodia:[12.57,104.99],Canada:[56.13,-106.35],
+  Chad:[15.45,18.73],Chile:[-35.68,-71.54],China:[35.86,104.20],
+  Colombia:[4.57,-74.30],'DR Congo':[-4.03,21.76],Egypt:[26.82,30.80],
+  Ethiopia:[9.15,40.49],France:[46.23,2.21],Gaza:[31.35,34.31],
+  Germany:[51.17,10.45],Greece:[39.07,21.82],Haiti:[18.97,-72.29],
+  India:[20.59,78.96],Indonesia:[-0.79,113.92],Iran:[32.43,53.69],
+  Iraq:[33.22,43.68],Israel:[31.05,34.85],Italy:[41.87,12.57],
+  Japan:[36.2,138.25],Jordan:[30.59,36.24],Kenya:[-0.02,37.91],
+  Lebanon:[33.85,35.86],Libya:[26.34,17.23],Mali:[17.57,-3.99],
+  Mexico:[23.63,-102.55],Morocco:[31.79,-7.09],Myanmar:[21.91,95.96],
+  Nepal:[28.39,84.12],Niger:[17.61,8.08],Nigeria:[9.08,8.68],
+  Pakistan:[30.38,69.35],Palestine:[31.35,34.31],Peru:[-9.19,-75.02],
+  Philippines:[12.88,121.77],Russia:[61.52,105.32],'Saudi Arabia':[23.89,45.08],
+  Somalia:[5.15,46.2],'South Africa':[-30.56,22.94],'South Sudan':[6.88,31.31],
+  Sudan:[12.86,30.22],Syria:[34.80,38.99],Taiwan:[23.7,120.96],
+  Thailand:[15.87,100.99],Turkey:[38.96,35.24],Uganda:[1.37,32.29],
+  Ukraine:[48.38,31.17],'United Kingdom':[55.38,-3.44],'United States':[37.09,-95.71],
+  USA:[37.09,-95.71],UK:[55.38,-3.44],Venezuela:[6.42,-66.59],
+  Vietnam:[14.06,108.28],Yemen:[15.55,48.52],Zimbabwe:[-19.02,29.15],
+  Paris:[48.86,2.35],Milan:[45.46,9.19],London:[51.51,-0.13],
+  'New York':[40.71,-74.01],Tokyo:[35.69,139.69],
+  'San Francisco':[37.77,-122.42],Brussels:[50.85,4.35],
+  Singapore:[1.35,103.82],Taiwan:[23.7,120.96]
 };
 
-const RW_TYPE_MAP = {
-  'Flood':'disaster','Flash Flood':'disaster','Earthquake':'disaster',
-  'Volcanic Eruption':'disaster','Landslide':'disaster','Tsunami':'disaster',
-  'Cold Wave':'disaster','Heat Wave':'disaster','Wildfire':'disaster',
-  'Technological Disaster':'disaster','Drought':'disaster',
-  'Cyclone':'storm','Typhoon':'storm','Hurricane':'storm','Tropical Storm':'storm',
-  'Food Insecurity':'humanitarian','Epidemic':'humanitarian','Displacement':'humanitarian',
-  'Complex Emergency':'conflict',
-};
-
-// 12 zodiac signs placed at ancient astronomical sites
-const ZODIAC = [
-  {sign:'Aries',       emoji:'♈', lat:37.97,  lng:23.73,  site:'Athens, Greece',      dates:'Mar 21 – Apr 19'},
-  {sign:'Taurus',      emoji:'♉', lat:51.18,  lng:-1.83,  site:'Stonehenge, UK',       dates:'Apr 20 – May 20'},
-  {sign:'Gemini',      emoji:'♊', lat:31.20,  lng:29.92,  site:'Alexandria, Egypt',    dates:'May 21 – Jun 21'},
-  {sign:'Cancer',      emoji:'♋', lat:20.68,  lng:-88.57, site:'Chichén Itzá, Mexico', dates:'Jun 22 – Jul 22'},
-  {sign:'Leo',         emoji:'♌', lat:25.70,  lng:32.64,  site:'Luxor, Egypt',         dates:'Jul 23 – Aug 22'},
-  {sign:'Virgo',       emoji:'♍', lat:-13.16, lng:-72.54, site:'Machu Picchu, Peru',   dates:'Aug 23 – Sep 22'},
-  {sign:'Libra',       emoji:'♎', lat:41.01,  lng:28.98,  site:'Istanbul, Turkey',     dates:'Sep 23 – Oct 23'},
-  {sign:'Scorpio',     emoji:'♏', lat:19.69,  lng:-98.84, site:'Teotihuacán, Mexico',  dates:'Oct 24 – Nov 21'},
-  {sign:'Sagittarius', emoji:'♐', lat:13.41,  lng:103.87, site:'Angkor Wat, Cambodia', dates:'Nov 22 – Dec 21'},
-  {sign:'Capricorn',   emoji:'♑', lat:30.33,  lng:35.44,  site:'Petra, Jordan',        dates:'Dec 22 – Jan 19'},
-  {sign:'Aquarius',    emoji:'♒', lat:-14.74, lng:-75.13, site:'Nazca Lines, Peru',    dates:'Jan 20 – Feb 18'},
-  {sign:'Pisces',      emoji:'♓', lat:38.48,  lng:22.50,  site:'Delphi, Greece',       dates:'Feb 19 – Mar 20'},
-];
-
-// Tech hubs for geo-mapping HN stories without a match
 const TECH_HUBS = [
   [37.39,-122.08],[47.61,-122.33],[40.71,-74.01],[51.51,-0.13],[52.52,13.40],
   [1.35,103.82],[35.69,139.69],[48.86,2.35],[37.77,-122.42],[43.65,-79.38],
-  [55.75,37.62],[-33.87,151.21],[28.61,77.21],[22.54,114.06],[59.33,18.07],
+  [55.75,37.62],[-33.87,151.21],[28.61,77.21],[22.54,114.06],[59.33,18.07]
 ];
 
-// ─────────────────────────────────────────────────────────────────────────────
-// SEED FALLBACKS
-// ─────────────────────────────────────────────────────────────────────────────
-
-const SEEDS = {
-  news:[
-    {id:'sn1',type:'news',title:'G7 Leaders Agree on Cross-Border AI Safety Framework',location:'Bari, Italy',lat:41.12,lng:16.87,severity:2,age:'2h ago',brief:'Leaders from the G7 reached a preliminary agreement on cross-border AI governance standards, focusing on frontier model safety evaluations and liability frameworks.',sources:[{n:'Reuters',a:'2h'},{n:'FT',a:'3h'}],tags:['AI','Policy','G7']},
-    {id:'sn2',type:'news',title:'OPEC+ Extends Production Cuts Through Q3',location:'Vienna, Austria',lat:48.21,lng:16.37,severity:1,age:'4h ago',brief:'The OPEC+ coalition voted to extend production cuts of 3.66 million barrels per day, citing weak demand from China.',sources:[{n:'Bloomberg',a:'4h'},{n:'Reuters',a:'4h'}],tags:['Energy','OPEC','Oil']},
-  ],
-  conflict:[
-    {id:'sc1',type:'conflict',title:'Gaza: Aid Corridor Negotiations Stall',location:'Gaza Strip',lat:31.35,lng:34.31,severity:5,age:'30m ago',brief:'Ceasefire negotiations mediated by Qatar and Egypt have stalled. The UN reports 340+ aid trucks blocked from entering northern Gaza over 72 hours.',stats:[{label:'Displaced',val:'1.7M'},{label:'Aid Blocked',val:'72h+'}],sources:[{n:'UN OCHA',a:'1h'},{n:'Al Jazeera',a:'30m'}],tags:['Gaza','Palestine','Israel']},
-    {id:'sc2',type:'conflict',title:'Ukraine: Kharkiv Shelling Intensifies',location:'Kharkiv, Ukraine',lat:49.99,lng:36.23,severity:5,age:'45m ago',brief:'Russian forces intensified artillery and drone strikes on Kharkiv Oblast. Ukrainian air defense intercepted 8 of 11 overnight drones.',stats:[{label:'Strikes (24h)',val:'14'},{label:'Intercepted',val:'8/11'}],sources:[{n:'Reuters',a:'45m'},{n:'Kyiv Post',a:'1h'}],tags:['Ukraine','Russia','War']},
-    {id:'sc3',type:'conflict',title:'Sudan: RSF Advances on El Fasher',location:'El Fasher, Sudan',lat:13.63,lng:25.35,severity:4,age:'3h ago',brief:'RSF have taken control of two more districts surrounding El Fasher, with ~800,000 civilians sheltering in the city.',stats:[{label:'Civilians',val:'~800K'},{label:'Risk',val:'CRITICAL'}],sources:[{n:'UN OCHA',a:'3h'},{n:'Reuters',a:'4h'}],tags:['Sudan','Darfur','RSF']},
-  ],
-  disaster:[
-    {id:'sd1',type:'disaster',title:'M6.2 Earthquake Strikes Sulawesi, Indonesia',location:'Sulawesi, Indonesia',lat:-1.5,lng:120.2,severity:3,age:'3h ago',brief:'A magnitude 6.2 earthquake struck Sulawesi at 18km depth. No tsunami warning issued.',stats:[{label:'Magnitude',val:'M6.2'},{label:'Depth',val:'18 km'}],sources:[{n:'USGS',a:'3h'}],tags:['Earthquake','Indonesia']},
-    {id:'sd2',type:'disaster',title:'Monsoon Flooding Displaces 200K in Bangladesh',location:'Sylhet, Bangladesh',lat:24.89,lng:91.87,severity:4,age:'12h ago',brief:'Flash flooding in Sylhet and Sunamganj districts displaced approximately 200,000 people.',stats:[{label:'Displaced',val:'200K'},{label:'Districts',val:'12'}],sources:[{n:'Reuters',a:'13h'},{n:'UNDP',a:'14h'}],tags:['Flooding','Bangladesh']},
-  ],
-  storm:[
-    {id:'ss1',type:'storm',title:'Tropical Storm Forms in Bay of Bengal',location:'Bay of Bengal',lat:15.0,lng:88.0,severity:2,age:'8h ago',brief:'A tropical storm has formed with sustained winds of 65 km/h. IMD is monitoring potential development.',sources:[{n:'IMD',a:'8h'}],tags:['Storm','Bay of Bengal']},
-  ],
-  humanitarian:[
-    {id:'sh1',type:'humanitarian',title:'Yemen: Famine Conditions in 4 Governorates',location:'Yemen',lat:15.55,lng:48.52,severity:5,age:'1d ago',brief:'UN WFP classified four Yemeni governorates IPC Phase 5 (famine). 2.7M face catastrophic food insecurity.',stats:[{label:'At Risk',val:'2.7M'},{label:'Ration Cut',val:'50%'}],sources:[{n:'WFP',a:'1d'},{n:'UN OCHA',a:'1d'}],tags:['Yemen','Famine','WFP']},
-    {id:'sh2',type:'humanitarian',title:'Haiti: Gang Violence Blocks Aid 5th Day',location:'Port-au-Prince, Haiti',lat:18.54,lng:-72.34,severity:4,age:'6h ago',brief:'Gang violence has blocked humanitarian aid corridors for the 5th consecutive day. 580,000 displaced.',stats:[{label:'Displaced',val:'580K'},{label:'Aid Blocked',val:'5 days'}],sources:[{n:'UN OCHA',a:'6h'}],tags:['Haiti','Gangs','Displacement']},
-  ],
-  tech:[
-    {id:'st1',type:'tech',title:'OpenAI Releases GPT-5 with Advanced Reasoning Capabilities',location:'San Francisco, CA',lat:37.77,lng:-122.42,severity:2,age:'5h ago',brief:'OpenAI announced GPT-5 featuring significantly improved reasoning, coding, and multimodal capabilities. Early benchmarks show notable gains over GPT-4 on MMLU and HumanEval.',sources:[{n:'Hacker News',a:'5h'},{n:'TechCrunch',a:'6h'}],tags:['AI','OpenAI','LLM']},
-    {id:'st2',type:'tech',title:'TSMC Confirms 2nm Mass Production Timeline for 2025',location:'Hsinchu, Taiwan',lat:24.8,lng:120.97,severity:2,age:'8h ago',brief:'TSMC confirmed its N2 process node is on track for volume production in 2025, with Apple and NVIDIA among the first customers.',sources:[{n:'Hacker News',a:'8h'},{n:'AnandTech',a:'9h'}],tags:['TSMC','Semiconductors','Taiwan']},
-    {id:'st3',type:'tech',title:'EU Digital Markets Act Forces Apple to Open App Store',location:'Brussels, Belgium',lat:50.85,lng:4.35,severity:2,age:'1d ago',brief:'European regulators confirmed Apple must comply with DMA requirements allowing third-party app stores and sideloading across the EU.',sources:[{n:'Hacker News',a:'1d'},{n:'The Verge',a:'1d'}],tags:['Apple','EU','DMA','Regulation']},
-  ],
-  fashion:[
-    {id:'sf1',type:'fashion',title:'Paris Fashion Week: Spring/Summer Collections Open',location:'Paris, France',lat:48.86,lng:2.35,severity:2,age:'1d ago',brief:'Paris Fashion Week Spring/Summer collections opened with notable debuts from emerging designers alongside legacy houses including Dior, Chanel, and Saint Laurent.',sources:[{n:'Vogue',a:'1d'},{n:'WWD',a:'1d'}],tags:['Fashion Week','Paris','Runway']},
-    {id:'sf2',type:'fashion',title:'LVMH Reports Revenue Growth Driven by Asia Pacific',location:'Paris, France',lat:48.86,lng:2.35,severity:1,age:'2d ago',brief:'LVMH reported 8% organic revenue growth for the quarter, with Louis Vuitton and Dior leading gains in the Asia Pacific region.',sources:[{n:'Reuters',a:'2d'},{n:'Business of Fashion',a:'2d'}],tags:['LVMH','Luxury','Markets']},
-    {id:'sf3',type:'fashion',title:'Milan Fashion Week: Sustainable Collections Dominate',location:'Milan, Italy',lat:45.46,lng:9.19,severity:1,age:'3d ago',brief:'Milan Fashion Week saw a marked shift toward sustainable materials and circular fashion practices, with Prada and Bottega Veneta leading the movement.',sources:[{n:'Vogue',a:'3d'},{n:'WWD',a:'3d'}],tags:['Milan','Sustainability','Fashion Week']},
-  ],
-};
-
-const FALLBACK_LAUNCHES = [
-  {id:'fl0',type:'launch',title:'SpaceX Falcon 9 — Starlink Group 8-5',location:'Cape Canaveral, FL',lat:28.61,lng:-80.6,severity:2,age:'In 2 days',brief:'SpaceX Falcon 9 carrying 23 Starlink v2 Mini satellites from SLC-40.',sources:[{n:'SpaceX',a:'Upcoming'}],tags:['SpaceX','Falcon 9','Starlink']},
-  {id:'fl1',type:'launch',title:'Rocket Lab Electron — Commercial Mission',location:'Mahia, New Zealand',lat:-39.26,lng:177.86,severity:2,age:'In 5 days',brief:'Rocket Lab Electron launching commercial payload from Mahia Peninsula.',sources:[{n:'Rocket Lab',a:'Upcoming'}],tags:['Rocket Lab','Electron']},
-];
-
-// ─────────────────────────────────────────────────────────────────────────────
-// STATE
-// ─────────────────────────────────────────────────────────────────────────────
-
-let allEvents = [];
-let flightPoints = [];
-let currentTab = 'all';
-let searchQ = '';
-let selectedId = null;
-let panelOpen = true;
-let watchTags = ['Gaza','Ukraine','AI','Markets','Fashion','Climate'];
-const layerVis = {
-  news:true,conflict:true,disaster:true,storm:true,humanitarian:true,
-  flight:true,launch:true,tech:true,fashion:true,astrology:true,
-};
-let globe;
-let tickerData = [
-  {sym:'BTC',px:'–',chg:'…',up:true},{sym:'ETH',px:'–',chg:'…',up:true},
-  {sym:'SOL',px:'–',chg:'…',up:true},{sym:'EUR/USD',px:'1.0842',chg:'+0.12%',up:true},
-  {sym:'GBP/USD',px:'1.2741',chg:'+0.08%',up:true},{sym:'USD/JPY',px:'157.32',chg:'-0.23%',up:false},
-  {sym:'GOLD',px:'2,341',chg:'+0.64%',up:true},{sym:'OIL (WTI)',px:'82.14',chg:'-1.20%',up:false},
-];
-
-// ─────────────────────────────────────────────────────────────────────────────
-// UTILITIES
-// ─────────────────────────────────────────────────────────────────────────────
-
-function timeAgo(ts) {
-  const ms = typeof ts === 'number' ? ts : new Date(ts).getTime();
-  const diff = Date.now() - ms;
-  if (isNaN(diff)||diff<0) return 'Upcoming';
-  const m = Math.floor(diff/60000);
-  if (m<2) return 'Just now';
-  if (m<60) return `${m}m ago`;
-  const h = Math.floor(m/60);
-  if (h<24) return `${h}h ago`;
-  return `${Math.floor(h/24)}d ago`;
-}
-
-function proxy(url) {
-  return `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`;
-}
-
-async function get(url, timeout=9000) {
-  const r = await fetch(url, {signal:AbortSignal.timeout(timeout)});
-  if (!r.ok) throw new Error(`HTTP ${r.status}`);
-  return r.json();
-}
-
-function findLatLng(text) {
-  if (!text) return null;
-  const lower = text.toLowerCase();
-  const sorted = Object.entries(CC).sort((a,b)=>b[0].length-a[0].length);
-  for (const [c,ll] of sorted) {
-    if (lower.includes(c.toLowerCase())) return ll;
-  }
-  return null;
-}
-
-function dedupeByTitle(events) {
-  const seen = new Set();
-  return events.filter(e => {
-    const key = e.title.toLowerCase().replace(/[^a-z0-9]/g,'').slice(0,50);
-    if (seen.has(key)) return false;
-    seen.add(key); return true;
-  });
-}
-
-function setLayerStatus(layer, status) {
-  const el = document.getElementById('ls-'+layer);
-  if (el) { el.className='lc-live '+status; el.title=status==='on'?'Live data':status==='fb'?'Fallback data':'No data'; }
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-// DATA SOURCES
-// ─────────────────────────────────────────────────────────────────────────────
-
-async function fetchUSGS() {
-  const d = await get('https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&minmagnitude=5.0&limit=25&orderby=time',12000);
-  return (d.features||[]).map((f,i)=>{
-    const mag=f.properties.mag||0, place=f.properties.place||'Unknown', depth=f.geometry.coordinates[2]||0, tsunami=f.properties.tsunami===1;
-    return {id:'usgs_'+i,type:'disaster',title:`M${mag.toFixed(1)} Earthquake — ${place}`,location:place,lat:f.geometry.coordinates[1],lng:f.geometry.coordinates[0],severity:mag>=7.5?5:mag>=6.5?4:mag>=6?3:2,age:timeAgo(f.properties.time),brief:`A M${mag.toFixed(1)} earthquake occurred ${place} at ${depth.toFixed(0)} km depth.`+(tsunami?' ⚠️ Tsunami advisory issued.':'')+(f.properties.alert?` PAGER: ${f.properties.alert.toUpperCase()}.`:''),stats:[{label:'Magnitude',val:`M${mag.toFixed(1)}`},{label:'Depth',val:`${depth.toFixed(0)} km`}],sources:[{n:'USGS',a:timeAgo(f.properties.time)}],tags:['Earthquake','USGS',tsunami?'Tsunami':'Natural Disaster'],_live:true};
-  });
-}
-
-async function fetchReliefWeb() { return []; } // API retired (410)
-
-async function fetchGDELT(query, type, limit=8) {
-  const gdeltUrl=`https://api.gdeltproject.org/api/v2/geo/geo?query=${encodeURIComponent(query)}&format=json&maxrecords=${limit}×pan=24h&SOURCELANG=english`;
-  const d = await get(gdeltUrl, 12000);
-  return dedupeByTitle((d.articles||[]).map((a,i)=>{
-    const geo=a.geolocation; let lat,lng,locName;
-    if (geo?.lat&&geo?.lon){lat=geo.lat;lng=geo.lon;locName=geo.fullname||geo.countrycode;}
-    else{const ll=findLatLng(a.title);if(!ll)return null;lat=ll[0];lng=ll[1];locName=null;}
-    const sd=a.seendate||'';
-    const date=sd.length>=8?new Date(`${sd.slice(0,4)}-${sd.slice(4,6)}-${sd.slice(6,8)}T${sd.length>=14?sd.slice(8,10)+':'+sd.slice(10,12):'12:00'}:00Z`):new Date();
-    return {id:`gd_${type}_${i}`,type,title:a.title||'Article',location:locName||a.domain||a.sourcecountry||'Global',lat,lng,severity:type==='conflict'?3:2,age:timeAgo(date),brief:`${a.title}\n\nSource: ${a.domain||'Unknown'}`,url:a.url,sources:[{n:a.domain||'GDELT',a:timeAgo(date),url:a.url}],tags:[type,a.sourcecountry||'International'],_live:true};
-  }).filter(Boolean));
-}
-
-// Multi-source world news via GDELT — each query targets a different region / source domain
-// GDELT ingests 65+ languages and thousands of outlets so domain-filtering surfaces distinct voices
-const NEWS_QUERIES = [
-  // Global wires
-  { q:'site:reuters.com OR site:apnews.com',           region:'Global Wires',    lat:51.51,  lng:-0.13  },
-  // Middle East & Africa
-  { q:'site:aljazeera.com OR site:middleeasteye.net',  region:'Middle East',     lat:25.2,   lng:55.27  },
-  { q:'site:daily-nation.com OR site:theafricareport.com OR site:allafrica.com', region:'Africa', lat:1.29, lng:36.82 },
-  // Asia-Pacific
-  { q:'site:scmp.com OR site:channelnewsasia.com',     region:'Asia-Pacific',    lat:22.32,  lng:114.17 },
-  { q:'site:nhk.or.jp OR site:japantimes.co.jp',       region:'Japan',           lat:35.69,  lng:139.69 },
-  { q:'site:thehindu.com OR site:ndtv.com',            region:'India',           lat:28.61,  lng:77.21  },
-  // Europe
-  { q:'site:euronews.com OR site:dw.com',              region:'Europe',          lat:48.86,  lng:2.35   },
-  { q:'site:bbc.com OR site:theguardian.com',          region:'UK',              lat:51.51,  lng:-0.13  },
-  // Americas
-  { q:'site:latam.latimes.com OR site:mercopress.com OR site:infobae.com', region:'Latin America', lat:-23.55, lng:-46.63 },
-  { q:'site:cbc.ca OR site:globalnews.ca',             region:'Canada',          lat:45.42,  lng:-75.69 },
-];
-
-async function fetchMultiSourceNews() {
-  const results = await Promise.allSettled(
-    NEWS_QUERIES.map(({ q }) =>
-      fetchGDELTRaw(`${q} breaking OR update OR crisis OR world`, 'news', 4)
-    )
-  );
-
-  const allArticles = [];
-  results.forEach((r, i) => {
-    if (r.status !== 'fulfilled') return;
-    const region = NEWS_QUERIES[i].region;
-    const fallbackLat = NEWS_QUERIES[i].lat;
-    const fallbackLng = NEWS_QUERIES[i].lng;
-    (r.value || []).forEach((a, j) => {
-      allArticles.push({
-        ...a,
-        id: `msn_${i}_${j}`,
-        location: a.location !== 'Global' ? a.location : region,
-        lat: a.lat || fallbackLat,
-        lng: a.lng || fallbackLng,
-        tags: [...(a.tags || []), region],
-      });
-    });
-  });
-
-  return dedupeByTitle(allArticles).slice(0, 35);
-}
-
-// Raw GDELT fetch that returns partial objects (no id, allows caller to assign)
-async function fetchGDELTRaw(query, type, limit=4) {
-  const gdeltUrl=`https://api.gdeltproject.org/api/v2/geo/geo?query=${encodeURIComponent(query)}&format=json&maxrecords=${limit}×pan=24h&SOURCELANG=english`;
-  const d = await get(gdeltUrl, 12000);
-  return (d.articles||[]).map((a)=>{
-    const geo=a.geolocation; let lat,lng,locName;
-    if (geo?.lat&&geo?.lon){lat=geo.lat;lng=geo.lon;locName=geo.fullname||geo.countrycode;}
-    else{const ll=findLatLng(a.title);if(!ll){lat=null;lng=null;locName=null;}else{lat=ll[0];lng=ll[1];locName=null;}}
-    if (!lat||!lng) return null;
-    const sd=a.seendate||'';
-    const date=sd.length>=8?new Date(`${sd.slice(0,4)}-${sd.slice(4,6)}-${sd.slice(6,8)}T${sd.length>=14?sd.slice(8,10)+':'+sd.slice(10,12):'12:00'}:00Z`):new Date();
-    return {type,title:a.title||'Article',location:locName||a.domain||a.sourcecountry||'Global',lat,lng,severity:2,age:timeAgo(date),brief:`${a.title}\n\nSource: ${a.domain||'Unknown'}`,url:a.url,sources:[{n:a.domain||'GDELT',a:timeAgo(date),url:a.url}],tags:[type,a.sourcecountry||'International'],_live:true};
-  }).filter(Boolean);
-}
-
-async function fetchNHC() { return []; } // NHC blocks external requests (403)
-
-async function fetchHackerNews() {
-  const d = await get('https://hn.algolia.com/api/v1/search?tags=front_page&hitsPerPage=15',10000);
-  return dedupeByTitle((d.hits||[]).map((h,i)=>{
-    const ll=findLatLng(h.title)||findLatLng(h.url||'');
-    const hub=TECH_HUBS[i%TECH_HUBS.length];
-    const lat=ll?ll[0]:hub[0], lng=ll?ll[1]:hub[1];
-    const location=ll?(Object.keys(CC).find(c=>h.title.toLowerCase().includes(c.toLowerCase()))||h.sourcecountry||'Tech'):'Tech Hub';
-    return {id:'hn_'+i,type:'tech',title:h.title,location:location,lat,lng,severity:Math.min(4,Math.max(1,Math.floor((h.points||0)/150)+1)),age:timeAgo(h.created_at),brief:`${h.title}\n\n${h.points||0} points · ${h.num_comments||0} comments · by ${h.author}`,url:h.url,sources:[{n:'Hacker News',a:timeAgo(h.created_at),url:h.url||`https://news.ycombinator.com/item?id=${h.objectID}`}],tags:['Tech','Hacker News'],_live:true};
-  }).filter(Boolean));
-}
-
-async function fetchFashionNews() {
-  return fetchGDELT(
-    '"fashion week" OR "designer" OR runway OR couture OR Vogue OR "luxury brand" OR Gucci OR Prada OR Dior OR Chanel OR LVMH OR Balenciaga OR "haute couture"',
-    'fashion', 10
-  );
-}
-
-// ── REAL SKY DATA — self-contained, no external library ──────────────────────
-// Uses standard astronomical algorithms (Meeus "Astronomical Algorithms")
-// to compute live subsolar/sublunar geographic points for all planets + Moon.
-
-const PLANETS = [
-  { name:'Sun',     emoji:'☀️'  },
-  { name:'Moon',    emoji:'🌕'  },
-  { name:'Mercury', emoji:'☿'   },
-  { name:'Venus',   emoji:'♀️'  },
-  { name:'Mars',    emoji:'♂️'  },
-  { name:'Jupiter', emoji:'♃'   },
-  { name:'Saturn',  emoji:'♄'   },
-  { name:'Uranus',  emoji:'♅'   },
-  { name:'Neptune', emoji:'♆'   },
-];
-
-const DEG = Math.PI / 180;
-const RAD = 180 / Math.PI;
-
-function jde(date) {
-  // Julian Day Number from JS Date
-  return date.getTime() / 86400000 + 2440587.5;
-}
-
-function T(date) {
-  // Julian centuries from J2000.0
-  return (jde(date) - 2451545.0) / 36525;
-}
-
-function norm360(x) { return ((x % 360) + 360) % 360; }
-function norm180(x) { x = norm360(x); return x > 180 ? x - 360 : x; }
-
-// Greenwich Mean Sidereal Time in degrees
-function gmst(date) {
-  const jd = jde(date);
-  const t  = (jd - 2451545.0) / 36525;
-  let g = 280.46061837 + 360.98564736629 * (jd - 2451545.0)
-          + 0.000387933 * t * t - t * t * t / 38710000;
-  return norm360(g);
-}
-
-// Convert equatorial (RA degrees, Dec degrees) → subsolar lat/lng
-function equToGeo(ra_deg, dec_deg, date) {
-  const lng = norm180(ra_deg - gmst(date));
-  return { lat: dec_deg, lng };
-}
-
-// ── Sun (low-precision, ~0.01° error) ──────────────────────────────────────
-function sunPosition(date) {
-  const t   = T(date);
-  const L0  = norm360(280.46646 + 36000.76983 * t);
-  const M   = norm360(357.52911 + 35999.05029 * t - 0.0001537 * t * t) * DEG;
-  const C   = (1.914602 - 0.004817 * t - 0.000014 * t * t) * Math.sin(M)
-            + (0.019993 - 0.000101 * t) * Math.sin(2 * M)
-            +  0.000289 * Math.sin(3 * M);
-  const sun_lon = norm360(L0 + C);
-  const omega   = norm360(125.04 - 1934.136 * t);
-  const lambda  = norm360(sun_lon - 0.00569 - 0.00478 * Math.sin(omega * DEG));
-  const eps     = (23.439291111 - 0.013004167 * t) * DEG;
-  const ra  = Math.atan2(Math.cos(eps) * Math.sin(lambda * DEG), Math.cos(lambda * DEG)) * RAD;
-  const dec = Math.asin(Math.sin(eps) * Math.sin(lambda * DEG)) * RAD;
-  return equToGeo(norm360(ra), dec, date);
-}
-
-// ── Moon (simplified, ~1° error) ───────────────────────────────────────────
-function moonPosition(date) {
-  const t  = T(date);
-  const L1 = norm360(218.3164477 + 481267.88123421 * t);
-  const D  = norm360(297.8501921 + 445267.1114034  * t) * DEG;
-  const M  = norm360(357.5291092 +  35999.0502909  * t) * DEG;
-  const Mp = norm360(134.9633964 + 477198.8675055  * t) * DEG;
-  const F  = norm360(93.2720950  + 483202.0175233  * t) * DEG;
-  const lon = L1
-    + 6.288774 * Math.sin(Mp)
-    + 1.274027 * Math.sin(2*D - Mp)
-    + 0.658314 * Math.sin(2*D)
-    + 0.213618 * Math.sin(2*Mp)
-    - 0.185116 * Math.sin(M)
-    - 0.114332 * Math.sin(2*F);
-  const lat_m =
-      5.128122 * Math.sin(F)
-    + 0.280602 * Math.sin(Mp + F)
-    + 0.277693 * Math.sin(Mp - F)
-    + 0.173237 * Math.sin(2*D - F);
-  const eps = (23.439291111 - 0.013004167 * t) * DEG;
-  const lrad = lon * DEG, brad = lat_m * DEG;
-  const ra  = Math.atan2(Math.sin(lrad) * Math.cos(eps) - Math.tan(brad) * Math.sin(eps), Math.cos(lrad)) * RAD;
-  const dec = Math.asin(Math.sin(brad) * Math.cos(eps) + Math.cos(brad) * Math.sin(eps) * Math.sin(lrad)) * RAD;
-  return equToGeo(norm360(ra), dec, date);
-}
-
-function moonPhase(date) {
-  const t   = T(date);
-  const D   = norm360(297.8501921 + 445267.1114034 * t) * DEG;
-  const M   = norm360(357.5291092 +  35999.0502909 * t) * DEG;
-  const Mp  = norm360(134.9633964 + 477198.8675055 * t) * DEG;
-  const angle = norm360(180 - (norm360(297.8501921 + 445267.1114034 * t)));
-  const phases = ['🌑 New Moon','🌒 Waxing Crescent','🌓 First Quarter','🌔 Waxing Gibbous','🌕 Full Moon','🌖 Waning Gibbous','🌗 Last Quarter','🌘 Waning Crescent'];
-  return phases[Math.floor(((angle + 22.5) % 360) / 45)];
-}
-
-// ── Planet mean positions (low-precision, Meeus ch.25 table) ───────────────
-const PLANET_ELEMS = {
-  Mercury:{ L:[252.250906,149472.6746358,-0.00000535,0.000000002], e:0.20563175, a:0.387098 },
-  Venus:  { L:[181.979801, 58517.8156760, 0.00000165,-0.000000002], e:0.00677188, a:0.723330 },
-  Mars:   { L:[ 19.9719697,19140.3023273, 0.00000097,-0.000000001], e:0.09340062, a:1.523688 },
-  Jupiter:{ L: [34.3514316, 3034.9056606,-0.00008501, 0.000000004], e:0.04849485, a:5.202561 },
-  Saturn: { L: [50.0774443, 1222.1138488, 0.00021004,-0.000000019], e:0.05550825, a:9.537070 },
-  Uranus: { L:[314.0550699,  428.4669983,-0.00000031, 0.000000000], e:0.04629590, a:19.19126 },
-  Neptune:{ L:[304.3487905,  218.4862002, 0.00000059,-0.000000002], e:0.00898809, a:30.06896 },
-};
-
-function planetPosition(name, date) {
-  const el  = PLANET_ELEMS[name];
-  const t   = T(date);
-  const L   = norm360(el.L[0] + el.L[1]*t + el.L[2]*t*t + el.L[3]*t*t*t) * DEG;
-  // Simplified: use mean longitude as ecliptic longitude (ignores equation of center for speed)
-  const eps = (23.439291111 - 0.013004167 * t) * DEG;
-  const ra  = Math.atan2(Math.sin(L) * Math.cos(eps), Math.cos(L)) * RAD;
-  const dec = Math.asin(Math.sin(eps) * Math.sin(L)) * RAD;
-  return equToGeo(norm360(ra), dec, date);
-}
-
-// Constellation lookup — 88 IAU boundaries (simplified 12-band version by RA/Dec)
-const CONST_BANDS = [
-  [0,30,'Pisces'],[30,60,'Aries'],[60,90,'Taurus'],[90,120,'Gemini'],
-  [120,150,'Cancer'],[150,180,'Leo'],[180,210,'Virgo'],[210,240,'Libra'],
-  [240,270,'Scorpius'],[270,300,'Sagittarius'],[300,330,'Capricornus'],[330,360,'Aquarius'],
-];
-function constellation(ra_deg) {
-  const ra = norm360(ra_deg);
-  return (CONST_BANDS.find(([a,b])=>ra>=a&&ra<b)||['','','Unknown'])[2];
-}
-
-function computeSubpoints(date) {
-  const results = {};
-  const sunPt = sunPosition(date);
-  results['Sun'] = sunPt;
-  results['Moon'] = moonPosition(date);
-  for (const name of Object.keys(PLANET_ELEMS)) {
-    results[name] = planetPosition(name, date);
-  }
-  return results;
-}
-
-async function fetchISSPosition() {
-  try {
-    const d = await get('https://api.wheretheiss.at/v1/satellites/25544', 8000);
-    return { lat: d.latitude, lng: d.longitude };
-  } catch (_) { return null; }
-}
-
-async function fetchAuroraKp() {
-  try {
-    const d = await get('https://services.swpc.noaa.gov/products/noaa-planetary-k-index-forecast.json', 8000);
-    const predicted = (d||[]).filter(r=>r[2]==='predicted');
-    const maxKp = Math.max(...predicted.slice(0,4).map(r=>parseFloat(r[1])||0));
-    return maxKp;
-  } catch (_) { return null; }
-}
-
-async function fetchSkyData() {
-  const now    = new Date();
-  const pts    = computeSubpoints(now);
-  const events = [];
-
-  for (const p of PLANETS) {
-    const pt = pts[p.name];
-    if (!pt) continue;
-    const ra_deg = norm360(gmst(now) + pt.lng);
-    const con    = constellation(ra_deg);
-    const phase  = p.name === 'Moon' ? `\nPhase: ${moonPhase(now)}.` : '';
-    const isInner = ['Mercury','Venus'].includes(p.name);
-
-    events.push({
-      id:       `sky_${p.name.toLowerCase()}`,
-      type:     'astrology',
-      title:    `${p.emoji} ${p.name} — ${con}`,
-      location: `${pt.lat.toFixed(2)}°, ${pt.lng.toFixed(2)}°`,
-      lat:      pt.lat,
-      lng:      pt.lng,
-      severity: p.name === 'Sun' || p.name === 'Moon' ? 3 : 2,
-      age:      'Live',
-      brief:    `Subpoint: ${pt.lat.toFixed(3)}°, ${pt.lng.toFixed(3)}°\nConstellation: ${con}.${phase}\n\nThe subpoint is the location on Earth directly beneath ${p.name} right now — the point experiencing its zenith.`,
-      stats:    [{ label:'Constellation', val:con }, { label:p.name==='Moon'?'Phase':'Subpoint Lat', val:p.name==='Moon'?moonPhase(now).split(' ').slice(1).join(' '):`${pt.lat.toFixed(1)}°` }],
-      sources:  [{ n:'Meeus Algorithms', a:'Computed live' }],
-      tags:     ['Astronomy', p.name, con, 'Sky'],
-      _live:    true,
-      _planet:  p,
-    });
-  }
-
-  // ISS
-  const iss = await fetchISSPosition();
-  if (iss) {
-    events.push({
-      id:'sky_iss', type:'astrology',
-      title:'🛸 ISS — International Space Station',
-      location:`${iss.lat.toFixed(2)}°, ${iss.lng.toFixed(2)}°`,
-      lat:iss.lat, lng:iss.lng, severity:2, age:'Live',
-      brief:`The ISS is currently at ${iss.lat.toFixed(3)}°, ${iss.lng.toFixed(3)}°, orbiting at ~408 km altitude at 27,600 km/h.`,
-      stats:[{label:'Altitude',val:'~408 km'},{label:'Speed',val:'27,600 km/h'}],
-      sources:[{n:'wheretheiss.at',a:'Live',url:'https://api.wheretheiss.at/v1/satellites/25544'}],
-      tags:['ISS','Space Station','Orbit','NASA'],
-      _live:true, _planet:{emoji:'🛸',name:'ISS'},
-    });
-  }
-
-  // Aurora
-  const kp = await fetchAuroraKp();
-  if (kp !== null) {
-    const auroLat = 66.5 - kp * 2.5;
-    const severity = kp>=7?5:kp>=5?4:kp>=3?3:2;
-    events.push({
-      id:'sky_aurora', type:'astrology',
-      title:`🌌 Aurora Forecast — Kp ${kp.toFixed(1)}`,
-      location:`~${auroLat.toFixed(0)}° latitude`,
-      lat:auroLat, lng:0, severity, age:'NOAA Forecast',
-      brief:`NOAA Kp index: ${kp.toFixed(1)}.\nAurora visible above ~${auroLat.toFixed(0)}° latitude.\n\nKp 0 = quiet · Kp 5+ = geomagnetic storm · Kp 9 = extreme.`,
-      stats:[{label:'Kp Index',val:kp.toFixed(1)},{label:'Visible ≥',val:`${auroLat.toFixed(0)}°`}],
-      sources:[{n:'NOAA SWPC',a:'Forecast',url:'https://www.swpc.noaa.gov'}],
-      tags:['Aurora','Geomagnetic Storm','NOAA','Space Weather'],
-      _live:true, _planet:{emoji:'🌌',name:'Aurora'},
-    });
-  }
-
-  return events;
-}
-
-// OpenSky CORS-blocks external origins. Simulated routes with time-based progress.
+// Simulated flight routes (OpenSky blocks external CORS)
 const FLIGHT_ROUTES = [
   {s:'JFK',d:'LHR',sLat:40.64,sLng:-73.78,dLat:51.48,dLng:-0.46},
   {s:'LAX',d:'NRT',sLat:33.94,sLng:-118.41,dLat:35.76,dLng:140.39},
@@ -793,326 +272,813 @@ const FLIGHT_ROUTES = [
   {s:'PEK',d:'LAX',sLat:40.08,sLng:116.58,dLat:33.94,dLng:-118.41},
   {s:'SCL',d:'MIA',sLat:-33.39,sLng:-70.79,dLat:25.79,dLng:-80.29},
   {s:'DOH',d:'JFK',sLat:25.27,sLng:51.61,dLat:40.64,dLng:-73.78},
-  {s:'CGK',d:'AMS',sLat:-6.13,sLng:106.66,dLat:52.31,dLng:4.77},
+  {s:'CGK',d:'AMS',sLat:-6.13,sLng:106.66,dLat:52.31,dLng:4.77}
 ];
-function getSimulatedFlights() {
-  const now = Date.now();
-  return FLIGHT_ROUTES.map((r, i) => {
-    const t = ((now / 1000 / 3600 + i * 0.7) % 10) / 10; // 0..1 progress
-    const lat = r.sLat + (r.dLat - r.sLat) * t;
-    const lng = r.sLng + (r.dLng - r.sLng) * t;
-    return [null,null,null,null,null,lng,lat,null,false,null,null,null,null,null,null,null,null];
+
+// =============================================================================
+// SEEDS (shown when live APIs fail)
+// =============================================================================
+const SEEDS = {
+  conflict:[
+    {id:'sc1',type:'conflict',title:'Gaza: Aid Corridor Negotiations Stall',location:'Gaza Strip',lat:31.35,lng:34.31,severity:5,age:'30m ago',brief:'Ceasefire negotiations have stalled. The UN reports 340+ aid trucks blocked from entering northern Gaza over 72 hours.',stats:[{label:'Displaced',val:'1.7M'},{label:'Aid Blocked',val:'72h+'}],sources:[{n:'UN OCHA',a:'1h'},{n:'Al Jazeera',a:'30m'}],tags:['Gaza','Palestine','Israel']},
+    {id:'sc2',type:'conflict',title:'Ukraine: Kharkiv Shelling Intensifies',location:'Kharkiv, Ukraine',lat:49.99,lng:36.23,severity:5,age:'45m ago',brief:'Russian forces intensified strikes on Kharkiv Oblast. Ukrainian air defense intercepted 8 of 11 overnight drones.',stats:[{label:'Strikes (24h)',val:'14'},{label:'Intercepted',val:'8/11'}],sources:[{n:'Reuters',a:'45m'},{n:'Kyiv Post',a:'1h'}],tags:['Ukraine','Russia','War']},
+    {id:'sc3',type:'conflict',title:'Sudan: RSF Advances on El Fasher',location:'El Fasher, Sudan',lat:13.63,lng:25.35,severity:4,age:'3h ago',brief:'RSF forces control two more districts surrounding El Fasher, with ~800,000 civilians sheltering in the city.',stats:[{label:'Civilians',val:'~800K'},{label:'Risk',val:'CRITICAL'}],sources:[{n:'UN OCHA',a:'3h'}],tags:['Sudan','Darfur','RSF']}
+  ],
+  disaster:[
+    {id:'sd1',type:'disaster',title:'M6.2 Earthquake — Sulawesi, Indonesia',location:'Sulawesi, Indonesia',lat:-1.5,lng:120.2,severity:3,age:'3h ago',brief:'A magnitude 6.2 earthquake struck Sulawesi at 18km depth. No tsunami warning issued.',stats:[{label:'Magnitude',val:'M6.2'},{label:'Depth',val:'18 km'}],sources:[{n:'USGS',a:'3h'}],tags:['Earthquake','Indonesia']},
+    {id:'sd2',type:'disaster',title:'Monsoon Flooding — Sylhet, Bangladesh',location:'Sylhet, Bangladesh',lat:24.89,lng:91.87,severity:4,age:'12h ago',brief:'Flash flooding in Sylhet displaced approximately 200,000 people.',stats:[{label:'Displaced',val:'200K'}],sources:[{n:'Reuters',a:'13h'}],tags:['Flooding','Bangladesh']}
+  ],
+  storm:[
+    {id:'ss1',type:'storm',title:'Tropical Storm — Bay of Bengal',location:'Bay of Bengal',lat:15.0,lng:88.0,severity:2,age:'8h ago',brief:'A tropical storm formed with sustained winds of 65 km/h. IMD monitoring.',sources:[{n:'IMD',a:'8h'}],tags:['Storm','Bay of Bengal']}
+  ],
+  humanitarian:[
+    {id:'sh1',type:'humanitarian',title:'Yemen: Famine in 4 Governorates',location:'Yemen',lat:15.55,lng:48.52,severity:5,age:'1d ago',brief:'WFP classified four Yemeni governorates IPC Phase 5. 2.7M face catastrophic food insecurity.',stats:[{label:'At Risk',val:'2.7M'},{label:'Ration Cut',val:'50%'}],sources:[{n:'WFP',a:'1d'}],tags:['Yemen','Famine','WFP']},
+    {id:'sh2',type:'humanitarian',title:'Haiti: Gang Violence Blocks Aid',location:'Port-au-Prince, Haiti',lat:18.54,lng:-72.34,severity:4,age:'6h ago',brief:'Gang violence blocked humanitarian aid corridors for the 5th consecutive day. 580,000 displaced.',stats:[{label:'Displaced',val:'580K'}],sources:[{n:'UN OCHA',a:'6h'}],tags:['Haiti','Displacement']}
+  ],
+  tech:[
+    {id:'st1',type:'tech',title:'OpenAI Releases GPT-5',location:'San Francisco, CA',lat:37.77,lng:-122.42,severity:2,age:'5h ago',brief:'OpenAI announced GPT-5 with significantly improved reasoning and coding capabilities.',sources:[{n:'Hacker News',a:'5h'}],tags:['AI','OpenAI']},
+    {id:'st2',type:'tech',title:'TSMC Confirms 2nm Timeline for 2025',location:'Taiwan',lat:24.8,lng:120.97,severity:2,age:'8h ago',brief:'TSMC confirmed N2 process node on track for 2025 volume production.',sources:[{n:'Hacker News',a:'8h'}],tags:['TSMC','Semiconductors']}
+  ],
+  fashion:[
+    {id:'sf1',type:'fashion',title:'Paris Fashion Week: Spring Collections',location:'Paris, France',lat:48.86,lng:2.35,severity:2,age:'1d ago',brief:'Paris Fashion Week Spring/Summer collections opened with debuts from emerging designers alongside Dior, Chanel, and Saint Laurent.',sources:[{n:'Vogue',a:'1d'}],tags:['Fashion Week','Paris','Runway']},
+    {id:'sf2',type:'fashion',title:'LVMH Reports Revenue Growth',location:'Paris, France',lat:48.86,lng:2.35,severity:1,age:'2d ago',brief:'LVMH reported 8% organic revenue growth, with Louis Vuitton and Dior leading gains in Asia Pacific.',sources:[{n:'Reuters',a:'2d'}],tags:['LVMH','Luxury']}
+  ]
+};
+
+const FALLBACK_LAUNCHES = [
+  {id:'fl0',type:'launch',title:'SpaceX Falcon 9 — Starlink',location:'Cape Canaveral, FL',lat:28.61,lng:-80.6,severity:2,age:'In 2 days',brief:'SpaceX Falcon 9 carrying Starlink v2 Mini satellites from SLC-40.',sources:[{n:'SpaceX',a:'Upcoming'}],tags:['SpaceX','Starlink']},
+  {id:'fl1',type:'launch',title:'Rocket Lab Electron — Commercial',location:'Mahia, New Zealand',lat:-39.26,lng:177.86,severity:2,age:'In 5 days',brief:'Rocket Lab Electron launching commercial payload from Mahia Peninsula.',sources:[{n:'Rocket Lab',a:'Upcoming'}],tags:['Rocket Lab','Electron']}
+];
+
+// =============================================================================
+// STATE
+// =============================================================================
+let allEvents = [];
+let flightPoints = [];
+let currentTab = 'all';
+let searchQ = '';
+let selectedId = null;
+let panelOpen = true;
+let watchTags = ['Gaza','Ukraine','AI','Markets','Fashion','Climate'];
+const layerVis = {news:true,conflict:true,disaster:true,storm:true,humanitarian:true,flight:true,launch:true,tech:true,fashion:true,astrology:true};
+let globe;
+let tickerData = [
+  {sym:'BTC',px:'–',chg:'',up:true},{sym:'ETH',px:'–',chg:'',up:true},
+  {sym:'SOL',px:'–',chg:'',up:true},{sym:'EUR/USD',px:'–',chg:'',up:true},
+  {sym:'GBP/USD',px:'–',chg:'',up:true},{sym:'USD/JPY',px:'–',chg:'',up:true},
+  {sym:'GOLD',px:'2,341',chg:'+0.64%',up:true},{sym:'OIL (WTI)',px:'82.14',chg:'-1.20%',up:false}
+];
+
+// =============================================================================
+// UTILITIES
+// =============================================================================
+function timeAgo(ts) {
+  const ms = typeof ts === 'number' ? ts : new Date(ts).getTime();
+  const diff = Date.now() - ms;
+  if (isNaN(diff) || diff < 0) return 'Upcoming';
+  const m = Math.floor(diff / 60000);
+  if (m < 2) return 'Just now';
+  if (m < 60) return m + 'm ago';
+  const h = Math.floor(m / 60);
+  if (h < 24) return h + 'h ago';
+  return Math.floor(h / 24) + 'd ago';
+}
+
+// Safe fetch — no proxy, just direct with timeout
+async function apiFetch(url, timeout) {
+  timeout = timeout || 9000;
+  const r = await fetch(url, {signal: AbortSignal.timeout(timeout)});
+  if (!r.ok) throw new Error('HTTP ' + r.status);
+  return r.json();
+}
+
+// Build GDELT URL safely using URLSearchParams (avoids & encoding issues)
+function gdeltUrl(query, limit, timespan) {
+  limit = limit || 8;
+  timespan = timespan || '24h';
+  const p = new URLSearchParams();
+  p.set('query', query);
+  p.set('format', 'json');
+  p.set('maxrecords', String(limit));
+  p.set('timespan', timespan);
+  p.set('SOURCELANG', 'english');
+  return 'https://api.gdeltproject.org/api/v2/geo/geo?' + p.toString();
+}
+
+function findLatLng(text) {
+  if (!text) return null;
+  const lower = text.toLowerCase();
+  const sorted = Object.entries(CC).sort(function(a,b){return b[0].length - a[0].length;});
+  for (let i = 0; i < sorted.length; i++) {
+    if (lower.indexOf(sorted[i][0].toLowerCase()) !== -1) return sorted[i][1];
+  }
+  return null;
+}
+
+function dedupeByTitle(events) {
+  const seen = new Set();
+  return events.filter(function(e) {
+    const key = e.title.toLowerCase().replace(/[^a-z0-9]/g,'').slice(0,50);
+    if (seen.has(key)) return false;
+    seen.add(key); return true;
   });
 }
-async function fetchOpenSky() { return getSimulatedFlights(); }
 
-async function fetchLaunches() {
-  const d = await get('https://ll.thespacedevs.com/2.2.0/launch/upcoming/?format=json&limit=6&mode=list',12000);
-  const parsed=(d.results||[]).map((l,i)=>{
-    const lat=parseFloat(l.pad?.latitude), lng=parseFloat(l.pad?.longitude);
-    if (!lat||!lng) return null;
-    const net=l.net?new Date(l.net):null;
-    const diff=net?Math.floor((net-Date.now())/86400000):null;
-    const age=diff===null?'TBD':diff<=0?'Imminent':diff===1?'Tomorrow':`In ${diff}d`;
-    return {id:'lnch_'+i,type:'launch',title:l.name,location:l.pad?.location?.name||'Launch Site',lat,lng,severity:2,age,brief:`${l.name}. Vehicle: ${l.rocket?.configuration?.full_name||'Unknown'}. Provider: ${l.launch_service_provider?.name||'Unknown'}. NET: ${net?net.toUTCString():'TBD'}.`,stats:[{label:'Vehicle',val:l.rocket?.configuration?.name||'TBD'},{label:'Window',val:age}],sources:[{n:l.launch_service_provider?.name||'Provider',a:age}],tags:['Launch',l.launch_service_provider?.name||'Space'],_live:true};
-  }).filter(Boolean);
-  return parsed.length?parsed:FALLBACK_LAUNCHES;
+function setLayerStatus(layer, status) {
+  const el = document.getElementById('ls-' + layer);
+  if (el) { el.className = 'lc-live ' + status; }
 }
 
-async function fetchCrypto() {
-  // Crypto via CoinGecko
+// =============================================================================
+// ASTRONOMY — self-contained Meeus algorithms
+// =============================================================================
+const DEG = Math.PI / 180;
+const RAD = 180 / Math.PI;
+
+function jde(date) { return date.getTime() / 86400000 + 2440587.5; }
+function julT(date) { return (jde(date) - 2451545.0) / 36525; }
+function norm360(x) { return ((x % 360) + 360) % 360; }
+function norm180(x) { x = norm360(x); return x > 180 ? x - 360 : x; }
+
+function gmstDeg(date) {
+  const jd = jde(date);
+  const t = (jd - 2451545.0) / 36525;
+  return norm360(280.46061837 + 360.98564736629 * (jd - 2451545.0) + 0.000387933 * t * t - t * t * t / 38710000);
+}
+
+function sunSubpoint(date) {
+  const t = julT(date);
+  const L0 = norm360(280.46646 + 36000.76983 * t);
+  const M = norm360(357.52911 + 35999.05029 * t - 0.0001537 * t * t) * DEG;
+  const C = (1.914602 - 0.004817 * t) * Math.sin(M) + 0.019993 * Math.sin(2*M) + 0.000289 * Math.sin(3*M);
+  const lon = norm360(L0 + C);
+  const omega = norm360(125.04 - 1934.136 * t);
+  const lam = norm360(lon - 0.00569 - 0.00478 * Math.sin(omega * DEG));
+  const eps = (23.439291111 - 0.013004167 * t) * DEG;
+  const ra = Math.atan2(Math.cos(eps) * Math.sin(lam * DEG), Math.cos(lam * DEG)) * RAD;
+  const dec = Math.asin(Math.sin(eps) * Math.sin(lam * DEG)) * RAD;
+  return {lat: dec, lng: norm180(norm360(ra) - gmstDeg(date))};
+}
+
+function moonSubpoint(date) {
+  const t = julT(date);
+  const L1 = norm360(218.3164477 + 481267.88123421 * t);
+  const D = norm360(297.8501921 + 445267.1114034 * t) * DEG;
+  const M = norm360(357.5291092 + 35999.0502909 * t) * DEG;
+  const Mp = norm360(134.9633964 + 477198.8675055 * t) * DEG;
+  const F = norm360(93.2720950 + 483202.0175233 * t) * DEG;
+  const lonM = L1 + 6.288774*Math.sin(Mp) + 1.274027*Math.sin(2*D-Mp) + 0.658314*Math.sin(2*D) + 0.213618*Math.sin(2*Mp) - 0.185116*Math.sin(M) - 0.114332*Math.sin(2*F);
+  const latM = 5.128122*Math.sin(F) + 0.280602*Math.sin(Mp+F) + 0.277693*Math.sin(Mp-F) + 0.173237*Math.sin(2*D-F);
+  const eps = (23.439291111 - 0.013004167 * t) * DEG;
+  const lr = lonM * DEG, br = latM * DEG;
+  const ra = Math.atan2(Math.sin(lr)*Math.cos(eps) - Math.tan(br)*Math.sin(eps), Math.cos(lr)) * RAD;
+  const dec = Math.asin(Math.sin(br)*Math.cos(eps) + Math.cos(br)*Math.sin(eps)*Math.sin(lr)) * RAD;
+  return {lat: dec, lng: norm180(norm360(ra) - gmstDeg(date))};
+}
+
+function moonPhaseName(date) {
+  const t = julT(date);
+  const D = norm360(297.8501921 + 445267.1114034 * t);
+  const phases = ['🌑 New','🌒 Crescent','🌓 Quarter','🌔 Gibbous','🌕 Full','🌖 Gibbous','🌗 Quarter','🌘 Crescent'];
+  return phases[Math.floor(((D + 22.5) % 360) / 45)];
+}
+
+const PLANET_ELEMS = {
+  Mercury:{L:[252.250906,149472.6746358,-0.00000535],e:0.20563175},
+  Venus:  {L:[181.979801, 58517.8156760, 0.00000165],e:0.00677188},
+  Mars:   {L:[ 19.971970, 19140.302327,  0.00000097],e:0.09340062},
+  Jupiter:{L:[ 34.351432,  3034.905661, -0.00008501],e:0.04849485},
+  Saturn: {L:[ 50.077444,  1222.113849,  0.00021004],e:0.05550825},
+  Uranus: {L:[314.055070,   428.466998, -0.00000031],e:0.04629590},
+  Neptune:{L:[304.348791,   218.486200,  0.00000059],e:0.00898809}
+};
+
+function planetSubpoint(name, date) {
+  const el = PLANET_ELEMS[name];
+  const t = julT(date);
+  const L = norm360(el.L[0] + el.L[1]*t + el.L[2]*t*t) * DEG;
+  const eps = (23.439291111 - 0.013004167 * t) * DEG;
+  const ra = Math.atan2(Math.sin(L)*Math.cos(eps), Math.cos(L)) * RAD;
+  const dec = Math.asin(Math.sin(eps)*Math.sin(L)) * RAD;
+  return {lat: dec, lng: norm180(norm360(ra) - gmstDeg(date))};
+}
+
+const CONST_BANDS = [
+  [0,30,'Pisces'],[30,60,'Aries'],[60,90,'Taurus'],[90,120,'Gemini'],
+  [120,150,'Cancer'],[150,180,'Leo'],[180,210,'Virgo'],[210,240,'Libra'],
+  [240,270,'Scorpius'],[270,300,'Sagittarius'],[300,330,'Capricornus'],[330,360,'Aquarius']
+];
+function constellation(ra_deg) {
+  const ra = norm360(ra_deg);
+  const b = CONST_BANDS.find(function(b){return ra >= b[0] && ra < b[1];});
+  return b ? b[2] : 'Unknown';
+}
+
+const SKY_BODIES = [
+  {name:'Sun',    emoji:'☀️'},
+  {name:'Moon',   emoji:'🌕'},
+  {name:'Mercury',emoji:'☿'},
+  {name:'Venus',  emoji:'♀'},
+  {name:'Mars',   emoji:'♂'},
+  {name:'Jupiter',emoji:'♃'},
+  {name:'Saturn', emoji:'♄'},
+  {name:'Uranus', emoji:'♅'},
+  {name:'Neptune',emoji:'♆'}
+];
+
+function computeSkyEvents() {
+  const now = new Date();
+  const events = [];
+  for (let i = 0; i < SKY_BODIES.length; i++) {
+    const b = SKY_BODIES[i];
+    let pt;
+    if (b.name === 'Sun') pt = sunSubpoint(now);
+    else if (b.name === 'Moon') pt = moonSubpoint(now);
+    else pt = planetSubpoint(b.name, now);
+    const raApprox = norm360(gmstDeg(now) + pt.lng);
+    const con = constellation(raApprox);
+    const phase = b.name === 'Moon' ? (' Phase: ' + moonPhaseName(now) + '.') : '';
+    events.push({
+      id: 'sky_' + b.name.toLowerCase(),
+      type: 'astrology',
+      title: b.emoji + ' ' + b.name + ' — ' + con,
+      location: pt.lat.toFixed(2) + '°, ' + pt.lng.toFixed(2) + '°',
+      lat: pt.lat, lng: pt.lng,
+      severity: (b.name === 'Sun' || b.name === 'Moon') ? 3 : 2,
+      age: 'Live',
+      brief: 'Subpoint: ' + pt.lat.toFixed(3) + '°, ' + pt.lng.toFixed(3) + '°\nConstellation: ' + con + '.' + phase + '\n\nThe subpoint is the location on Earth directly beneath ' + b.name + ' right now.',
+      stats: [{label:'Constellation',val:con},{label:b.name==='Moon'?'Phase':'Sub-lat',val:b.name==='Moon'?moonPhaseName(now):pt.lat.toFixed(1)+'°'}],
+      sources: [{n:'Meeus Algorithms',a:'Computed live'}],
+      tags: ['Astronomy',b.name,con,'Sky'],
+      _live: true, _planet: b
+    });
+  }
+  return events;
+}
+
+// =============================================================================
+// API FETCHERS — only using APIs confirmed to have CORS *
+// =============================================================================
+
+// USGS Earthquakes — CORS *
+async function fetchUSGS() {
+  const p = new URLSearchParams();
+  p.set('format', 'geojson');
+  p.set('minmagnitude', '5.0');
+  p.set('limit', '25');
+  p.set('orderby', 'time');
+  const d = await apiFetch('https://earthquake.usgs.gov/fdsnws/event/1/query?' + p.toString(), 12000);
+  return (d.features || []).map(function(f, i) {
+    const mag = f.properties.mag || 0;
+    const place = f.properties.place || 'Unknown';
+    const depth = f.geometry.coordinates[2] || 0;
+    const tsunami = f.properties.tsunami === 1;
+    return {
+      id: 'usgs_' + i, type: 'disaster',
+      title: 'M' + mag.toFixed(1) + ' Earthquake — ' + place,
+      location: place,
+      lat: f.geometry.coordinates[1], lng: f.geometry.coordinates[0],
+      severity: mag >= 7.5 ? 5 : mag >= 6.5 ? 4 : mag >= 6 ? 3 : 2,
+      age: timeAgo(f.properties.time),
+      brief: 'M' + mag.toFixed(1) + ' earthquake ' + place + ' at ' + depth.toFixed(0) + ' km depth.' + (tsunami ? ' Tsunami advisory issued.' : '') + (f.properties.alert ? ' PAGER alert: ' + f.properties.alert.toUpperCase() + '.' : ''),
+      stats: [{label:'Magnitude',val:'M'+mag.toFixed(1)},{label:'Depth',val:depth.toFixed(0)+' km'}],
+      sources: [{n:'USGS',a:timeAgo(f.properties.time),url:'https://earthquake.usgs.gov'}],
+      tags: ['Earthquake','USGS',tsunami?'Tsunami':'Natural Disaster'],
+      _live: true
+    };
+  });
+}
+
+// GDELT — CORS * natively, called directly (no proxy)
+async function fetchGDELT(query, type, limit) {
+  limit = limit || 8;
+  const d = await apiFetch(gdeltUrl(query, limit, '24h'), 12000);
+  const articles = d.articles || [];
+  return dedupeByTitle(articles.map(function(a, i) {
+    const geo = a.geolocation;
+    let lat, lng, locName;
+    if (geo && geo.lat && geo.lon) {
+      lat = geo.lat; lng = geo.lon; locName = geo.fullname || geo.countrycode;
+    } else {
+      const ll = findLatLng(a.title);
+      if (!ll) return null;
+      lat = ll[0]; lng = ll[1]; locName = null;
+    }
+    const sd = a.seendate || '';
+    let date;
+    try {
+      date = sd.length >= 8 ? new Date(sd.slice(0,4) + '-' + sd.slice(4,6) + '-' + sd.slice(6,8) + 'T' + (sd.length >= 14 ? sd.slice(8,10) + ':' + sd.slice(10,12) : '12:00') + ':00Z') : new Date();
+    } catch(e) { date = new Date(); }
+    return {
+      id: 'gd_' + type + '_' + i, type: type,
+      title: a.title || 'Article',
+      location: locName || a.domain || a.sourcecountry || 'Global',
+      lat: lat, lng: lng,
+      severity: type === 'conflict' ? 3 : 2,
+      age: timeAgo(date),
+      brief: a.title + '\n\nSource: ' + (a.domain || 'Unknown'),
+      url: a.url,
+      sources: [{n: a.domain || 'GDELT', a: timeAgo(date), url: a.url}],
+      tags: [type, a.sourcecountry || 'International'],
+      _live: true
+    };
+  }).filter(Boolean));
+}
+
+// Multi-source world news via GDELT
+const NEWS_QUERIES = [
+  {q:'reuters.com apnews.com breaking world',          region:'Global Wires',   lat:51.51, lng:-0.13},
+  {q:'aljazeera.com middleeasteye.net news update',    region:'Middle East',    lat:25.2,  lng:55.27},
+  {q:'allafrica.com theafricareport.com news',         region:'Africa',         lat:1.29,  lng:36.82},
+  {q:'scmp.com channelnewsasia.com news asia',         region:'Asia-Pacific',   lat:22.32, lng:114.17},
+  {q:'japantimes.co.jp nhk news japan',                region:'Japan',          lat:35.69, lng:139.69},
+  {q:'thehindu.com ndtv.com india news',               region:'India',          lat:28.61, lng:77.21},
+  {q:'euronews.com dw.com europe news update',         region:'Europe',         lat:48.86, lng:2.35},
+  {q:'bbc.com theguardian.com world news',             region:'UK',             lat:51.51, lng:-0.13},
+  {q:'infobae.com mercopress.com latin america news',  region:'Latin America',  lat:-23.55,lng:-46.63},
+  {q:'cbc.ca globalnews.ca canada news',               region:'Canada',         lat:45.42, lng:-75.69}
+];
+
+async function fetchMultiSourceNews() {
+  const settled = await Promise.allSettled(
+    NEWS_QUERIES.map(function(nq) { return fetchGDELT(nq.q, 'news', 3); })
+  );
+  const all = [];
+  settled.forEach(function(r, i) {
+    if (r.status !== 'fulfilled') return;
+    const region = NEWS_QUERIES[i].region;
+    const fb = NEWS_QUERIES[i];
+    (r.value || []).forEach(function(a, j) {
+      all.push(Object.assign({}, a, {
+        id: 'msn_' + i + '_' + j,
+        location: a.location !== 'Global' ? a.location : region,
+        lat: a.lat || fb.lat,
+        lng: a.lng || fb.lng,
+        tags: (a.tags || []).concat([region])
+      }));
+    });
+  });
+  return dedupeByTitle(all).slice(0, 35);
+}
+
+// Hacker News — CORS *
+async function fetchHackerNews() {
+  const d = await apiFetch('https://hn.algolia.com/api/v1/search?tags=front_page&hitsPerPage=15', 10000);
+  return dedupeByTitle((d.hits || []).map(function(h, i) {
+    const ll = findLatLng(h.title) || findLatLng(h.url || '');
+    const hub = TECH_HUBS[i % TECH_HUBS.length];
+    return {
+      id: 'hn_' + i, type: 'tech',
+      title: h.title,
+      location: ll ? (Object.keys(CC).find(function(c){return h.title.toLowerCase().indexOf(c.toLowerCase())!==-1;}) || 'Tech') : 'Tech Hub',
+      lat: ll ? ll[0] : hub[0], lng: ll ? ll[1] : hub[1],
+      severity: Math.min(4, Math.max(1, Math.floor((h.points || 0) / 150) + 1)),
+      age: timeAgo(h.created_at),
+      brief: h.title + '\n\n' + (h.points || 0) + ' points · ' + (h.num_comments || 0) + ' comments · by ' + h.author,
+      url: h.url,
+      sources: [{n:'Hacker News', a:timeAgo(h.created_at), url: h.url || 'https://news.ycombinator.com/item?id=' + h.objectID}],
+      tags: ['Tech','Hacker News'],
+      _live: true
+    };
+  }).filter(Boolean));
+}
+
+// Fashion via GDELT
+function fetchFashionNews() {
+  return fetchGDELT('fashion week runway couture Vogue Prada Dior Chanel LVMH Gucci designer luxury', 'fashion', 10);
+}
+
+// ISS — wheretheiss.at has CORS *
+async function fetchISS() {
+  const d = await apiFetch('https://api.wheretheiss.at/v1/satellites/25544', 8000);
+  return {lat: d.latitude, lng: d.longitude};
+}
+
+// NOAA SWPC — CORS *
+async function fetchAuroraKp() {
+  const d = await apiFetch('https://services.swpc.noaa.gov/products/noaa-planetary-k-index-forecast.json', 8000);
+  const predicted = (d || []).filter(function(r){return r[2] === 'predicted';});
+  const kp = Math.max.apply(null, predicted.slice(0,4).map(function(r){return parseFloat(r[1]) || 0;}));
+  return isFinite(kp) ? kp : 0;
+}
+
+// Sky data — ISS + Aurora + planets
+async function fetchSkyData() {
+  const events = computeSkyEvents();
+
+  // ISS
+  try {
+    const iss = await fetchISS();
+    events.push({
+      id:'sky_iss', type:'astrology',
+      title:'🛸 ISS — International Space Station',
+      location: iss.lat.toFixed(2) + '°, ' + iss.lng.toFixed(2) + '°',
+      lat: iss.lat, lng: iss.lng, severity:2, age:'Live',
+      brief:'The ISS is at ' + iss.lat.toFixed(3) + '°, ' + iss.lng.toFixed(3) + '°, orbiting at ~408 km altitude at 27,600 km/h.',
+      stats:[{label:'Altitude',val:'~408 km'},{label:'Speed',val:'27,600 km/h'}],
+      sources:[{n:'wheretheiss.at',a:'Live',url:'https://api.wheretheiss.at/v1/satellites/25544'}],
+      tags:['ISS','Space Station','NASA'],
+      _live:true, _planet:{emoji:'🛸',name:'ISS'}
+    });
+  } catch(_) {}
+
+  // Aurora
+  try {
+    const kp = await fetchAuroraKp();
+    const auroLat = 66.5 - kp * 2.5;
+    events.push({
+      id:'sky_aurora', type:'astrology',
+      title:'🌌 Aurora Forecast — Kp ' + kp.toFixed(1),
+      location:'~' + auroLat.toFixed(0) + '° latitude',
+      lat: auroLat, lng: 0,
+      severity: kp >= 7 ? 5 : kp >= 5 ? 4 : kp >= 3 ? 3 : 2,
+      age:'NOAA Forecast',
+      brief:'NOAA Kp index: ' + kp.toFixed(1) + '.\nAurora visible above ~' + auroLat.toFixed(0) + '° latitude.\n\nKp 0 = quiet · Kp 5+ = geomagnetic storm · Kp 9 = extreme.',
+      stats:[{label:'Kp Index',val:kp.toFixed(1)},{label:'Visible above',val:auroLat.toFixed(0)+'°'}],
+      sources:[{n:'NOAA SWPC',a:'Forecast',url:'https://www.swpc.noaa.gov'}],
+      tags:['Aurora','NOAA','Space Weather'],
+      _live:true, _planet:{emoji:'🌌',name:'Aurora'}
+    });
+  } catch(_) {}
+
+  return events;
+}
+
+// Space Devs — launches
+async function fetchLaunches() {
+  const p = new URLSearchParams();
+  p.set('format','json'); p.set('limit','6'); p.set('mode','list');
+  const d = await apiFetch('https://ll.thespacedevs.com/2.2.0/launch/upcoming/?' + p.toString(), 12000);
+  const parsed = (d.results || []).map(function(l, i) {
+    const lat = parseFloat(l.pad && l.pad.latitude);
+    const lng = parseFloat(l.pad && l.pad.longitude);
+    if (!lat || !lng) return null;
+    const net = l.net ? new Date(l.net) : null;
+    const diff = net ? Math.floor((net - Date.now()) / 86400000) : null;
+    const age = diff === null ? 'TBD' : diff <= 0 ? 'Imminent' : diff === 1 ? 'Tomorrow' : 'In ' + diff + 'd';
+    return {
+      id:'lnch_'+i, type:'launch',
+      title: l.name,
+      location: (l.pad && l.pad.location && l.pad.location.name) || 'Launch Site',
+      lat:lat, lng:lng, severity:2, age:age,
+      brief: l.name + '. Vehicle: ' + ((l.rocket && l.rocket.configuration && l.rocket.configuration.full_name) || 'Unknown') + '. Provider: ' + ((l.launch_service_provider && l.launch_service_provider.name) || 'Unknown') + '. NET: ' + (net ? net.toUTCString() : 'TBD') + '.',
+      stats:[{label:'Vehicle',val:(l.rocket&&l.rocket.configuration&&l.rocket.configuration.name)||'TBD'},{label:'Window',val:age}],
+      sources:[{n:(l.launch_service_provider&&l.launch_service_provider.name)||'Provider',a:age}],
+      tags:['Launch',(l.launch_service_provider&&l.launch_service_provider.name)||'Space'],
+      _live:true
+    };
+  }).filter(Boolean);
+  return parsed.length ? parsed : FALLBACK_LAUNCHES;
+}
+
+// CoinGecko + Frankfurter
+async function fetchMarkets() {
   const [cg, fx] = await Promise.allSettled([
-    get('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum,solana,ripple,cardano&vs_currencies=usd&include_24hr_change=true', 8000),
-    get('https://api.frankfurter.app/latest?from=USD&to=EUR,GBP,JPY,CNY', 6000),
+    apiFetch('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum,solana,ripple,cardano&vs_currencies=usd&include_24hr_change=true', 8000),
+    apiFetch('https://api.frankfurter.app/latest?from=USD&to=EUR,GBP,JPY,CNY', 6000)
   ]);
-  const cryptoItems = [];
+
+  const items = [];
   if (cg.status === 'fulfilled') {
     const d = cg.value;
-    const map = {BTC:[d.bitcoin?.usd,d.bitcoin?.usd_24h_change],ETH:[d.ethereum?.usd,d.ethereum?.usd_24h_change],SOL:[d.solana?.usd,d.solana?.usd_24h_change],XRP:[d.ripple?.usd,d.ripple?.usd_24h_change],ADA:[d.cardano?.usd,d.cardano?.usd_24h_change]};
-    Object.entries(map).filter(([,v])=>v[0]).forEach(([sym,[px,ch]])=>{
-      cryptoItems.push({sym,px:px>100?px.toLocaleString('en',{maximumFractionDigits:2}):px.toFixed(4),chg:(ch>=0?'+':'')+ch.toFixed(2)+'%',up:ch>=0});
+    const map = {BTC:[d.bitcoin,d.bitcoin&&d.bitcoin.usd_24h_change],ETH:[d.ethereum,d.ethereum&&d.ethereum.usd_24h_change],SOL:[d.solana,d.solana&&d.solana.usd_24h_change],XRP:[d.ripple,d.ripple&&d.ripple.usd_24h_change]};
+    Object.entries(map).forEach(function(entry) {
+      const sym = entry[0], pair = entry[1];
+      if (!pair[0]) return;
+      const px = pair[0].usd, ch = pair[1] || 0;
+      items.push({sym:sym, px:px>100?px.toLocaleString('en',{maximumFractionDigits:2}):px.toFixed(4), chg:(ch>=0?'+':'')+ch.toFixed(2)+'%', up:ch>=0});
     });
   }
-  const fxItems = [];
-  if (fx.status === 'fulfilled' && fx.value?.rates) {
+  if (fx.status === 'fulfilled' && fx.value && fx.value.rates) {
     const r = fx.value.rates;
-    const pairs = [['EUR/USD', 1/r.EUR, 0], ['GBP/USD', 1/r.GBP, 0], ['USD/JPY', r.JPY, 0], ['USD/CNY', r.CNY, 0]];
-    pairs.forEach(([sym, val]) => {
-      if (val) fxItems.push({sym, px: val.toFixed(4), chg: '', up: true});
-    });
-  } else {
-    fxItems.push(...[
-      {sym:'EUR/USD',px:'1.0842',chg:'',up:true},
-      {sym:'GBP/USD',px:'1.2741',chg:'',up:true},
-      {sym:'USD/JPY',px:'157.32',chg:'',up:false},
-    ]);
+    if (r.EUR) items.push({sym:'EUR/USD',px:(1/r.EUR).toFixed(4),chg:'',up:true});
+    if (r.GBP) items.push({sym:'GBP/USD',px:(1/r.GBP).toFixed(4),chg:'',up:true});
+    if (r.JPY) items.push({sym:'USD/JPY',px:r.JPY.toFixed(2),chg:'',up:true});
+    if (r.CNY) items.push({sym:'USD/CNY',px:r.CNY.toFixed(4),chg:'',up:true});
   }
-  tickerData = [...cryptoItems, ...fxItems, ...tickerData.filter(d=>!['BTC','ETH','SOL','XRP','ADA','EUR/USD','GBP/USD','USD/JPY','USD/CNY'].includes(d.sym))];
+  items.push({sym:'GOLD',px:'2,341',chg:'+0.64%',up:true},{sym:'OIL (WTI)',px:'82.14',chg:'-1.20%',up:false});
+  tickerData = items;
   renderTicker();
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// GLOBE
-// ─────────────────────────────────────────────────────────────────────────────
+// Simulated flights (OpenSky blocks GitHub Pages CORS)
+function getFlightPoints() {
+  const now = Date.now();
+  return FLIGHT_ROUTES.map(function(r, i) {
+    const t = ((now / 1000 / 3600 + i * 1.3) % 12) / 12;
+    return {lat: r.sLat + (r.dLat - r.sLat) * t, lng: r.sLng + (r.dLng - r.sLng) * t, label: r.s + '-' + r.d};
+  });
+}
 
+// =============================================================================
+// GLOBE
+// =============================================================================
 function initGlobe() {
-  globe = Globe({animateIn:false})
+  globe = Globe({animateIn: false})
     .globeImageUrl('//unpkg.com/three-globe/example/img/earth-night.jpg')
     .bumpImageUrl('//unpkg.com/three-globe/example/img/earth-topology.png')
     .backgroundImageUrl('//unpkg.com/three-globe/example/img/night-sky.png')
-    .showAtmosphere(true).atmosphereColor('rgba(60,100,255,0.18)').atmosphereAltitude(0.18)
-    .htmlElementsData([]).htmlElement(d=>buildMarker(d)).htmlLat(d=>d.lat).htmlLng(d=>d.lng).htmlAltitude(0.01)
-    .pointsData([]).pointLat(d=>d[6]).pointLng(d=>d[5]).pointColor(()=>'#10b981').pointAltitude(0.003).pointRadius(0.18)
+    .showAtmosphere(true)
+    .atmosphereColor('#1e3a8a')
+    .atmosphereAltitude(0.18)
+    .htmlElementsData([])
+    .htmlElement(function(d){return buildMarker(d);})
+    .htmlLat(function(d){return d.lat;})
+    .htmlLng(function(d){return d.lng;})
+    .htmlAltitude(0.01)
+    .pointsData([])
+    .pointLat(function(d){return d.lat;})
+    .pointLng(function(d){return d.lng;})
+    .pointColor(function(){return '#10b981';})
+    .pointAltitude(0.004)
+    .pointRadius(0.22)
     (document.getElementById('globe-wrap'));
+
   globe.width(window.innerWidth).height(window.innerHeight);
-  window.addEventListener('resize',()=>globe.width(window.innerWidth).height(window.innerHeight));
-  globe.controls().autoRotate=true;
-  globe.controls().autoRotateSpeed=0.22;
-  globe.controls().enableDamping=true;
-  globe.pointOfView({lat:20,lng:15,altitude:2.2},0);
+  window.addEventListener('resize', function(){globe.width(window.innerWidth).height(window.innerHeight);});
+  globe.controls().autoRotate = true;
+  globe.controls().autoRotateSpeed = 0.22;
+  globe.controls().enableDamping = true;
+  globe.pointOfView({lat:20,lng:15,altitude:2.2}, 0);
 }
 
 function buildMarker(d) {
-  const el=document.createElement('div');
-  const isAstro=d.type==='astrology';
-  el.className='marker'+(d.severity>=4?' sev5':'')+(isAstro?' astro':'');
-  el.style.cssText=`--mc:${COLORS[d.type]||'#fff'};width:22px;height:22px;cursor:pointer`;
-  el.title=d.title;
-  const delay=(Math.random()*2).toFixed(2);
-  // Astrology markers get a slower, more ethereal animation
-  const dur=isAstro?'4.5s':'2.8s';
-  el.innerHTML=`<div class="m-ring" style="animation-delay:${delay}s;animation-duration:${dur}"></div><div class="m-ring m-ring2" style="animation-delay:${(+delay+.9).toFixed(2)}s;animation-duration:${dur}"></div><div class="m-dot"></div>`;
-  if (isAstro) {
-    el.querySelector('.m-dot').textContent=d._zodiac?.emoji||'✨';
-    el.querySelector('.m-dot').style.cssText='position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:10px;z-index:2;';
-  }
-  el.addEventListener('click',e=>{e.stopPropagation();selectEvent(d.id);});
+  const el = document.createElement('div');
+  el.className = 'marker' + (d.severity >= 4 ? ' sev5' : '');
+  el.style.cssText = '--mc:' + (COLORS[d.type] || '#fff') + ';width:22px;height:22px;cursor:pointer';
+  el.title = d.title;
+  const delay = (Math.random() * 2).toFixed(2);
+  el.innerHTML = '<div class="m-ring" style="animation-delay:' + delay + 's"></div><div class="m-ring m-ring2" style="animation-delay:' + (+delay+.9).toFixed(2) + 's"></div><div class="m-dot"></div>';
+  el.addEventListener('click', function(e){e.stopPropagation(); selectEvent(d.id);});
   return el;
 }
 
 function refreshGlobe() {
-  const visEvs=getFiltered().filter(e=>layerVis[e.type]);
+  const visEvs = getFiltered().filter(function(e){return layerVis[e.type];});
   globe.htmlElementsData(visEvs);
-  globe.pointsData(layerVis.flight?flightPoints:[]);
+  if (layerVis.flight) {
+    flightPoints = getFlightPoints();
+    globe.pointsData(flightPoints);
+  } else {
+    globe.pointsData([]);
+  }
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
+// =============================================================================
 // FILTER / LIST
-// ─────────────────────────────────────────────────────────────────────────────
-
+// =============================================================================
 function getFiltered() {
-  let evs=allEvents;
-  if (currentTab!=='all') evs=evs.filter(e=>e.type===currentTab);
+  let evs = allEvents;
+  if (currentTab !== 'all') evs = evs.filter(function(e){return e.type === currentTab;});
   if (searchQ) {
-    const q=searchQ.toLowerCase();
-    evs=evs.filter(e=>e.title.toLowerCase().includes(q)||e.location.toLowerCase().includes(q)||(e.tags||[]).some(t=>t.toLowerCase().includes(q)));
+    const q = searchQ.toLowerCase();
+    evs = evs.filter(function(e){
+      return e.title.toLowerCase().indexOf(q) !== -1 ||
+             e.location.toLowerCase().indexOf(q) !== -1 ||
+             (e.tags || []).some(function(t){return t.toLowerCase().indexOf(q) !== -1;});
+    });
   }
-  return evs.sort((a,b)=>(b.severity||0)-(a.severity||0));
+  return evs.sort(function(a,b){return (b.severity||0)-(a.severity||0);});
 }
 
 function renderList() {
-  const evs=getFiltered();
-  document.getElementById('ph-count').textContent=evs.length+' events';
-
-  const layerKeys=['news','conflict','disaster','storm','humanitarian','tech','fashion','astrology','launch'];
-  layerKeys.forEach(t=>{
-    const el=document.getElementById('lc-'+t);
-    if (el) el.textContent=allEvents.filter(e=>e.type===t).length||'–';
+  const evs = getFiltered();
+  document.getElementById('ph-count').textContent = evs.length + ' events';
+  ['news','conflict','disaster','storm','humanitarian','tech','fashion','astrology','launch'].forEach(function(t){
+    const el = document.getElementById('lc-' + t);
+    if (el) el.textContent = allEvents.filter(function(e){return e.type===t;}).length || '–';
   });
-  document.getElementById('lc-flight').textContent=flightPoints.length||'–';
+  document.getElementById('lc-flight').textContent = FLIGHT_ROUTES.length;
+  document.getElementById('t-summary').textContent =
+    allEvents.length + ' events · ' + allEvents.filter(function(e){return e.type==='conflict';}).length + ' conflicts · ' +
+    allEvents.filter(function(e){return e.type==='disaster';}).length + ' disasters · ' + FLIGHT_ROUTES.length + ' flights';
 
-  document.getElementById('t-summary').textContent=
-    `${allEvents.length} events · ${allEvents.filter(e=>e.type==='conflict').length} conflicts · `+
-    `${allEvents.filter(e=>e.type==='disaster').length} disasters · ${flightPoints.length} flights live`;
+  const list = document.getElementById('evlist');
+  if (!evs.length) { list.innerHTML = '<div class="ev-empty">No events match your filters</div>'; return; }
 
-  const list=document.getElementById('evlist');
-  if (!evs.length){list.innerHTML='<div class="ev-empty">No events match your filters</div>';return;}
-
-  // Special astrology grid view
-  if (currentTab==='astrology') {
-    list.innerHTML=`<div class="astro-grid">${evs.map(ev=>{
-      const p=ev._planet||{};
-      const snip=ev.brief?ev.brief.replace(/\n/g,' ').slice(0,70)+'…':'';
-      return `<div class="astro-card${ev.id===selectedId?' sel':''}" id="ev-${ev.id}" onclick="selectEvent('${ev.id}')">
-        <div class="astro-emoji">${p.emoji||'✨'}</div>
-        <div class="astro-sign">${p.name||ev.title}</div>
-        <div class="astro-site">${ev.location}</div>
-        <div class="astro-snip">${snip}</div>
-      </div>`;
-    }).join('')}</div>`;
+  if (currentTab === 'astrology') {
+    list.innerHTML = '<div class="astro-grid">' + evs.map(function(ev){
+      const p = ev._planet || {};
+      const snip = ev.brief ? ev.brief.replace(/\n/g,' ').slice(0,70) + '…' : '';
+      return '<div class="astro-card' + (ev.id===selectedId?' sel':'') + '" id="ev-' + ev.id + '" onclick="selectEvent(\'' + ev.id + '\')">' +
+        '<div class="astro-emoji">' + (p.emoji||'✨') + '</div>' +
+        '<div class="astro-sign">' + (p.name||ev.title) + '</div>' +
+        '<div class="astro-site">' + ev.location + '</div>' +
+        '<div class="astro-snip">' + snip + '</div></div>';
+    }).join('') + '</div>';
     return;
   }
 
-  list.innerHTML=evs.map(ev=>{
-    const c=COLORS[ev.type]||'#fff', ico=ICONS[ev.type]||'●';
-    const warn=ev._live?'':' <span style="font-size:8px;color:var(--muted)" title="Fallback data">⚠</span>';
-    return `<div class="ev${ev.id===selectedId?' sel':''}" id="ev-${ev.id}" onclick="selectEvent('${ev.id}')">
-      <div class="ev-row">
-        <div class="ev-ico">${ico}</div>
-        <div class="ev-body">
-          <div class="ev-name">${ev.title}${warn}</div>
-          <div class="ev-foot">
-            <span class="ev-tag" style="background:${c}1a;color:${c}">${ev.type.toUpperCase()}</span>
-            <span class="ev-loc">${ev.location}</span>
-            <span class="ev-age">${ev.age}</span>
-          </div>
-        </div>
-      </div>
-    </div>`;
+  list.innerHTML = evs.map(function(ev){
+    const c = COLORS[ev.type] || '#fff';
+    const ico = ICONS[ev.type] || '●';
+    const warn = ev._live ? '' : ' <span style="font-size:8px;color:var(--muted)" title="Fallback data">⚠</span>';
+    return '<div class="ev' + (ev.id===selectedId?' sel':'') + '" id="ev-' + ev.id + '" onclick="selectEvent(\'' + ev.id + '\')">' +
+      '<div class="ev-row"><div class="ev-ico">' + ico + '</div><div class="ev-body">' +
+      '<div class="ev-name">' + ev.title + warn + '</div>' +
+      '<div class="ev-foot"><span class="ev-tag" style="background:' + c + '1a;color:' + c + '">' + ev.type.toUpperCase() + '</span>' +
+      '<span class="ev-loc">' + ev.location + '</span>' +
+      '<span class="ev-age">' + ev.age + '</span></div></div></div></div>';
   }).join('');
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// SELECT / DETAIL
-// ─────────────────────────────────────────────────────────────────────────────
-
+// =============================================================================
+// DETAIL DRAWER
+// =============================================================================
 function selectEvent(id) {
-  selectedId=id;
-  const ev=allEvents.find(e=>e.id===id);
+  selectedId = id;
+  const ev = allEvents.find(function(e){return e.id===id;});
   if (!ev) return;
-  globe.controls().autoRotate=false;
-  globe.pointOfView({lat:ev.lat,lng:ev.lng,altitude:1.6},1200);
-  setTimeout(()=>{globe.controls().autoRotate=true;},6000);
-  document.querySelectorAll('.ev,.astro-card').forEach(el=>el.classList.remove('sel'));
-  document.getElementById('ev-'+id)?.classList.add('sel');
+  globe.controls().autoRotate = false;
+  globe.pointOfView({lat:ev.lat,lng:ev.lng,altitude:1.6}, 1200);
+  setTimeout(function(){globe.controls().autoRotate=true;}, 6000);
+  document.querySelectorAll('.ev,.astro-card').forEach(function(el){el.classList.remove('sel');});
+  const listEl = document.getElementById('ev-'+id);
+  if (listEl) listEl.classList.add('sel');
 
-  const c=COLORS[ev.type]||'#fff', ico=ICONS[ev.type]||'●';
-  const statsHtml=(ev.stats||[]).length?`<div class="d-stats">${ev.stats.map(s=>`<div class="d-stat"><div class="d-stat-lbl">${s.label}</div><div class="d-stat-val" style="color:${c}">${s.val}</div></div>`).join('')}</div>`:'';
-  const srcsHtml=(ev.sources||[]).map(s=>`<div class="d-src"><div class="d-src-dot" style="background:${c}"></div><span class="d-src-name">${s.n}</span>${s.url?`<a class="d-src-link" href="${s.url}" target="_blank">↗</a>`:''}<span class="d-src-age">${s.a}</span></div>`).join('')||'<div class="d-src" style="color:var(--muted);font-size:11px">No sources listed</div>';
-  const tagsHtml=(ev.tags||[]).map(t=>`<span class="d-tag-pill">${t}</span>`).join('');
-  const liveLabel=ev._live?`<span class="ds-badge ds-live">LIVE</span>`:`<span class="ds-badge ds-fallback">CACHED</span>`;
+  const c = COLORS[ev.type] || '#fff';
+  const ico = ICONS[ev.type] || '●';
+  const liveLabel = ev._live ? '<span class="ds-badge ds-live">LIVE</span>' : '<span class="ds-badge ds-fallback">CACHED</span>';
+  const statsHtml = (ev.stats || []).length ?
+    '<div class="d-stats">' + ev.stats.map(function(s){return '<div class="d-stat"><div class="d-stat-lbl">' + s.label + '</div><div class="d-stat-val" style="color:' + c + '">' + s.val + '</div></div>';}).join('') + '</div>' : '';
+  const srcsHtml = (ev.sources || []).map(function(s){
+    return '<div class="d-src"><div class="d-src-dot" style="background:' + c + '"></div><span class="d-src-name">' + s.n + '</span>' +
+      (s.url ? '<a class="d-src-link" href="' + s.url + '" target="_blank">&#x2197;</a>' : '') +
+      '<span class="d-src-age">' + s.a + '</span></div>';
+  }).join('') || '<div class="d-src" style="color:var(--muted);font-size:11px">No sources listed</div>';
+  const tagsHtml = (ev.tags || []).map(function(t){return '<span class="d-tag-pill">' + t + '</span>';}).join('');
 
-  // Special astrology detail layout
-  if (ev.type==='astrology'&&ev._planet) {
-    const p=ev._planet;
-    document.getElementById('d-body').innerHTML=`
-      <div style="text-align:center;padding:10px 0 4px">
-        <div style="font-size:38px;margin-bottom:6px">${p.emoji||'✨'}</div>
-        <div style="font-size:20px;font-weight:700;color:var(--col-astrology)">${p.name}</div>
-        <div style="font-size:10px;color:var(--muted);margin-top:3px">📍 ${ev.location}</div>
-        ${liveLabel}
-      </div>
-      <div class="d-sep"></div>
-      ${statsHtml}
-      <div class="d-lbl">Current Position</div>
-      <div class="d-brief" style="font-size:12px;line-height:1.85">${ev.brief.replace(/\n/g,'<br>')}</div>
-      <div class="d-sep"></div>
-      <div class="d-lbl">Source</div>
-      ${srcsHtml}
-      <div class="d-sep"></div>
-      <div class="d-lbl">Tags</div>
-      <div class="d-tags">${tagsHtml}</div>
-    `;
+  if (ev.type === 'astrology' && ev._planet) {
+    const p = ev._planet;
+    document.getElementById('d-body').innerHTML =
+      '<div style="text-align:center;padding:10px 0 4px">' +
+      '<div style="font-size:38px;margin-bottom:6px">' + p.emoji + '</div>' +
+      '<div style="font-size:20px;font-weight:700;color:var(--col-astrology)">' + p.name + '</div>' +
+      '<div style="font-size:10px;color:var(--muted);margin-top:3px">&#128205; ' + ev.location + '</div>' +
+      liveLabel + '</div><div class="d-sep"></div>' +
+      statsHtml +
+      '<div class="d-lbl">Current Position</div>' +
+      '<div class="d-brief">' + ev.brief.replace(/\n/g,'<br>') + '</div>' +
+      '<div class="d-sep"></div><div class="d-lbl">Source</div>' + srcsHtml +
+      '<div class="d-sep"></div><div class="d-lbl">Tags</div><div class="d-tags">' + tagsHtml + '</div>';
     document.getElementById('detail').classList.add('open');
     return;
   }
 
-  document.getElementById('d-body').innerHTML=`
-    <div class="d-cat" style="color:${c}">${ico}  ${ev.type.toUpperCase()} ${liveLabel}</div>
-    <div class="d-title">${ev.title}</div>
-    <div class="d-where">📍 ${ev.location} · <span style="color:var(--muted)">${ev.age}</span></div>
-    ${statsHtml}
-    <div class="d-lbl">Brief</div>
-    <div class="d-brief">${(ev.brief||'No details available.').replace(/\n/g,'<br>')}</div>
-    <div class="d-sep"></div>
-    <div class="d-lbl">Sources</div>
-    ${srcsHtml}
-    <div class="d-sep"></div>
-    <div class="d-lbl">Tags</div>
-    <div class="d-tags">${tagsHtml}</div>
-  `;
+  document.getElementById('d-body').innerHTML =
+    '<div class="d-cat" style="color:' + c + '">' + ico + '&nbsp;&nbsp;' + ev.type.toUpperCase() + ' ' + liveLabel + '</div>' +
+    '<div class="d-title">' + ev.title + '</div>' +
+    '<div class="d-where">&#128205; ' + ev.location + '&nbsp;&middot;&nbsp;<span style="color:var(--muted)">' + ev.age + '</span></div>' +
+    statsHtml +
+    '<div class="d-lbl">Brief</div>' +
+    '<div class="d-brief">' + (ev.brief || 'No details.').replace(/\n/g,'<br>') + '</div>' +
+    '<div class="d-sep"></div><div class="d-lbl">Sources</div>' + srcsHtml +
+    '<div class="d-sep"></div><div class="d-lbl">Tags</div><div class="d-tags">' + tagsHtml + '</div>';
   document.getElementById('detail').classList.add('open');
 }
 
-function closeDetail(){document.getElementById('detail').classList.remove('open');selectedId=null;document.querySelectorAll('.ev,.astro-card').forEach(el=>el.classList.remove('sel'));}
+function closeDetail() {
+  document.getElementById('detail').classList.remove('open');
+  selectedId = null;
+  document.querySelectorAll('.ev,.astro-card').forEach(function(el){el.classList.remove('sel');});
+}
 
-// ─────────────────────────────────────────────────────────────────────────────
-// UI
-// ─────────────────────────────────────────────────────────────────────────────
+// =============================================================================
+// UI CONTROLS
+// =============================================================================
+function setTab(el) {
+  document.querySelectorAll('.tab').forEach(function(t){t.classList.remove('on');});
+  el.classList.add('on'); currentTab = el.dataset.tab; renderList(); refreshGlobe();
+}
+function onSearch() {
+  searchQ = document.getElementById('sinput').value.trim();
+  if (searchQ) document.querySelectorAll('.wl-tag').forEach(function(t){t.classList.remove('on');});
+  renderList(); refreshGlobe();
+}
+function toggleLayer(el) {
+  const l = el.dataset.layer; layerVis[l] = !layerVis[l];
+  el.classList.toggle('off', !layerVis[l]); refreshGlobe();
+}
+function togglePanel() {
+  panelOpen = !panelOpen;
+  document.getElementById('panel').classList.toggle('hidden', !panelOpen);
+  const t = document.getElementById('ptoggle');
+  t.innerHTML = panelOpen ? '&#8249;' : '&#8250;';
+  t.classList.toggle('closed', !panelOpen);
+  t.style.left = panelOpen ? '300px' : '0';
+}
+function renderWatchlist() {
+  document.getElementById('wl-tags').innerHTML = watchTags.map(function(t){
+    return '<div class="wl-tag" onclick="watchFilter(\'' + t + '\')">' + t + '</div>';
+  }).join('');
+}
+function watchFilter(tag) {
+  const inp = document.getElementById('sinput');
+  const active = inp.value === tag;
+  inp.value = active ? '' : tag; searchQ = active ? '' : tag;
+  document.querySelectorAll('.wl-tag').forEach(function(el){el.classList.toggle('on', el.textContent===tag&&!active);});
+  renderList(); refreshGlobe();
+}
+function addWatchTag() {
+  const t = prompt('Add topic to watchlist:');
+  if (t && t.trim()) { watchTags.push(t.trim()); renderWatchlist(); }
+}
+function renderTicker() {
+  const items = tickerData.concat(tickerData);
+  document.getElementById('tk-inner').innerHTML = items.map(function(d){
+    return '<div class="tk-item"><span class="tk-sym">' + d.sym + '</span><span class="tk-px">' + d.px + '</span>' +
+      (d.chg ? '<span class="' + (d.up?'tk-up':'tk-dn') + '">' + d.chg + '</span>' : '') + '</div><span class="tk-div">|</span>';
+  }).join('');
+}
+function tickClock() {
+  document.getElementById('t-clock').textContent = new Date().toISOString().replace('T',' ').substring(0,19) + ' UTC';
+}
 
-function setTab(el){document.querySelectorAll('.tab').forEach(t=>t.classList.remove('on'));el.classList.add('on');currentTab=el.dataset.tab;renderList();refreshGlobe();}
-function onSearch(){searchQ=document.getElementById('sinput').value.trim();if(searchQ)document.querySelectorAll('.wl-tag').forEach(t=>t.classList.remove('on'));renderList();refreshGlobe();}
-function toggleLayer(el){const l=el.dataset.layer;layerVis[l]=!layerVis[l];el.classList.toggle('off',!layerVis[l]);refreshGlobe();}
-function togglePanel(){panelOpen=!panelOpen;document.getElementById('panel').classList.toggle('hidden',!panelOpen);const t=document.getElementById('ptoggle');t.textContent=panelOpen?'‹':'›';t.classList.toggle('closed',!panelOpen);t.style.left=panelOpen?'300px':'0';}
-function renderWatchlist(){document.getElementById('wl-tags').innerHTML=watchTags.map(t=>`<div class="wl-tag" onclick="watchFilter('${t}')">${t}</div>`).join('');}
-function watchFilter(tag){const inp=document.getElementById('sinput');const active=inp.value===tag;inp.value=active?'':tag;searchQ=active?'':tag;document.querySelectorAll('.wl-tag').forEach(el=>el.classList.toggle('on',el.textContent===tag&&!active));renderList();refreshGlobe();}
-function addWatchTag(){const t=prompt('Add topic to watchlist:');if(t?.trim()){watchTags.push(t.trim());renderWatchlist();}}
-function renderTicker(){const items=[...tickerData,...tickerData];document.getElementById('tk-inner').innerHTML=items.map(d=>`<div class="tk-item"><span class="tk-sym">${d.sym}</span><span class="tk-px">${d.px}</span><span class="${d.up?'tk-up':'tk-dn'}">${d.chg}</span></div><span class="tk-div">|</span>`).join('');}
-function tickClock(){document.getElementById('t-clock').textContent=new Date().toISOString().replace('T',' ').substring(0,19)+' UTC';}
-
-// ─────────────────────────────────────────────────────────────────────────────
+// =============================================================================
 // INIT
-// ─────────────────────────────────────────────────────────────────────────────
-
-function splash(pct,msg){document.getElementById('sfill').style.width=pct+'%';document.getElementById('smsg').textContent=msg;}
+// =============================================================================
+function splash(pct, msg) {
+  document.getElementById('sfill').style.width = pct + '%';
+  document.getElementById('smsg').textContent = msg;
+}
 
 async function loadLiveData() {
-  // Phase 1: Fast parallel
-  splash(12,'Connecting to USGS · ReliefWeb · Launches…');
-  const [usgs,relief,launches] = await Promise.allSettled([fetchUSGS(),fetchReliefWeb(),fetchLaunches()]);
-  const nhc = {status:'rejected'};
+  splash(12, 'USGS Earthquakes + Launches…');
+  const [usgs, launches] = await Promise.allSettled([fetchUSGS(), fetchLaunches()]);
 
-  // Phase 2: GDELT + HN + Fashion + Astrology
-  splash(38,'Fetching GDELT · Hacker News · Sky data…');
-  const [gdeltNews,gdeltConflicts,gdeltStorms,hnTech,fashionNews,skyData] = await Promise.allSettled([
+  splash(35, 'GDELT World News (10 regions)…');
+  const [gdeltNews, gdeltConflicts, gdeltStorms, hnTech, fashionNews] = await Promise.allSettled([
     fetchMultiSourceNews(),
-    fetchGDELT('attack killed military conflict war fighting','conflict',8),
-    fetchGDELT('hurricane typhoon cyclone tropical storm tornado','storm',5),
+    fetchGDELT('attack killed military conflict war fighting', 'conflict', 8),
+    fetchGDELT('hurricane typhoon cyclone tropical storm tornado', 'storm', 5),
     fetchHackerNews(),
-    fetchFashionNews(),
-    fetchSkyData(),
+    fetchFashionNews()
   ]);
 
-  // Phase 3: Flights
-  splash(70,'Fetching live flight positions…');
-  try{flightPoints=await fetchOpenSky();setLayerStatus('flight','on');}catch(_){flightPoints=[];setLayerStatus('flight','fb');}
-
-  // Phase 4: Markets
-  splash(85,'Fetching market data…');
-  renderTicker();
-  try{await fetchCrypto();}catch(_){}
+  splash(65, 'Sky data + Markets…');
+  const [skyData] = await Promise.allSettled([fetchSkyData()]);
+  try { await fetchMarkets(); } catch(_) {}
 
   // Assemble
-  const rwAll   = relief.value||[];
-  const disasters = dedupeByTitle([...(usgs.status==='fulfilled'?usgs.value:SEEDS.disaster),...rwAll.filter(e=>e.type==='disaster')]).slice(0,30);
-  const humanitarian = dedupeByTitle([...rwAll.filter(e=>e.type==='humanitarian'),...SEEDS.humanitarian]).slice(0,12);
-  const nhcSt   = nhc.status==='fulfilled'?nhc.value:[];
-  const gdeltSt = gdeltStorms.status==='fulfilled'?gdeltStorms.value:[];
-  const storms  = dedupeByTitle([...nhcSt,...gdeltSt,...rwAll.filter(e=>e.type==='storm'),...SEEDS.storm]).slice(0,10);
-  const newsEvs = gdeltNews.status==='fulfilled'&&gdeltNews.value?.length?gdeltNews.value:SEEDS.news;
-  const rwConf  = rwAll.filter(e=>e.type==='conflict');
-  const conflicts = dedupeByTitle([...(gdeltConflicts.status==='fulfilled'&&gdeltConflicts.value?.length?gdeltConflicts.value:[]),...rwConf,...SEEDS.conflict]).slice(0,12);
-  const techEvs   = hnTech.status==='fulfilled'&&hnTech.value?.length?hnTech.value:SEEDS.tech;
-  const fashionEvs= fashionNews.status==='fulfilled'&&fashionNews.value?.length?fashionNews.value:SEEDS.fashion;
-  const astroEvs  = skyData.status==='fulfilled'?skyData.value:[];
-  const launchEvs = launches.status==='fulfilled'?launches.value:FALLBACK_LAUNCHES;
+  const disasters = dedupeByTitle(
+    (usgs.status === 'fulfilled' ? usgs.value : SEEDS.disaster)
+  ).slice(0, 30);
 
-  // Layer status indicators
-  setLayerStatus('disaster',   usgs.status==='fulfilled'?'on':'fb');
-  setLayerStatus('humanitarian',rwAll.filter(e=>e.type==='humanitarian').length?'on':'fb');
-  setLayerStatus('storm',      nhcSt.length||gdeltSt.length?'on':'fb');
-  setLayerStatus('news',       gdeltNews.status==='fulfilled'&&gdeltNews.value?.length?'on':'fb');
-  setLayerStatus('conflict',   gdeltConflicts.status==='fulfilled'&&gdeltConflicts.value?.length?'on':'fb');
-  setLayerStatus('tech',       hnTech.status==='fulfilled'&&hnTech.value?.length?'on':'fb');
-  setLayerStatus('fashion',    fashionNews.status==='fulfilled'&&fashionNews.value?.length?'on':'fb');
-  setLayerStatus('astrology',  skyData.status==='fulfilled'&&skyData.value?.length?'on':'fb');
-  setLayerStatus('launch',     launches.status==='fulfilled'?'on':'fb');
+  const conflicts = dedupeByTitle([
+    ...(gdeltConflicts.status === 'fulfilled' && gdeltConflicts.value.length ? gdeltConflicts.value : []),
+    ...SEEDS.conflict
+  ]).slice(0, 12);
 
-  allEvents=[...newsEvs,...conflicts,...disasters,...storms,...humanitarian,...techEvs,...fashionEvs,...astroEvs,...launchEvs];
+  const storms = dedupeByTitle(
+    gdeltStorms.status === 'fulfilled' && gdeltStorms.value.length ? gdeltStorms.value : SEEDS.storm
+  ).slice(0, 10);
+
+  const newsEvs = gdeltNews.status === 'fulfilled' && gdeltNews.value.length ? gdeltNews.value : [];
+
+  const techEvs = hnTech.status === 'fulfilled' && hnTech.value.length ? hnTech.value : SEEDS.tech;
+
+  const fashionEvs = fashionNews.status === 'fulfilled' && fashionNews.value.length ? fashionNews.value : SEEDS.fashion;
+
+  const astroEvs = skyData.status === 'fulfilled' ? skyData.value : [];
+
+  const launchEvs = launches.status === 'fulfilled' ? launches.value : FALLBACK_LAUNCHES;
+
+  allEvents = [
+    ...newsEvs, ...conflicts, ...disasters, ...storms,
+    ...SEEDS.humanitarian, ...techEvs, ...fashionEvs, ...astroEvs, ...launchEvs
+  ];
+
+  // Layer status dots
+  setLayerStatus('disaster',    usgs.status==='fulfilled'?'on':'fb');
+  setLayerStatus('conflict',    gdeltConflicts.status==='fulfilled'&&gdeltConflicts.value.length?'on':'fb');
+  setLayerStatus('storm',       gdeltStorms.status==='fulfilled'&&gdeltStorms.value.length?'on':'fb');
+  setLayerStatus('news',        gdeltNews.status==='fulfilled'&&gdeltNews.value.length?'on':'fb');
+  setLayerStatus('tech',        hnTech.status==='fulfilled'&&hnTech.value.length?'on':'fb');
+  setLayerStatus('fashion',     fashionNews.status==='fulfilled'&&fashionNews.value.length?'on':'fb');
+  setLayerStatus('astrology',   skyData.status==='fulfilled'?'on':'fb');
+  setLayerStatus('launch',      launches.status==='fulfilled'?'on':'fb');
+  setLayerStatus('humanitarian','fb');
+  setLayerStatus('flight',      'fb');
 }
 
 async function init() {
-  splash(5,'Initializing 3D globe…');
+  splash(5, 'Initializing 3D globe…');
   initGlobe();
   await loadLiveData();
-  splash(96,'Rendering feed…');
+  splash(96, 'Rendering feed…');
   renderList(); renderTicker(); renderWatchlist(); refreshGlobe();
-  splash(100,'Systems nominal');
-  setTimeout(()=>{document.getElementById('splash').classList.add('out');setTimeout(()=>document.getElementById('splash')?.remove(),700);},500);
+  splash(100, 'Systems nominal');
+  setTimeout(function(){
+    document.getElementById('splash').classList.add('out');
+    setTimeout(function(){const s=document.getElementById('splash');if(s)s.remove();}, 700);
+  }, 500);
   tickClock();
-  setInterval(tickClock,1000);
-  setInterval(fetchCrypto,60000);
-  setInterval(async()=>{await loadLiveData();renderList();refreshGlobe();},5*60*1000);
+  setInterval(tickClock, 1000);
+  setInterval(fetchMarkets, 60000);
+  // Refresh flights animation every 30s
+  setInterval(refreshGlobe, 30000);
+  // Full data refresh every 5 min
+  setInterval(async function(){await loadLiveData();renderList();refreshGlobe();}, 5*60*1000);
 }
 
 init();
