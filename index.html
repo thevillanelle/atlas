@@ -903,6 +903,8 @@ function getFiltered() {
   var histBarOpen = document.getElementById('hist-bar') && document.getElementById('hist-bar').classList.contains('open');
   if (histBarOpen) return histEvents; // empty [] until events load, then shows them
   var evs = allEvents;
+  // Connection events only appear in the sidebar when connect mode is active
+  if (!connectMode) evs = evs.filter(function(e){return e.type !== 'connection';});
   if (currentTab !== 'all') evs = evs.filter(function(e){return e.type===currentTab;});
   if (searchQ) {
     var q = searchQ.toLowerCase();
@@ -1363,9 +1365,11 @@ function toggleHistBar() {
 
 function updatePanelOffsets() {
   var bar = document.getElementById('hist-bar');
-  var offset = bar.classList.contains('open') ? (48 + bar.offsetHeight) + 'px' : '48px';
-  document.getElementById('panel').style.top = offset;
-  document.getElementById('detail').style.top = offset;
+  var extra = bar.classList.contains('open') ? bar.offsetHeight : 0;
+  var topPx = (48 + extra) + 'px';
+  document.getElementById('panel').style.top = topPx;
+  document.getElementById('detail').style.top = topPx;
+  document.getElementById('lctrl').style.top = (12 + extra) + 'px';
 }
 
 async function loadHistory() {
