@@ -22,24 +22,32 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);font-famil
 #globe-wrap{position:fixed;inset:0;z-index:0}
 #splash{position:fixed;inset:0;z-index:9999;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;transition:opacity .6s ease}
 #splash.out{opacity:0;pointer-events:none}
-#mode-select{position:fixed;inset:0;z-index:9998;background:rgba(5,8,16,0.97);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0;opacity:0;pointer-events:none;transition:opacity .5s ease;backdrop-filter:blur(12px)}
+#mode-select{position:fixed;inset:0;z-index:9998;background:rgba(5,8,16,0.97);display:flex;flex-direction:column;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .5s ease;overflow-y:auto;padding:32px 0}
 #mode-select.open{opacity:1;pointer-events:all}
 #mode-select.out{opacity:0;pointer-events:none}
-.ms-eyebrow{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:4px;text-transform:uppercase;color:var(--muted);margin-bottom:10px}
-.ms-title{font-family:'Space Mono',monospace;font-size:22px;font-weight:700;letter-spacing:6px;color:#fff;margin-bottom:6px}
+.ms-wrap{width:100%;max-width:860px;padding:0 28px}
+.ms-eyebrow{font-family:'Space Mono',monospace;font-size:8px;letter-spacing:5px;text-transform:uppercase;color:#475569;margin-bottom:8px}
+.ms-title{font-family:'Space Mono',monospace;font-size:20px;font-weight:700;letter-spacing:8px;color:#fff;margin-bottom:4px}
 .ms-title em{color:var(--accent);font-style:normal}
-.ms-sub{font-size:11px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;margin-bottom:40px}
-.ms-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;max-width:780px;width:100%;padding:0 24px;margin-bottom:32px}
-.ms-card{background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:14px;padding:22px 18px 18px;cursor:pointer;transition:all .2s ease;text-align:left;position:relative;overflow:hidden}
-.ms-card::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,var(--mc) 0%,transparent 60%);opacity:0;transition:opacity .2s}
-.ms-card:hover{border-color:var(--mc);transform:translateY(-2px);box-shadow:0 8px 32px var(--mc)22}
-.ms-card:hover::before{opacity:.08}
-.ms-card-ico{font-size:26px;margin-bottom:10px;display:block}
-.ms-card-name{font-size:13px;font-weight:700;color:#fff;letter-spacing:.5px;margin-bottom:4px}
-.ms-card-desc{font-size:10px;color:var(--muted);line-height:1.5}
-.ms-footer{display:flex;align-items:center;gap:20px;font-size:10px;color:var(--muted)}
-.ms-skip{cursor:pointer;text-transform:uppercase;letter-spacing:1.5px;padding:6px 14px;border:1px solid var(--border);border-radius:6px;transition:all .15s}.ms-skip:hover{color:#fff;border-color:rgba(255,255,255,.3)}
-.ms-hint{letter-spacing:1px;text-transform:uppercase}
+.ms-rule{width:32px;height:1px;background:#1e3a5f;margin:12px 0}
+.ms-sub{font-size:9px;letter-spacing:2px;text-transform:uppercase;color:#64748b;margin-bottom:22px;font-family:'Space Mono',monospace}
+.ms-section-label{font-size:7px;letter-spacing:3px;text-transform:uppercase;color:#1e3a5f;font-family:'Space Mono',monospace;margin-bottom:8px}
+.ms-fn-grid{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:rgba(255,255,255,.06);margin-bottom:18px}
+.ms-fn-cell{background:#050810;padding:16px 18px;cursor:pointer;transition:background .15s;display:flex;align-items:flex-start;gap:12px}
+.ms-fn-cell:hover{background:#0a1020}
+.ms-fn-cell:hover .ms-cell-name{color:#fff}
+.ms-fn-cell:hover .ms-dot{opacity:1}
+.ms-feed-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:1px;background:rgba(255,255,255,.06)}
+.ms-feed-cell{background:#050810;padding:14px 12px;cursor:pointer;transition:background .15s}
+.ms-feed-cell:hover{background:#0a1020}
+.ms-feed-cell:hover .ms-cell-name{color:#fff}
+.ms-feed-cell:hover .ms-dot{opacity:1}
+.ms-dot{width:5px;height:5px;border-radius:50%;opacity:.35;transition:opacity .15s;margin-bottom:9px;flex-shrink:0;margin-top:3px}
+.ms-cell-name{font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:#94a3b8;margin-bottom:4px;transition:color .15s;font-family:'Space Mono',monospace}
+.ms-cell-desc{font-size:8px;color:#334155;line-height:1.5;font-family:'Space Mono',monospace}
+.ms-footer{display:flex;align-items:center;justify-content:space-between;margin-top:12px;padding-top:12px;border-top:1px solid rgba(255,255,255,.05)}
+.ms-skip{font-size:8px;letter-spacing:2px;text-transform:uppercase;color:#334155;cursor:pointer;font-family:'Space Mono',monospace;transition:color .15s}.ms-skip:hover{color:#94a3b8}
+.ms-status{font-size:7px;letter-spacing:1px;text-transform:uppercase;color:#1e3a5f;font-family:'Space Mono',monospace}
 .sp-logo{font-family:'Space Mono',monospace;font-size:30px;font-weight:700;letter-spacing:8px;color:#fff}
 .sp-logo em{color:var(--accent);font-style:normal}
 .sp-sub{font-size:10px;color:var(--muted);letter-spacing:4px;text-transform:uppercase;font-family:'Space Mono',monospace}
@@ -236,44 +244,42 @@ body.hist-open #panel{top:92px}body.hist-open #detail{top:92px}body.hist-open #l
 </head>
 <body>
 <div id="mode-select">
-  <div class="ms-eyebrow">Global Intelligence Feed</div>
-  <div class="ms-title">ATL<em>A</em>S</div>
-  <div class="ms-sub">What are you here for today?</div>
-  <div class="ms-grid">
-    <div class="ms-card" style="--mc:#ef4444" onclick="selectMode('news')">
-      <span class="ms-card-ico">📰</span>
-      <div class="ms-card-name">Breaking News</div>
-      <div class="ms-card-desc">Live world events, conflicts, disasters, and developing stories across the globe.</div>
+  <div class="ms-wrap">
+    <div class="ms-eyebrow">Global Intelligence Feed</div>
+    <div class="ms-title">ATL<em>A</em>S</div>
+    <div class="ms-rule"></div>
+    <div class="ms-sub">What are you monitoring today?</div>
+
+    <div class="ms-section-label">Explore</div>
+    <div class="ms-fn-grid">
+      <div class="ms-fn-cell" onclick="selectMode('history')">
+        <div class="ms-dot" style="background:#a3e635"></div>
+        <div><div class="ms-cell-name">History</div><div class="ms-cell-desc">Step back to any point in time — see what was happening anywhere in the world</div></div>
+      </div>
+      <div class="ms-fn-cell" onclick="selectMode('connection')">
+        <div class="ms-dot" style="background:#f59e0b"></div>
+        <div><div class="ms-cell-name">Connections</div><div class="ms-cell-desc">Surface the threads linking events — chokepoints, fault lines, economic pressure</div></div>
+      </div>
     </div>
-    <div class="ms-card" style="--mc:#f472b6" onclick="selectMode('fashion')">
-      <span class="ms-card-ico">👗</span>
-      <div class="ms-card-name">Fashion</div>
-      <div class="ms-card-desc">Runway, luxury, designers, and the global culture of style.</div>
+
+    <div class="ms-section-label">Live feeds</div>
+    <div class="ms-feed-grid">
+      <div class="ms-feed-cell" onclick="selectMode('news')"><div class="ms-dot" style="background:#ef4444"></div><div class="ms-cell-name">Breaking News</div><div class="ms-cell-desc">Live world events and developing stories</div></div>
+      <div class="ms-feed-cell" onclick="selectMode('conflict')"><div class="ms-dot" style="background:#f97316"></div><div class="ms-cell-name">Conflicts</div><div class="ms-cell-desc">Wars, attacks, military movements</div></div>
+      <div class="ms-feed-cell" onclick="selectMode('disaster')"><div class="ms-dot" style="background:#eab308"></div><div class="ms-cell-name">Disasters</div><div class="ms-cell-desc">Earthquakes, floods, natural events</div></div>
+      <div class="ms-feed-cell" onclick="selectMode('storm')"><div class="ms-dot" style="background:#60a5fa"></div><div class="ms-cell-name">Storms</div><div class="ms-cell-desc">Hurricanes, cyclones, severe weather</div></div>
+      <div class="ms-feed-cell" onclick="selectMode('humanitarian')"><div class="ms-dot" style="background:#ec4899"></div><div class="ms-cell-name">Humanitarian</div><div class="ms-cell-desc">Aid, crises, relief operations</div></div>
+      <div class="ms-feed-cell" onclick="selectMode('tech')"><div class="ms-dot" style="background:#06b6d4"></div><div class="ms-cell-name">Tech</div><div class="ms-cell-desc">Hacker News, AI, the internet</div></div>
+      <div class="ms-feed-cell" onclick="selectMode('fashion')"><div class="ms-dot" style="background:#f472b6"></div><div class="ms-cell-name">Fashion</div><div class="ms-cell-desc">Runway, luxury, global style</div></div>
+      <div class="ms-feed-cell" onclick="selectMode('launch')"><div class="ms-dot" style="background:#a78bfa"></div><div class="ms-cell-name">Launches</div><div class="ms-cell-desc">Upcoming rocket launches</div></div>
+      <div class="ms-feed-cell" onclick="selectMode('astrology')"><div class="ms-dot" style="background:#c084fc"></div><div class="ms-cell-name">Astrology</div><div class="ms-cell-desc">Planetary placements, celestial events</div></div>
+      <div class="ms-feed-cell" onclick="selectMode('astronomy')"><div class="ms-dot" style="background:#38bdf8"></div><div class="ms-cell-name">Astronomy</div><div class="ms-cell-desc">Space news pinned to planets</div></div>
     </div>
-    <div class="ms-card" style="--mc:#c084fc" onclick="selectMode('astrology')">
-      <span class="ms-card-ico">✨</span>
-      <div class="ms-card-name">Astrology</div>
-      <div class="ms-card-desc">Live planetary placements, horoscopes, and celestial events.</div>
+
+    <div class="ms-footer">
+      <span class="ms-skip" onclick="selectMode('all')">Skip — enter all feeds →</span>
+      <span class="ms-status">● Systems nominal</span>
     </div>
-    <div class="ms-card" style="--mc:#38bdf8" onclick="selectMode('astronomy')">
-      <span class="ms-card-ico">🔭</span>
-      <div class="ms-card-name">Astronomy</div>
-      <div class="ms-card-desc">Space news pinned to the planets and stars they're about.</div>
-    </div>
-    <div class="ms-card" style="--mc:#a3e635" onclick="selectMode('history')">
-      <span class="ms-card-ico">🕰️</span>
-      <div class="ms-card-name">History</div>
-      <div class="ms-card-desc">Explore what was happening anywhere in the world, at any point in time.</div>
-    </div>
-    <div class="ms-card" style="--mc:#f59e0b" onclick="selectMode('connection')">
-      <span class="ms-card-ico">🔗</span>
-      <div class="ms-card-name">Connections</div>
-      <div class="ms-card-desc">Chokepoints, economic stress, political flashpoints — the threads that bind events.</div>
-    </div>
-  </div>
-  <div class="ms-footer">
-    <span class="ms-skip" onclick="selectMode('all')">Enter all feeds →</span>
-    <span class="ms-hint">or select a mode above</span>
   </div>
 </div>
 <div id="splash">
