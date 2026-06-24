@@ -1128,7 +1128,6 @@ var PLANET_DATA = {
   Uranus: {dist:'19.2 AU',period:'84 yrs',moons:28,radius:'25,362 km',type:'Ice Giant',note:'Rotates on its side — axial tilt of 98°, likely the result of a massive ancient collision. Its north pole points almost directly at the Sun for 42 years at a time. Coldest planetary atmosphere at -224°C.'},
   Neptune:{dist:'30.1 AU',period:'165 yrs',moons:16,radius:'24,622 km',type:'Ice Giant',note:'The windiest planet — supersonic winds reach 2,100 km/h. Its moon Triton orbits backwards and is almost certainly a captured Kuiper Belt object. Neptune was predicted mathematically before it was ever observed.'},
 };
-
 var PLANET_DEFS = [
   {name:'Mercury',color:'#c8c8c8',r:4, N0:48.3313, dN:3.24587e-5, i0:7.0047, di:5e-8,   w0:29.1241,  dw:1.01444e-5, a0:0.387098,da:0,        e0:0.205635,de:5.59e-10,  M0:168.6562,dM:4.0923344368},
   {name:'Venus',  color:'#ffe580',r:7, N0:76.6799, dN:2.46590e-5, i0:3.3946, di:2.75e-8, w0:54.8910,  dw:1.38374e-5, a0:0.723330, da:0,        e0:0.006773,de:-1.302e-9, M0:48.0052, dM:1.6021302244},
@@ -1195,6 +1194,32 @@ function initPlanetOrbs() {
     (function(planet){ el.onclick = function(e){ e.stopPropagation(); showPlanetDetail(planet); }; })(p);
     c.appendChild(el);
   });
+}
+
+function showPlanetDetail(p) {
+  var data = PLANET_DATA[p.name] || {};
+  var d = daysSinceJ2000(histDate || new Date());
+  var pos = planetGeogLatLng(p, d);
+  globe.controls().autoRotate = false;
+  globe.pointOfView({lat: pos.lat, lng: pos.lng, altitude: 2.8}, 1200);
+  setTimeout(function(){globe.controls().autoRotate = true;}, 6000);
+  var det = document.getElementById('detail');
+  det.innerHTML = '<button id="d-close" onclick="document.getElementById(\'detail\').style.display=\'none\'">✕</button>' +
+    '<div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">' +
+      '<div style="width:18px;height:18px;border-radius:50%;background:'+p.color+';box-shadow:0 0 12px 4px '+p.color+'66;flex-shrink:0"></div>' +
+      '<div><div style="font-size:16px;font-weight:700;color:var(--text)">'+p.name+'</div>' +
+      '<div style="font-size:10px;color:var(--muted);letter-spacing:1px;text-transform:uppercase">'+(data.type||'Planet')+' · Solar System</div></div>' +
+    '</div>' +
+    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">' +
+      '<div style="background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:6px;padding:8px 10px"><div style="font-size:8px;letter-spacing:1px;color:var(--muted);text-transform:uppercase;margin-bottom:2px">Distance</div><div style="font-size:14px;font-weight:700;color:'+p.color+'">'+(data.dist||'—')+'</div></div>' +
+      '<div style="background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:6px;padding:8px 10px"><div style="font-size:8px;letter-spacing:1px;color:var(--muted);text-transform:uppercase;margin-bottom:2px">Orbital Period</div><div style="font-size:14px;font-weight:700;color:var(--text)">'+(data.period||'—')+'</div></div>' +
+    '</div>' +
+    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px">' +
+      '<div style="background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:6px;padding:8px 10px"><div style="font-size:8px;letter-spacing:1px;color:var(--muted);text-transform:uppercase;margin-bottom:2px">Radius</div><div style="font-size:14px;font-weight:700;color:var(--text)">'+(data.radius||'—')+'</div></div>' +
+      '<div style="background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:6px;padding:8px 10px"><div style="font-size:8px;letter-spacing:1px;color:var(--muted);text-transform:uppercase;margin-bottom:2px">Moons</div><div style="font-size:14px;font-weight:700;color:var(--text)">'+(data.moons!==undefined?data.moons:'—')+'</div></div>' +
+    '</div>' +
+    '<div style="font-size:11px;line-height:1.65;color:rgba(216,221,232,.85);margin-bottom:14px">'+(data.note||'')+'</div>';
+  det.style.display = '';
 }
 
 var planetRAF = null;
