@@ -167,7 +167,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);font-famil
     <div class="tab"     data-tab="news"         onclick="setTab(this)">News</div>
     <div class="tab"     data-tab="tech"         onclick="setTab(this)">Tech</div>
     <div class="tab"     data-tab="fashion"      onclick="setTab(this)">Fashion</div>
-    <div class="tab"     data-tab="astrology"    onclick="setTab(this)">&#10024; Sky</div>
+    <div class="tab"     data-tab="astrology"    onclick="setTab(this)">Sky</div>
     <div class="tab"     data-tab="conflict"     onclick="setTab(this)">Conflicts</div>
     <div class="tab"     data-tab="disaster"     onclick="setTab(this)">Disasters</div>
     <div class="tab"     data-tab="storm"        onclick="setTab(this)">Storms</div>
@@ -352,17 +352,14 @@ async function apiFetch(url, timeout) {
   return r.json();
 }
 
-// Build GDELT URL safely using URLSearchParams (avoids & encoding issues)
+// Build GDELT URL — must use %20 (not +) for spaces
 function gdeltUrl(query, limit, timespan) {
   limit = limit || 8;
   timespan = timespan || '24h';
-  const p = new URLSearchParams();
-  p.set('query', query);
-  p.set('format', 'json');
-  p.set('maxrecords', String(limit));
-  p.set('timespan', timespan);
-  p.set('SOURCELANG', 'english');
-  return 'https://api.gdeltproject.org/api/v2/geo/geo?' + p.toString();
+  return 'https://api.gdeltproject.org/api/v2/geo/geo?' +
+    'query=' + encodeURIComponent(query) +
+    '&format=json&maxrecords=' + limit +
+    '&timespan=' + timespan + '&SOURCELANG=english';
 }
 
 function findLatLng(text) {
@@ -587,16 +584,16 @@ async function fetchGDELT(query, type, limit) {
 
 // Multi-source world news via GDELT
 const NEWS_QUERIES = [
-  {q:'reuters.com apnews.com breaking world',          region:'Global Wires',   lat:51.51, lng:-0.13},
-  {q:'aljazeera.com middleeasteye.net news update',    region:'Middle East',    lat:25.2,  lng:55.27},
-  {q:'allafrica.com theafricareport.com news',         region:'Africa',         lat:1.29,  lng:36.82},
-  {q:'scmp.com channelnewsasia.com news asia',         region:'Asia-Pacific',   lat:22.32, lng:114.17},
-  {q:'japantimes.co.jp nhk news japan',                region:'Japan',          lat:35.69, lng:139.69},
-  {q:'thehindu.com ndtv.com india news',               region:'India',          lat:28.61, lng:77.21},
-  {q:'euronews.com dw.com europe news update',         region:'Europe',         lat:48.86, lng:2.35},
-  {q:'bbc.com theguardian.com world news',             region:'UK',             lat:51.51, lng:-0.13},
-  {q:'infobae.com mercopress.com latin america news',  region:'Latin America',  lat:-23.55,lng:-46.63},
-  {q:'cbc.ca globalnews.ca canada news',               region:'Canada',         lat:45.42, lng:-75.69}
+  {q:'world politics government summit diplomacy',           region:'Global',        lat:48.86, lng:2.35},
+  {q:'Middle East Israel Iran Syria Lebanon Iraq war',       region:'Middle East',   lat:33.0,  lng:44.0},
+  {q:'Africa Nigeria Ethiopia Somalia Kenya Sudan crisis',   region:'Africa',        lat:8.0,   lng:25.0},
+  {q:'China Asia Pacific Taiwan Korea Japan trade',          region:'Asia-Pacific',  lat:25.0,  lng:110.0},
+  {q:'Japan Tokyo economy technology earthquake',            region:'Japan',         lat:35.69, lng:139.69},
+  {q:'India Pakistan South Asia economy election',           region:'South Asia',    lat:24.0,  lng:78.0},
+  {q:'Europe NATO EU Ukraine Russia energy election',        region:'Europe',        lat:50.0,  lng:15.0},
+  {q:'United Kingdom Britain Scotland parliament',           region:'UK',            lat:51.51, lng:-0.13},
+  {q:'Latin America Brazil Mexico Argentina Colombia',       region:'Latin America', lat:-15.0, lng:-60.0},
+  {q:'Canada Australia economy immigration climate',         region:'Canada',        lat:56.0,  lng:-106.0}
 ];
 
 async function fetchMultiSourceNews() {
@@ -643,9 +640,19 @@ async function fetchHackerNews() {
   }).filter(Boolean));
 }
 
-// Fashion via GDELT
-function fetchFashionNews() {
-  return fetchGDELT('fashion week runway couture Vogue Prada Dior Chanel LVMH Gucci designer luxury', 'fashion', 10);
+// Fashion — multiple targeted queries for fuller feed
+async function fetchFashionNews() {
+  const queries = [
+    'fashion week runway show collection designer debut',
+    'Vogue Prada Dior Chanel LVMH Gucci Balenciaga Hermes couture',
+    'luxury brand fashion model trend streetwear style',
+    'Milan Paris London New York fashion week show',
+    'sustainable fashion eco textile circular design',
+  ];
+  const settled = await Promise.allSettled(queries.map(function(q){ return fetchGDELT(q, 'fashion', 6); }));
+  const all = [];
+  settled.forEach(function(r){ if (r.status === 'fulfilled') all.push.apply(all, r.value); });
+  return dedupeByTitle(all).slice(0, 30);
 }
 
 // ISS — wheretheiss.at has CORS *
@@ -735,7 +742,7 @@ async function fetchLaunches() {
 async function fetchMarkets() {
   const [cg, fx] = await Promise.allSettled([
     apiFetch('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum,solana,ripple,cardano&vs_currencies=usd&include_24hr_change=true', 8000),
-    apiFetch('https://api.frankfurter.app/latest?from=USD&to=EUR,GBP,JPY,CNY', 6000)
+    apiFetch('https://api.frankfurter.dev/v1/latest?from=USD&to=EUR,GBP,JPY,CNY', 6000)
   ]);
 
   const items = [];
@@ -861,7 +868,6 @@ function renderList() {
       const p = ev._planet || {};
       const snip = ev.brief ? ev.brief.replace(/\n/g,' ').slice(0,70) + '…' : '';
       return '<div class="astro-card' + (ev.id===selectedId?' sel':'') + '" id="ev-' + ev.id + '" onclick="selectEvent(\'' + ev.id + '\')">' +
-        '<div class="astro-emoji">' + (p.emoji||'✨') + '</div>' +
         '<div class="astro-sign">' + (p.name||ev.title) + '</div>' +
         '<div class="astro-site">' + ev.location + '</div>' +
         '<div class="astro-snip">' + snip + '</div></div>';
@@ -875,7 +881,7 @@ function renderList() {
     const warn = ev._live ? '' : ' <span style="font-size:8px;color:var(--muted)" title="Fallback data">⚠</span>';
     return '<div class="ev' + (ev.id===selectedId?' sel':'') + '" id="ev-' + ev.id + '" onclick="selectEvent(\'' + ev.id + '\')">' +
       '<div class="ev-row"><div class="ev-ico">' + ico + '</div><div class="ev-body">' +
-      '<div class="ev-name">' + ev.title + warn + '</div>' +
+      '<div class="ev-name">' + (ev.url ? '<a href="' + ev.url + '" target="_blank" style="color:inherit;text-decoration:none;border-bottom:1px solid rgba(255,255,255,0.12)" onclick="event.stopPropagation()">' + ev.title + '</a>' : ev.title) + warn + '</div>' +
       '<div class="ev-foot"><span class="ev-tag" style="background:' + c + '1a;color:' + c + '">' + ev.type.toUpperCase() + '</span>' +
       '<span class="ev-loc">' + ev.location + '</span>' +
       '<span class="ev-age">' + ev.age + '</span></div></div></div></div>';
