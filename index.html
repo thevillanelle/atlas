@@ -228,7 +228,6 @@ select#theme-btn option{background:#070b18;color:var(--text);font-size:12px;lett
   <input id="hb-year" type="number" min="1900" max="2025" placeholder="Year" value="1962">
   <button id="hb-go" onclick="loadHistory()">GO ›</button>
   <span id="hb-status"></span>
-  <span class="hb-exit" onclick="exitHistMode()" style="display:none" id="hb-exit">✕ Exit History</span>
 </div>
 <button id="ptoggle" onclick="togglePanel()">&#8249;</button>
 <div id="panel">
@@ -266,6 +265,7 @@ select#theme-btn option{background:#070b18;color:var(--text);font-size:12px;lett
   <div class="lc-row" data-layer="flight"       onclick="toggleLayer(this)"><div class="lc-dot" style="background:var(--col-flight)"></div><span>Live Flights</span><div class="lc-live" id="ls-flight"></div><span class="lc-n" id="lc-flight">–</span></div>
   <div class="lc-row" data-layer="launch"       onclick="toggleLayer(this)"><div class="lc-dot" style="background:var(--col-launch)"></div><span>Launches</span><div class="lc-live" id="ls-launch"></div><span class="lc-n" id="lc-launch">–</span></div>
   <div class="lc-row" data-layer="connection"   onclick="toggleLayer(this)"><div class="lc-dot" style="background:var(--col-connection)"></div><span>Connections</span><div class="lc-live on" id="ls-connection"></div><span class="lc-n" id="lc-connection">–</span></div>
+  <div class="lc-row off" data-layer="history" onclick="toggleLayer(this)"><div class="lc-dot" style="background:var(--col-history)"></div><span>Historical</span><div class="lc-live" id="ls-history"></div><span class="lc-n" id="lc-history">–</span></div>
 </div>
 <div id="sun-orb"></div>
 <div id="ap"></div>
@@ -399,15 +399,14 @@ var searchQ = '';
 var selectedId = null;
 var panelOpen = true;
 var watchTags = ['Gaza','Ukraine','AI','Markets','Fashion','Climate'];
-var layerVis = {news:true,conflict:true,disaster:true,storm:true,humanitarian:true,flight:true,launch:true,tech:true,fashion:true,astrology:true,connection:true,history:true};
+var layerVis = {news:true,conflict:true,disaster:true,storm:true,humanitarian:true,flight:true,launch:true,tech:true,fashion:true,astrology:true,connection:true,history:false};
 var globe;
 var themeMode = 0; // 0=NIGHT 1=DAY 2=IRL
 var dayMode = false; // kept for compat — true when themeMode===1
 var irlMode = false; // true when themeMode===2
 var connectMode = false;
 var connectedIds = [];
-var histMode = false;
-var histEvents = [];
+var histEvents = []; // historical layer — shown alongside live events when layerVis.history is true
 var irlCanvas = null, irlMaskCanvas = null, irlDayCanvas = null;
 var irlImgDay = null, irlImgNight = null, irlImgsLoaded = false;
 var irlBlobUrl = null;
@@ -898,8 +897,9 @@ function refreshGlobe() {
 // FILTER / LIST
 // =============================================================================
 function getFiltered() {
-  if (histMode) return histEvents;
-  var evs = allEvents;
+  var evs = histEvents.length && layerVis.history
+    ? allEvents.concat(histEvents)
+    : allEvents;
   if (currentTab !== 'all') evs = evs.filter(function(e){return e.type===currentTab;});
   if (searchQ) {
     var q = searchQ.toLowerCase();
@@ -1329,7 +1329,6 @@ function tickSunOrb() {
 var MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
 
 function toggleHistBar() {
-  if (histMode) { exitHistMode(); return; }
   var bar = document.getElementById('hist-bar');
   var btn = document.getElementById('hist-btn');
   var open = bar.classList.toggle('open');
@@ -1345,27 +1344,14 @@ async function loadHistory() {
   document.getElementById('hb-go').disabled = true;
   try {
     var evs = await fetchHistoricalEvents(month, year);
-    if (!evs.length) { setHistStatus('No geolocatable events found — try another date'); document.getElementById('hb-go').disabled=false; return; }
     histEvents = evs;
-    histMode = true;
-    document.getElementById('hb-status').textContent = label + ' — ' + evs.length + ' events';
-    document.getElementById('hb-exit').style.display = '';
-    var sun = sunSubpoint(new Date(year, month-1, 15));
-    globe.pointOfView({lat:sun.lat, lng:sun.lng, altitude:2.0}, 1200);
+    layerVis.history = true;
+    setHistStatus(label + ' — ' + evs.length + ' events on globe');
     renderList(); refreshGlobe();
   } catch(e) {
     setHistStatus('Failed to load — try another date');
   }
   document.getElementById('hb-go').disabled = false;
-}
-
-function exitHistMode() {
-  histMode = false; histEvents = [];
-  document.getElementById('hb-status').textContent = '';
-  document.getElementById('hb-exit').style.display = 'none';
-  document.getElementById('hist-bar').classList.remove('open');
-  document.getElementById('hist-btn').classList.remove('active');
-  renderList(); refreshGlobe();
 }
 
 function setHistStatus(msg) { document.getElementById('hb-status').textContent = msg; }
