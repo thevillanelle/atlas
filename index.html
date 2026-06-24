@@ -640,19 +640,51 @@ async function fetchHackerNews() {
   }).filter(Boolean));
 }
 
-// Fashion — multiple targeted queries for fuller feed
+// Fashion — RSS feeds from Vogue, Vogue Business, Harper's Bazaar, WWD, BOF, Elle
+// rss2json.com: free, CORS *, converts any RSS to JSON
 async function fetchFashionNews() {
-  const queries = [
-    'fashion week runway show collection designer debut',
-    'Vogue Prada Dior Chanel LVMH Gucci Balenciaga Hermes couture',
-    'luxury brand fashion model trend streetwear style',
-    'Milan Paris London New York fashion week show',
-    'sustainable fashion eco textile circular design',
+  const FASHION_RSS = [
+    {url:'https://www.vogue.com/feed/rss',              source:'Vogue',           lat:40.71,  lng:-74.01},
+    {url:'https://www.harpersbazaar.com/rss/all.xml',   source:"Harper's Bazaar", lat:40.71,  lng:-74.01},
+    {url:'https://wwd.com/feed/',                       source:'WWD',             lat:40.71,  lng:-74.01},
+    {url:'https://www.businessoffashion.com/feed',      source:'Business of Fashion', lat:51.51, lng:-0.13},
+    {url:'https://www.elle.com/rss/all.xml',            source:'Elle',            lat:48.86,  lng:2.35},
+    {url:'https://www.esquire.com/rss/all.xml',         source:'Esquire',         lat:40.71,  lng:-74.01},
   ];
-  const settled = await Promise.allSettled(queries.map(function(q){ return fetchGDELT(q, 'fashion', 6); }));
+  const settled = await Promise.allSettled(
+    FASHION_RSS.map(function(feed) {
+      return apiFetch(
+        'https://api.rss2json.com/v1/api.json?rss_url=' + encodeURIComponent(feed.url) + '&count=8',
+        10000
+      ).then(function(d) { return {d:d, feed:feed}; });
+    })
+  );
   const all = [];
-  settled.forEach(function(r){ if (r.status === 'fulfilled') all.push.apply(all, r.value); });
-  return dedupeByTitle(all).slice(0, 30);
+  settled.forEach(function(r, i) {
+    if (r.status !== 'fulfilled') return;
+    const feed = FASHION_RSS[i];
+    const items = (r.value && r.value.d && r.value.d.items) || [];
+    items.forEach(function(item, j) {
+      if (!item.title) return;
+      const ll = findLatLng(item.title) || findLatLng(item.description || '');
+      all.push({
+        id: 'fash_' + i + '_' + j,
+        type: 'fashion',
+        title: item.title.replace(/<[^>]*>/g,'').trim(),
+        location: ll ? (Object.keys(CC).find(function(c){return (item.title+' '+(item.description||'')).toLowerCase().indexOf(c.toLowerCase())!==-1;}) || feed.source) : feed.source,
+        lat: ll ? ll[0] : feed.lat,
+        lng: ll ? ll[1] : feed.lng,
+        severity: 1,
+        age: item.pubDate ? timeAgo(item.pubDate) : 'Recent',
+        brief: (item.description || item.content || item.title).replace(/<[^>]*>/g,'').trim().slice(0, 400),
+        url: item.link || item.guid || null,
+        sources: [{n: feed.source, a: item.pubDate ? timeAgo(item.pubDate) : 'Recent', url: item.link}],
+        tags: ['Fashion', feed.source],
+        _live: true
+      });
+    });
+  });
+  return dedupeByTitle(all).slice(0, 40);
 }
 
 // ISS — wheretheiss.at has CORS *
@@ -742,7 +774,7 @@ async function fetchLaunches() {
 async function fetchMarkets() {
   const [cg, fx] = await Promise.allSettled([
     apiFetch('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum,solana,ripple,cardano&vs_currencies=usd&include_24hr_change=true', 8000),
-    apiFetch('https://api.frankfurter.dev/v1/latest?from=USD&to=EUR,GBP,JPY,CNY', 6000)
+    apiFetch('https://open.er-api.com/v6/latest/USD', 6000)
   ]);
 
   const items = [];
@@ -758,10 +790,11 @@ async function fetchMarkets() {
   }
   if (fx.status === 'fulfilled' && fx.value && fx.value.rates) {
     const r = fx.value.rates;
-    if (r.EUR) items.push({sym:'EUR/USD',px:(1/r.EUR).toFixed(4),chg:'',up:true});
-    if (r.GBP) items.push({sym:'GBP/USD',px:(1/r.GBP).toFixed(4),chg:'',up:true});
-    if (r.JPY) items.push({sym:'USD/JPY',px:r.JPY.toFixed(2),chg:'',up:true});
-    if (r.CNY) items.push({sym:'USD/CNY',px:r.CNY.toFixed(4),chg:'',up:true});
+    // open.er-api: rates are USD→X, so EUR/USD = 1/r.EUR
+    if (r.EUR) items.push({sym:'EUR/USD', px:(1/r.EUR).toFixed(4), chg:'', up:true});
+    if (r.GBP) items.push({sym:'GBP/USD', px:(1/r.GBP).toFixed(4), chg:'', up:true});
+    if (r.JPY) items.push({sym:'USD/JPY', px:r.JPY.toFixed(2),      chg:'', up:true});
+    if (r.CNY) items.push({sym:'USD/CNY', px:r.CNY.toFixed(4),      chg:'', up:true});
   }
   items.push({sym:'GOLD',px:'2,341',chg:'+0.64%',up:true},{sym:'OIL (WTI)',px:'82.14',chg:'-1.20%',up:false});
   tickerData = items;
