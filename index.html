@@ -175,6 +175,20 @@ body.hist-open #panel{top:92px}body.hist-open #detail{top:92px}body.hist-open #l
 .ap-row{display:flex;justify-content:space-between;align-items:center;font-size:10px;padding:4px 0;border-bottom:1px solid rgba(255,255,255,.04)}
 .ap-row:last-child{border-bottom:none}
 .ap-rv{color:var(--text);font-family:'Space Mono',monospace;font-size:9px}
+.ap-engines{display:flex;align-items:center;gap:5px;padding:7px 14px;border-bottom:1px solid var(--border);background:rgba(255,255,255,.02)}
+.ap-eng-lbl{font-size:8px;font-weight:700;letter-spacing:1.5px;color:var(--muted);text-transform:uppercase;margin-right:4px}
+.ap-eng{font-size:8px;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:3px 9px;border-radius:4px;border:1px solid var(--border);background:transparent;color:var(--muted);cursor:pointer;transition:all .15s;font-family:'Space Mono',monospace}
+.ap-eng:hover{color:var(--text);border-color:rgba(255,255,255,.25)}
+.ap-eng.on{background:rgba(168,85,247,.15);border-color:rgba(168,85,247,.5);color:#c084fc}
+.ap-loading{padding:16px 14px;font-size:10px;color:var(--muted);letter-spacing:1px;font-family:'Space Mono',monospace;text-align:center}
+.ap-eng-result{padding:12px 14px}
+.ap-eng-thread{font-size:11px;line-height:1.65;color:rgba(216,221,232,.85);margin-bottom:9px;padding-bottom:9px;border-bottom:1px solid var(--border)}
+.ap-eng-thread:last-child{border-bottom:none;margin-bottom:0;padding-bottom:0}
+.ap-eng-signals{display:flex;flex-wrap:wrap;gap:5px;margin-top:10px;padding-top:10px;border-top:1px solid var(--border)}
+.ap-eng-sig{font-size:8.5px;padding:2px 7px;border-radius:3px;background:rgba(45,212,191,.1);border:1px solid rgba(45,212,191,.25);color:#2dd4bf;display:inline-block}
+.ap-eng-source{font-size:8.5px;padding:2px 7px;border-radius:3px;background:rgba(251,191,36,.08);border:1px solid rgba(251,191,36,.2);color:#fbbf24;display:inline-block}
+.ap-eng-lbl-row{font-size:8px;font-weight:700;letter-spacing:1.5px;color:var(--muted);text-transform:uppercase;margin-bottom:6px;margin-top:12px}
+.ap-eng-lbl-row:first-child{margin-top:0}
 .ap-prompt{padding:20px 16px;text-align:center;color:var(--muted);font-size:11px;font-family:'Space Mono',monospace}
 .marker{position:relative;cursor:pointer;width:22px;height:22px}
 .m-dot{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:8px;height:8px;border-radius:50%;background:var(--mc);box-shadow:0 0 8px var(--mc);z-index:2}
@@ -416,6 +430,8 @@ var dayMode = false; // kept for compat — true when themeMode===1
 var irlMode = false; // true when themeMode===2
 var connectMode = false;
 var connectedIds = [];
+var activeEngine = 'guardian';
+var engineCache = {};
 var histEvents = []; // historical layer — shown alongside live events when layerVis.history is true
 var irlCanvas = null, irlMaskCanvas = null, irlDayCanvas = null;
 var irlImgDay = null, irlImgNight = null, irlImgsLoaded = false;
@@ -1263,67 +1279,166 @@ function drawArcs() {
   globe.arcsData(arcs);
 }
 
-function analyzeConnections(evs) {
-  var tagCounts = {};
-  evs.forEach(function(ev){(ev.tags||[]).forEach(function(t){tagCounts[t]=(tagCounts[t]||0)+1;});});
-  var sharedTags = Object.keys(tagCounts).filter(function(t){return tagCounts[t]>1;}).sort(function(a,b){return tagCounts[b]-tagCounts[a];});
+// =============================================================================
+// ANALYSIS ENGINES
+// =============================================================================
+var ENGINES = [
+  {id:'guardian',  label:'GUARDIAN', desc:'News co-coverage'},
+  {id:'wiki',      label:'WIKI',     desc:'Encyclopedic categories'},
+  {id:'wikidata',  label:'WIKIDATA', desc:'Entity relationships'},
+  {id:'backlinks', label:'BACKLINKS',desc:'Cross-references'},
+];
 
-  var lats = evs.map(function(e){return e.lat;}), lngs = evs.map(function(e){return e.lng;});
-  var latSpan = Math.max.apply(null,lats)-Math.min.apply(null,lats);
-  var lngSpan = Math.max.apply(null,lngs)-Math.min.apply(null,lngs);
-  var geo = latSpan<12&&lngSpan<12 ? 'Localized cluster' : latSpan<40&&lngSpan<60 ? 'Regional spread' : 'Global — multi-theater';
+function setEngine(id) {
+  activeEngine = id;
+  document.querySelectorAll('.ap-eng').forEach(function(b){ b.classList.toggle('on', b.dataset.eng === id); });
+  var evs = connectedIds.map(findEventById).filter(Boolean);
+  if (evs.length >= 2) runEngine(evs);
+}
 
-  var types = {};
-  evs.forEach(function(ev){types[ev.type]=(types[ev.type]||0)+1;});
+async function runEngine(evs) {
+  var el = document.getElementById('ap-analysis');
+  if (!el) return;
+  var cacheKey = activeEngine + ':' + connectedIds.slice().sort().join(',');
+  if (engineCache[cacheKey]) { renderEngineResult(el, engineCache[cacheKey]); return; }
+  el.innerHTML = '<div class="ap-loading">⟳ QUERYING ' + activeEngine.toUpperCase() + '…</div>';
+  var result;
+  try {
+    if (activeEngine === 'guardian')  result = await engineGuardian(evs);
+    else if (activeEngine === 'wiki') result = await engineWiki(evs);
+    else if (activeEngine === 'wikidata') result = await engineWikidata(evs);
+    else if (activeEngine === 'backlinks') result = await engineBacklinks(evs);
+  } catch(e) { result = {threads:['Query failed: ' + e.message], signals:[]}; }
+  engineCache[cacheKey] = result;
+  var el2 = document.getElementById('ap-analysis');
+  if (el2) renderEngineResult(el2, result);
+}
 
+function renderEngineResult(el, result) {
+  var html = '<div class="ap-eng-result">';
+  if (result.threads && result.threads.length) {
+    result.threads.forEach(function(t){ html += '<div class="ap-eng-thread">' + t + '</div>'; });
+  }
+  if (result.signals && result.signals.length) {
+    html += '<div class="ap-eng-lbl-row">Signals</div><div class="ap-eng-signals">';
+    result.signals.slice(0,12).forEach(function(s){ html += '<span class="ap-eng-sig">' + s + '</span>'; });
+    html += '</div>';
+  }
+  if (result.sources && result.sources.length) {
+    html += '<div class="ap-eng-lbl-row">Sources</div><div class="ap-eng-signals">';
+    result.sources.slice(0,8).forEach(function(s){ html += '<span class="ap-eng-source">' + s + '</span>'; });
+    html += '</div>';
+  }
+  html += '</div>';
+  el.innerHTML = html;
+}
+
+// Engine 1: GUARDIAN — find Guardian articles covering both events together
+async function engineGuardian(evs) {
+  var terms = evs.map(function(e){ return e.location.split(',')[0].trim(); });
+  var query = terms.join(' AND ');
+  var url = guardianUrl(null, query, 10);
+  var data = await apiFetch(url, 10000);
+  var arts = (data && data.response && data.response.results) || [];
+  if (!arts.length) return {threads:['The Guardian found no articles covering ' + terms.join(' + ') + ' together. Try connecting events that share a region or geopolitical theme.'], signals:[], sources:[]};
   var threads = [];
-  var conflicts = evs.filter(function(e){return e.type==='conflict';});
-  var humanitarian = evs.filter(function(e){return e.type==='humanitarian';});
-  var disasters = evs.filter(function(e){return e.type==='disaster';});
-  var news = evs.filter(function(e){return e.type==='news';});
-  var tech = evs.filter(function(e){return e.type==='tech';});
-  var fashion = evs.filter(function(e){return e.type==='fashion';});
+  threads.push('The Guardian found ' + arts.length + ' article' + (arts.length!==1?'s':'') + ' covering ' + terms.join(' + ') + ' in the same story.');
+  threads.push('Most recent: "' + arts[0].webTitle + '" (' + (arts[0].webPublicationDate||'').slice(0,10) + ')');
+  var sections = arts.map(function(a){ return a.sectionName; }).filter(function(s,i,arr){ return arr.indexOf(s)===i; });
+  if (sections.length) threads.push('Coverage appears in: ' + sections.join(', ') + ' — the section spread reveals how editors are framing the connection.');
+  var summaries = arts.slice(0,3).map(function(a){ return a.fields && a.fields.trailText; }).filter(Boolean);
+  if (summaries.length) threads.push('From the coverage: "' + summaries[0].replace(/<[^>]+>/g,'').slice(0,180) + '…"');
+  return {threads:threads, signals:sections, sources:[]};
+}
 
-  if (conflicts.length && humanitarian.length)
-    threads.push('Conflict zones and humanitarian crises overlap — ' + conflicts.map(function(e){return e.location;}).join(', ') + ' may be the source of the displacement and aid blockages in ' + humanitarian.map(function(e){return e.location;}).join(', ') + '.');
-  if (conflicts.length && disasters.length)
-    threads.push('Compounding crisis: active conflict in ' + conflicts.map(function(e){return e.location;}).join(', ') + ' intersects with natural disaster response — aid corridors and infrastructure may be simultaneously overwhelmed.');
-  if (disasters.length && news.length)
-    threads.push('Natural disasters are generating news coverage — check whether media framing matches the severity data, or whether coverage is concentrated on one event while others go underreported.');
-  if (tech.length && conflicts.length)
-    threads.push('Tech developments alongside active conflicts — watch for surveillance technology, cyber operations, or infrastructure disruption narratives that connect these events.');
-  if (fashion.length && conflicts.length)
-    threads.push('Fashion events alongside conflict zones — supply chain disruption, labor exploitation, or raw material sourcing from conflict regions may be the connecting thread.');
-
-  var regionCounts = {};
-  evs.forEach(function(ev){
-    (ev.tags||[]).concat(ev.location.split(/[,\s]+/)).forEach(function(t){
-      if(t&&CC[t])regionCounts[t]=(regionCounts[t]||0)+1;
-    });
+// Engine 2: WIKI — find shared Wikipedia categories between events
+async function engineWiki(evs) {
+  var results = await Promise.all(evs.map(async function(ev) {
+    var title = ev.type === 'history' ? ev.title : ev.location.split(',')[0].trim();
+    var url = 'https://en.wikipedia.org/w/api.php?action=query&titles=' + encodeURIComponent(title) +
+      '&prop=categories&cllimit=50&clshow=!hidden&format=json&origin=*';
+    var data = await apiFetch(url, 6000);
+    var pages = data && data.query && data.query.pages;
+    var page = pages && Object.values(pages)[0];
+    var cats = (page && page.categories || []).map(function(c){ return c.title.replace('Category:',''); });
+    return {title: title, cats: cats, missing: !page || page.missing !== undefined};
+  }));
+  var found = results.filter(function(r){ return !r.missing && r.cats.length; });
+  if (found.length < 2) return {threads:['Wikipedia articles not found for one or more of these events. Try history mode events or events with well-known location names.'], signals:[]};
+  var shared = found[0].cats.filter(function(c){
+    return found.slice(1).every(function(r){ return r.cats.indexOf(c) !== -1; });
   });
-  var sharedRegions = Object.keys(regionCounts).filter(function(r){return regionCounts[r]>1;});
-  if (sharedRegions.length && !threads.length)
-    threads.push('Geographic convergence in ' + sharedRegions.slice(0,3).join(', ') + ' — multiple event types compressing into the same territory signals systemic instability, not isolated incidents.');
+  var threads = [];
+  if (shared.length) {
+    threads.push('Wikipedia places ' + found.map(function(r){return r.title;}).join(' and ') + ' in ' + shared.length + ' shared categor' + (shared.length===1?'y':'ies') + '.');
+    threads.push('Shared classification signals structural similarity in how human knowledge organizes these events — they belong to the same encyclopedic territory.');
+    if (shared.length > 3) threads.push('High category overlap (' + shared.length + ') suggests these events are deeply entangled at the definitional level — same conflict, same region, same systemic cause.');
+  } else {
+    var allCats = found.map(function(r){return r.cats.length;});
+    threads.push('No direct Wikipedia category overlap found between ' + found.map(function(r){return r.title;}).join(' and ') + '.');
+    threads.push('The connection is likely indirect — economic, causal, or temporal rather than taxonomic. Consider the GDELT or BACKLINKS engine for co-occurrence patterns.');
+  }
+  return {threads:threads, signals:shared.slice(0,12)};
+}
 
-  var dominant = Object.keys(types).sort(function(a,b){return types[b]-types[a];})[0];
-  if (types[dominant]===evs.length && evs.length>1)
-    threads.push('All ' + evs.length + ' selected events are ' + dominant + '. Compare them: which is most severe? Which has the least coverage? The gap between severity and attention is where the real story lives.');
+// Engine 3: WIKIDATA — find shared entity properties via SPARQL
+async function engineWikidata(evs) {
+  var locs = evs.map(function(e){ return e.location.split(',')[0].trim(); });
+  // Search for Wikidata entity IDs
+  var entities = await Promise.all(locs.map(async function(loc) {
+    var url = 'https://www.wikidata.org/w/api.php?action=wbsearchentities&search=' +
+      encodeURIComponent(loc) + '&language=en&limit=1&format=json&origin=*';
+    var data = await apiFetch(url, 6000);
+    return data && data.search && data.search[0];
+  }));
+  var found = entities.filter(Boolean);
+  if (found.length < 2) return {threads:['Could not resolve Wikidata entities for these locations. Wikidata works best with city, country, or well-known place names.'], signals:[]};
+  var ids = found.map(function(e){ return e.id; });
+  var sparql = 'SELECT DISTINCT ?propLabel ?valueLabel WHERE { wd:' + ids[0] + ' ?prop ?value . wd:' + ids[1] + ' ?prop ?value . ?propItem wikibase:directClaim ?prop . FILTER(?value != wd:' + ids[0] + ' && ?value != wd:' + ids[1] + ') SERVICE wikibase:label { bd:serviceParam wikibase:language "en" . } } LIMIT 15';
+  var sparqlUrl = 'https://query.wikidata.org/sparql?query=' + encodeURIComponent(sparql) + '&format=json';
+  var result = await apiFetch(sparqlUrl, 10000);
+  var bindings = (result && result.results && result.results.bindings) || [];
+  var props = bindings.map(function(b){
+    var p = b.propLabel && b.propLabel.value;
+    var v = b.valueLabel && b.valueLabel.value;
+    return (p && v && !p.startsWith('P') && !v.startsWith('Q')) ? p + ': ' + v : null;
+  }).filter(Boolean);
+  var threads = [];
+  if (props.length) {
+    threads.push('Wikidata links ' + found[0].label + ' (' + ids[0] + ') and ' + found[1].label + ' (' + ids[1] + ') through ' + props.length + ' shared propert' + (props.length===1?'y':'ies') + '.');
+    threads.push('Shared structural properties reveal the ontological backbone connecting these events — the same country, region, governing body, or historical classification.');
+  } else {
+    threads.push('Wikidata found no direct shared properties between ' + found[0].label + ' and ' + found[1].label + '.');
+    threads.push('These entities may be connected at a higher level of abstraction — try WIKI for category overlap or BACKLINKS for encyclopedic co-citation.');
+  }
+  return {threads:threads, signals:props.slice(0,10)};
+}
 
-  // Temporal connections — historical events mixed with live ones
-  var histEvsList = evs.filter(function(e){return e.type==='history';});
-  var liveEvsList = evs.filter(function(e){return e.type!=='history';});
-  if (histEvsList.length && liveEvsList.length) {
-    var hlocs = histEvsList.map(function(e){return e.location;}).join(', ');
-    var llocs = liveEvsList.map(function(e){return e.title;}).join(', ');
-    threads.unshift('ACROSS TIME: ' + hlocs + ' (historical) is connected to ' + llocs + ' (now). What patterns repeat? What has changed? History doesn\'t repeat — but it rhymes. Trace what the historical event set in motion and whether it has fully resolved or only shifted form.');
-    if (sharedTags.length)
-      threads.push('Shared signal across time: ' + sharedTags.slice(0,4).join(', ') + '. The same forces may be operating across different eras — look for the actor, the resource, or the ideology that links them.');
-  } else if (!threads.length && sharedTags.length)
-    threads.push('Shared signals across ' + evs.length + ' events: ' + sharedTags.slice(0,5).join(', ') + '. These threads suggest a coordinated narrative or linked causal chain worth tracing.');
-  if (!threads.length)
-    threads.push('No direct signal overlap detected between these ' + evs.length + ' events. The connection may be economic, temporal, or structural — consider what a single actor (state, market, institution) might have to gain from all of these happening simultaneously.');
-
-  return {sharedTags:sharedTags, geo:geo, types:types, threads:threads};
+// Engine 4: BACKLINKS — find Wikipedia articles that reference both events
+async function engineBacklinks(evs) {
+  var results = await Promise.all(evs.map(async function(ev) {
+    var title = ev.type === 'history' ? ev.title : ev.location.split(',')[0].trim();
+    var url = 'https://en.wikipedia.org/w/api.php?action=query&titles=' + encodeURIComponent(title) +
+      '&prop=linkshere&lhlimit=100&lhnamespace=0&format=json&origin=*';
+    var data = await apiFetch(url, 7000);
+    var pages = data && data.query && data.query.pages;
+    var page = pages && Object.values(pages)[0];
+    var links = (page && page.linkshere || []).map(function(l){ return l.title; });
+    return {title: title, links: links};
+  }));
+  var shared = results[0].links.filter(function(link){
+    return results.slice(1).every(function(r){ return r.links.indexOf(link) !== -1; });
+  });
+  var threads = [];
+  if (shared.length) {
+    threads.push(shared.length + ' Wikipedia article' + (shared.length!==1?'s':'') + ' cite' + (shared.length===1?'s':'') + ' both events — these are the connective tissue.');
+    threads.push('Articles referencing both: ' + shared.slice(0,5).join(', ') + (shared.length>5?' and ' + (shared.length-5) + ' more':'') + '.');
+    threads.push('Shared citations reveal the broader topics, conflicts, and histories that contain both events at an encyclopedic level — this is the structural frame.');
+  } else {
+    threads.push('No Wikipedia articles directly reference both events.');
+    threads.push('Their connection is likely lateral rather than hierarchical — look for a third event or actor that bridges them rather than a parent topic that contains them both.');
+  }
+  return {threads:threads, signals:shared.slice(0,10)};
 }
 
 function renderAP() {
@@ -1345,24 +1460,14 @@ function renderAP() {
     panel.classList.add('open'); return;
   }
 
-  var a = analyzeConnections(evs);
+  var engHtml = '<div class="ap-engines"><span class="ap-eng-lbl">Engine</span>' +
+    ENGINES.map(function(eng){
+      return '<button class="ap-eng' + (activeEngine===eng.id?' on':'') + '" data-eng="'+eng.id+'" onclick="setEngine(\''+eng.id+'\')" title="'+eng.desc+'">'+eng.label+'</button>';
+    }).join('') + '</div>';
 
-  var threadsHtml = a.threads.map(function(t){return '<div class="ap-thread">'+t+'</div>';}).join('');
-  var tagsHtml = a.sharedTags.length
-    ? a.sharedTags.slice(0,10).map(function(t){return '<span class="ap-tag">'+t+'</span>';}).join('')
-    : '<span style="color:var(--muted);font-size:10px">No overlapping signals</span>';
-  var typeRows = Object.keys(a.types).map(function(t){
-    return '<div class="ap-row"><span style="color:'+(COLORS[t]||'#aaa')+'">'+t.toUpperCase()+'</span><span class="ap-rv">'+a.types[t]+'</span></div>';
-  }).join('');
-
-  panel.innerHTML = header +
-    '<div class="ap-body">' +
-      '<div class="ap-card"><div class="ap-card-ttl">Narrative Threads</div>'+threadsHtml+'</div>' +
-      '<div class="ap-card"><div class="ap-card-ttl">Shared Signals</div>'+tagsHtml+
-        '<div style="margin-top:12px"><div class="ap-card-ttl">Geographic Scope</div><div style="font-size:10.5px;color:var(--text)">'+a.geo+'</div></div></div>' +
-      '<div class="ap-card"><div class="ap-card-ttl">Event Types</div>'+typeRows+'</div>' +
-    '</div>';
+  panel.innerHTML = header + engHtml + '<div id="ap-analysis"></div>';
   panel.classList.add('open');
+  runEngine(evs);
 }
 
 function closeAP(){document.getElementById('ap').classList.remove('open');}
