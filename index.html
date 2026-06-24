@@ -208,6 +208,10 @@ body.hist-open #panel{top:92px}body.hist-open #detail{top:92px}body.hist-open #l
 .tk-up{color:#10b981}
 .tk-dn{color:#ef4444}
 .tk-div{color:rgba(255,255,255,.08);padding:0 2px}
+#orbit-canvas{position:fixed;top:0;left:0;pointer-events:none;z-index:128;width:100%;height:100%}
+#star-orbs{position:fixed;top:0;left:0;pointer-events:none;z-index:130;width:0;height:0}
+.sorb{position:absolute;transform:translate(-50%,-50%);border-radius:50%;cursor:pointer;pointer-events:all;transition:opacity .3s}
+.sorb:hover{filter:brightness(2) saturate(1.5);z-index:200}
 </style>
 </head>
 <body>
@@ -292,6 +296,8 @@ body.hist-open #panel{top:92px}body.hist-open #detail{top:92px}body.hist-open #l
 </div>
 <div id="sun-orb"></div>
 <div id="planet-orbs"></div>
+<canvas id="orbit-canvas"></canvas>
+<div id="star-orbs"></div>
 <div id="ap"></div>
 <div id="detail">
   <button id="d-close" onclick="closeDetail()">&#x2715;</button>
@@ -1020,8 +1026,193 @@ function tickPlanets() {
     el.style.left = sp.x + 'px';
     el.style.top  = sp.y + 'px';
   });
+  // Draw orbit rings
+  var orbitOpacity = Math.min(0.55, Math.max(0, (camDist - 220) / 130));
+  var oc = document.getElementById('orbit-canvas');
+  if (oc && orbitOpacity > 0) {
+    if (oc.width !== window.innerWidth || oc.height !== window.innerHeight) {
+      oc.width = window.innerWidth; oc.height = window.innerHeight;
+    }
+    var ctx = oc.getContext('2d');
+    ctx.clearRect(0, 0, oc.width, oc.height);
+    PLANET_DEFS.forEach(function(p) {
+      var pts = ORBIT_GEO_PATHS[p.name];
+      if (!pts || !pts.length) return;
+      ctx.beginPath();
+      ctx.strokeStyle = p.color + Math.round(orbitOpacity * 0x55).toString(16).padStart(2,'0');
+      ctx.lineWidth = 0.6;
+      ctx.setLineDash([3,5]);
+      var started = false;
+      for (var i = 0; i <= pts.length; i++) {
+        var pos = pts[i % pts.length];
+        var lat = pos.lat * DEG, lng = pos.lng * DEG, dist = 620;
+        var sp = projectToScreen(dist*Math.cos(lat)*Math.sin(lng), dist*Math.sin(lat), dist*Math.cos(lat)*Math.cos(lng));
+        if (!sp) { started = false; continue; }
+        if (!started) { ctx.moveTo(sp.x, sp.y); started = true; } else ctx.lineTo(sp.x, sp.y);
+      }
+      ctx.stroke();
+      ctx.setLineDash([]);
+    });
+  } else if (oc && orbitOpacity <= 0) {
+    var ctx2 = oc.getContext('2d');
+    ctx2.clearRect(0, 0, oc.width || 1, oc.height || 1);
+  }
+
+  // Update named star positions
+  var starOp = opacity;
+  var starDate = histDate || new Date();
+  var starD = daysSinceJ2000(starDate);
+  var GMST_s = norm360(280.46061837 + 360.98564736629 * starD);
+  STAR_CATALOG.forEach(function(s, i) {
+    var el = document.getElementById('sorb-' + i);
+    if (!el) return;
+    if (starOp <= 0) { el.style.display = 'none'; return; }
+    var slat = s[2] * DEG, slng = norm180(s[1] - GMST_s) * DEG, dist = 618;
+    var sp = projectToScreen(dist*Math.cos(slat)*Math.sin(slng), dist*Math.sin(slat), dist*Math.cos(slat)*Math.cos(slng));
+    if (!sp) { el.style.display = 'none'; return; }
+    el.style.display = 'block';
+    el.style.opacity = starOp;
+    el.style.left = sp.x + 'px';
+    el.style.top  = sp.y + 'px';
+  });
+
   planetRAF = requestAnimationFrame(tickPlanets);
 }
+
+// =============================================================================
+// STARS & ORBITAL RINGS
+// =============================================================================
+// name, ra_deg(J2000), dec_deg, mag, spectral, dist_ly, constellation, note
+var STAR_CATALOG = [
+  ['Sirius',      101.29, -16.72, -1.46,'A1V',   8.6,  'Canis Major',    'Brightest star in the night sky. Its heliacal rising signaled the Nile flood to ancient Egyptians.'],
+  ['Canopus',      95.99, -52.70, -0.74,'F0II',  310,  'Carina',         'Second brightest star. Used by NASA as a navigational reference for spacecraft attitude control.'],
+  ['Arcturus',    213.91,  19.18, -0.05,'K1.5III', 37, 'Boötes',         'Brightest star in the northern sky. Its 1933 light was used to open the Chicago World\'s Fair.'],
+  ['Vega',        279.23,  38.78,  0.03,'A0V',    25,  'Lyra',           'Was the North Star 14,000 years ago. Will be again in ~13,700 years. Touchstone for stellar brightness.'],
+  ['Capella',      79.17,  45.99,  0.08,'G5+G0III',43, 'Auriga',         'Actually two giant stars orbiting each other every 104 days, indistinguishable to the naked eye.'],
+  ['Rigel',        78.63,  -8.20,  0.13,'B8Ia',  860,  'Orion',          'A blue supergiant so luminous it would cast shadows if it replaced our Sun. Orion\'s left foot.'],
+  ['Procyon',     114.83,   5.22,  0.34,'F5IV',  11.5, 'Canis Minor',    'One of the nearest bright stars. Rises just before Sirius — the Greeks called it "before the dog."'],
+  ['Achernar',     24.43, -57.24,  0.46,'B6Vep', 139,  'Eridanus',       'One of the most oblate stars known — spins so fast its equatorial diameter is 50% wider than its poles.'],
+  ['Betelgeuse',   88.79,   7.41,  0.50,'M1-2Ia',700,  'Orion',          'A red supergiant so large it would swallow Jupiter\'s orbit. Expected to go supernova within 100,000 years.'],
+  ['Hadar',       210.96, -60.37,  0.61,'B1III', 390,  'Centaurus',      'Pointer star to the Southern Cross. Once thought to be the same star as Alpha Centauri to the naked eye.'],
+  ['Altair',      297.70,   8.87,  0.77,'A7V',    17,  'Aquila',         'Spins once every 9 hours — so fast it is noticeably flattened at the poles. The Eagle\'s neck.'],
+  ['Acrux',       186.65, -63.10,  0.77,'B0.5+B1V',320,'Crux',          'The bottom of the Southern Cross. Used by navigators in the southern hemisphere as Polaris is in the north.'],
+  ['Aldebaran',    68.98,  16.51,  0.85,'K5III',  65,  'Taurus',         'The eye of the Bull. A red giant so large our Sun could fit 44 times across its diameter.'],
+  ['Antares',     247.35, -26.43,  0.96,'M1.5Iab',550, 'Scorpius',       'The heart of the Scorpion. Name means "rival of Mars" — its red color rivals the planet\'s. A red supergiant.'],
+  ['Spica',       201.30, -11.16,  0.97,'B1+B4V', 250, 'Virgo',          'One of the brightest binary systems. Hipparchus used it to discover the precession of the equinoxes in 127 BC.'],
+  ['Pollux',      116.33,  28.03,  1.14,'K0III',  34,  'Gemini',         'Has a confirmed exoplanet (Pollux b), making it one of the nearest stars known to host a planet.'],
+  ['Fomalhaut',   344.41, -29.62,  1.16,'A3V',    25,  'Piscis Austrinus','Surrounded by a debris disk — one of the first stars photographed with a directly imaged exoplanet candidate.'],
+  ['Deneb',       310.36,  45.28,  1.25,'A2Ia',  2600, 'Cygnus',         'One of the most luminous stars visible to the naked eye — intrinsically 200,000× brighter than the Sun.'],
+  ['Mimosa',      191.93, -59.69,  1.25,'B0.5III',280, 'Crux',           'The upper arm of the Southern Cross. A blue giant and spectroscopic binary system.'],
+  ['Regulus',     152.09,  11.97,  1.36,'B7V',    79,  'Leo',            'The heart of the Lion. Almost massive enough to destroy itself — spinning at 96% of its breakup velocity.'],
+  ['Adhara',      104.66, -28.97,  1.50,'B2Ia',  430,  'Canis Major',    'Would be the brightest star in the sky if it were as close as Sirius. Emits massive amounts of UV light.'],
+  ['Castor',      113.65,  31.89,  1.57,'A1+A2V',  51, 'Gemini',         'Appears as one star but is actually a system of 6 stars — three binary pairs orbiting each other.'],
+  ['Gacrux',      187.79, -57.11,  1.63,'M3.5III', 88, 'Crux',           'Top of the Southern Cross. A red giant — one of the closest red giants to Earth.'],
+  ['Bellatrix',    81.28,   6.35,  1.64,'B2III',  250, 'Orion',          'Orion\'s right shoulder. The "Female Warrior." Rapidly rotating — its spectral lines are notably broadened.'],
+  ['Elnath',       81.57,  28.61,  1.65,'B7III',  130, 'Taurus',         'Marks the northern tip of Taurus — shared as the foot of Auriga in older star maps.'],
+  ['Alnilam',      84.05,  -1.20,  1.70,'B0Ia',  2000, 'Orion',          'The middle star of Orion\'s Belt. A blue supergiant nearly 800,000× more luminous than the Sun.'],
+  ['Alioth',      193.51,  55.96,  1.76,'A0p',    81,  'Ursa Major',     'Brightest star in the Big Dipper. The epsilon star of the Great Bear — a chemically peculiar star.'],
+  ['Alnitak',      85.19,  -1.94,  1.88,'O9.7Ib',1260, 'Orion',          'The easternmost star of Orion\'s Belt. Illuminates the Horsehead Nebula, one of astronomy\'s most iconic images.'],
+  ['Dubhe',       165.93,  61.75,  1.79,'K0III',  124, 'Ursa Major',     'The outer pointer of the Big Dipper\'s bowl — follow the line to find Polaris, the North Star.'],
+  ['Mirfak',       51.08,  49.86,  1.80,'F5Ib',   592, 'Perseus',        'The brightest star in Perseus. Center of the Perseus Moving Group — a cluster of stars sharing motion through space.'],
+  ['Alkaid',      206.88,  49.31,  1.86,'B3V',    100, 'Ursa Major',     'The handle tip of the Big Dipper. Does NOT share the motion of the other six Dipper stars — a coincidental alignment.'],
+  ['Kaus Australis',276.04,-34.38, 1.85,'B9.5III',143, 'Sagittarius',    'Brightest star in Sagittarius. Located at the base of the Teapot asterism — the spout of the cosmic kettle.'],
+  ['Atria',       252.17, -69.03,  1.92,'K2II-III',391,'Triangulum Australe','Brightest star in the Southern Triangle. A bright orange giant used in navigation.'],
+  ['Alhena',       99.43,  16.40,  1.93,'A0IV',   109, 'Gemini',         'Marks the left foot of Pollux in Gemini. The star has a faint companion and is a slightly variable giant.'],
+  ['Peacock',     306.41, -56.74,  1.94,'B2IV',   183, 'Pavo',           'The brightest star in Pavo (the Peacock). One of several stars formally named after its constellation\'s creature.'],
+  ['Mirzam',       95.67, -17.96,  1.98,'B1II-III',500,'Canis Major',    '"The announcer" — rises just before Sirius, heralding its appearance. A Beta Cephei-type variable.'],
+  ['Alphard',     141.90,  -8.66,  1.99,'K3II',   177, 'Hydra',          '"The lonely one of the serpent" — the brightest star in the largest constellation with no nearby bright neighbors.'],
+  ['Hamal',        31.79,  23.46,  2.01,'K2III',   66, 'Aries',          'The brightest star in Aries, the Ram. Marked the vernal equinox around 2000 BC — the "First Point of Aries."'],
+  ['Polaris',      37.95,  89.26,  1.97,'F7Ib',   433, 'Ursa Minor',     'The North Star. Sits within ~1° of the celestial north pole. Has been the navigator\'s star for centuries.'],
+  ['Diphda',       10.90, -17.99,  2.04,'K0III',   96, 'Cetus',          'The brightest star in Cetus (the Whale). Sometimes called Deneb Kaitos — the tail of the sea monster.'],
+  ['Nunki',       283.82, -26.30,  2.05,'B2.5V',  224, 'Sagittarius',    'The second brightest star in Sagittarius. Its ancient Babylonian name means "the star of the proclamation of the sea."'],
+  ['Schedar',      10.13,  56.54,  2.24,'K0IIIa', 228, 'Cassiopeia',     'The brightest star in Cassiopeia\'s W. An orange giant named from the Arabic for "the breast."'],
+  ['Denebola',    177.26,  14.57,  2.14,'A3V',     36, 'Leo',            'The tail of the Lion. One of three stars in the Spring Triangle. Slightly variable and surrounded by a debris disk.'],
+  ['Naos',        120.90, -40.00,  2.25,'O4If',  1080, 'Puppis',         'One of the hottest and most luminous naked-eye stars. Emits powerful stellar winds that sculpt surrounding nebulae.'],
+  ['Saiph',        86.94,  -9.67,  2.07,'B0.5Ia', 720, 'Orion',          'Orion\'s right knee. Similar in size to Rigel but much closer, making it dimmer. Will also explode as a supernova.'],
+  ['Mintaka',      83.00,  -0.30,  2.23,'O9.5+B0',900, 'Orion',          'The westernmost star of Orion\'s Belt. One of the few stars that lies almost exactly on the celestial equator.'],
+  ['Almach',       30.97,  42.33,  2.10,'K3+A0V', 355, 'Andromeda',      'A stunning double star system — contrasting orange and blue-green stars, one of the sky\'s finest color pairs.'],
+  ['Menkent',     211.67, -36.37,  2.06,'K0III',   61, 'Centaurus',      'The shoulder of the Centaur. One of the bright pointer stars of the southern sky.'],
+  ['Caph',          2.29,  59.15,  2.27,'F2III',   54, 'Cassiopeia',     'One of the points of Cassiopeia\'s W. The first star to be spectroscopically studied in the 19th century.'],
+  ['Alpheratz',     2.10,  29.09,  2.06,'B9p+A3V',97, 'Andromeda',      'The top-left corner of the Great Square of Pegasus AND the head of Andromeda — shared by two constellations.'],
+  ['Rasalhague',  263.73,  12.56,  2.08,'A5III',   47, 'Ophiuchus',      'The head of the Serpent Bearer. One of the "13th zodiac constellation" stars — the Sun passes through Ophiuchus each year.'],
+  ['Algieba',     154.99,  19.84,  2.61,'K1+G7III',126,'Leo',            'A beautiful binary — two golden giant stars orbiting each other. One of the finest double stars for small telescopes.'],
+  ['Enif',        326.05,   9.88,  2.38,'K2Ib',   690, 'Pegasus',        'The nose of the flying horse Pegasus. A yellow-orange supergiant with notable brightness variations.'],
+  ['Gienah',      183.79, -17.54,  2.59,'B8III',  165, 'Corvus',         'The right wing of the Crow. One of four bright stars forming the distinctive quadrilateral of Corvus.'],
+  ['Zubenelgenubi',222.68,-16.04,  2.75,'A3IV',   77, 'Libra',           '"The southern claw of the Scorpion" — before Libra was a separate constellation, these were the Scorpion\'s claws.'],
+  ['Alphecca',    233.67,  26.71,  2.22,'A0V',     75, 'Corona Borealis', 'The gem in the Crown. A spectroscopic binary embedded in a disk of gas and dust.'],
+  ['Sabik',       258.04, -15.72,  2.43,'A2+A3V', 84, 'Ophiuchus',      'The second brightest star in Ophiuchus. A close binary system barely distinguishable by large telescopes.'],
+  ['Phecda',      178.46,  53.70,  2.44,'A0Ve',    84, 'Ursa Major',     'One of the five stars of the Big Dipper that form a true moving cluster, drifting together through the galaxy.'],
+  ['Kochab',      222.68,  74.16,  2.08,'K4III',  130, 'Ursa Minor',     'The brighter of the two "Guardians of the Pole." Was the North Star from 1500 BC to 500 AD.'],
+  ['Zubeneschamali',229.25,-9.38,  2.61,'B8V',    160, 'Libra',          'The only star with a distinctly greenish hue visible to the naked eye. "The northern claw of the Scorpion."'],
+  ['Ankaa',        6.57,  -42.31,  2.40,'K0III',   77, 'Phoenix',        'The brightest star in Phoenix. Named for the mythical bird of renewal. A double star system.'],
+  ['Graffias',    241.36, -19.81,  2.62,'B1IV',  530, 'Scorpius',        'The head of the Scorpion. A beautiful optical triple star system — three stars at very different distances.'],
+];
+
+var ORBIT_GEO_PATHS = {};
+var ORBITAL_PERIODS = {Mercury:88,Venus:225,Mars:687,Jupiter:4333,Saturn:10759,Uranus:30687,Neptune:60190};
+
+function computeOrbitPaths() {
+  var d0 = daysSinceJ2000(histDate || new Date());
+  PLANET_DEFS.forEach(function(p) {
+    var period = ORBITAL_PERIODS[p.name] || 365;
+    var steps = 72;
+    var pts = [];
+    for (var i = 0; i < steps; i++) {
+      pts.push(planetGeogLatLng(p, d0 + (i / steps) * period));
+    }
+    ORBIT_GEO_PATHS[p.name] = pts;
+  });
+}
+
+function starColor(sp) {
+  return {O:'#9BB0FF',B:'#AABFFF',A:'#E8EDFF',F:'#FFF4E8',G:'#FFEECC',K:'#FFDDAA',M:'#FFAA88',W:'#AAFFD0'}[sp[0]] || '#FFFFFF';
+}
+
+function initStars() {
+  var c = document.getElementById('star-orbs');
+  if (!c) return;
+  c.innerHTML = '';
+  STAR_CATALOG.forEach(function(s, i) {
+    var mag = s[3], r = mag < 0 ? 5.5 : mag < 1 ? 4.5 : mag < 2 ? 3.5 : mag < 2.5 ? 2.8 : 2.2;
+    var color = starColor(s[4]);
+    var el = document.createElement('div');
+    el.className = 'sorb';
+    el.id = 'sorb-' + i;
+    el.style.cssText = 'width:' + (r*2) + 'px;height:' + (r*2) + 'px;display:none;background:' + color + ';box-shadow:0 0 ' + (r*2.5) + 'px ' + (r) + 'px ' + color + '55;';
+    el.onclick = function(e){ e.stopPropagation(); showStarDetail(s); };
+    el.title = s[0];
+    c.appendChild(el);
+  });
+}
+
+function showStarDetail(s) {
+  var color = starColor(s[4]);
+  var d = document.getElementById('detail');
+  d.innerHTML = '<button id="d-close" onclick="document.getElementById(\'detail\').style.display=\'none\'">✕</button>' +
+    '<div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">' +
+      '<div style="width:18px;height:18px;border-radius:50%;background:' + color + ';box-shadow:0 0 12px 4px ' + color + '66;flex-shrink:0"></div>' +
+      '<div><div style="font-size:16px;font-weight:700;color:var(--text)">' + s[0] + '</div>' +
+      '<div style="font-size:10px;color:var(--muted);letter-spacing:1px;text-transform:uppercase">' + s[6] + ' · ' + s[4] + '</div></div>' +
+    '</div>' +
+    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px">' +
+      '<div style="background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:6px;padding:8px 10px">' +
+        '<div style="font-size:8px;letter-spacing:1px;color:var(--muted);text-transform:uppercase;margin-bottom:2px">Distance</div>' +
+        '<div style="font-size:15px;font-weight:700;color:' + color + '">' + (s[5] < 10 ? s[5].toFixed(2) : Math.round(s[5])) + ' <span style="font-size:10px;font-weight:400;color:var(--muted)">light-years</span></div>' +
+      '</div>' +
+      '<div style="background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:6px;padding:8px 10px">' +
+        '<div style="font-size:8px;letter-spacing:1px;color:var(--muted);text-transform:uppercase;margin-bottom:2px">Magnitude</div>' +
+        '<div style="font-size:15px;font-weight:700;color:var(--text)">' + s[3] + ' <span style="font-size:10px;font-weight:400;color:var(--muted)">visual</span></div>' +
+      '</div>' +
+    '</div>' +
+    '<div style="background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:6px;padding:10px 12px;margin-bottom:14px">' +
+      '<div style="font-size:8px;letter-spacing:1px;color:var(--muted);text-transform:uppercase;margin-bottom:6px">Coordinates (J2000)</div>' +
+      '<div style="font-size:10px;color:var(--text);font-family:\'Space Mono\',monospace">RA ' + s[1].toFixed(2) + '° · Dec ' + (s[2] >= 0 ? '+' : '') + s[2].toFixed(2) + '°</div>' +
+    '</div>' +
+    '<div style="font-size:11px;line-height:1.65;color:rgba(216,221,232,.85)">' + s[7] + '</div>';
+  d.style.display = '';
+}
+
+
 
 // =============================================================================
 // FILTER / LIST
@@ -1619,7 +1810,7 @@ function toggleHistBar() {
   var open = bar.classList.toggle('open');
   btn.classList.toggle('active', open);
   document.body.classList.toggle('hist-open', open);
-  if (!open) { histEvents = []; layerVis.history = false; histDate = null; }
+  if (!open) { histEvents = []; layerVis.history = false; histDate = null; computeOrbitPaths(); }
   var hint = document.getElementById('hb-connect-hint');
   if (hint) hint.style.display = open && connectMode ? 'inline' : 'none';
   refreshGlobe();
@@ -1637,7 +1828,8 @@ async function loadHistory() {
     var evs = await fetchHistoricalEvents(month, year);
     histEvents = evs;
     layerVis.history = true;
-    histDate = new Date(year, month - 1, 15); // midpoint of selected month
+    histDate = new Date(year, month - 1, 15);
+    computeOrbitPaths();
     setHistStatus(label + ' — ' + evs.length + ' events · planets at ' + label);
     renderList(); refreshGlobe();
   } catch(e) {
@@ -1820,6 +2012,8 @@ async function init() {
     setTimeout(function(){var s=document.getElementById('splash');if(s)s.remove();},700);
   },500);
   initPlanetOrbs();
+  initStars();
+  computeOrbitPaths();
   tickPlanets();
   tickClock();
   setInterval(tickClock, 1000);
