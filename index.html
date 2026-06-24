@@ -15,7 +15,9 @@
   --col-storm:#60a5fa;--col-humanitarian:#ec4899;--col-flight:#10b981;
   --col-launch:#a78bfa;--col-tech:#06b6d4;--col-fashion:#f472b6;--col-astrology:#c084fc;
   --col-connection:#f59e0b;
+  --col-history:#a3e635;
 }
+
 html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);font-family:'Inter',sans-serif;color:var(--text)}
 #globe-wrap{position:fixed;inset:0;z-index:0}
 #splash{position:fixed;inset:0;z-index:9999;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;transition:opacity .6s ease}
@@ -39,7 +41,9 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);font-famil
 .t-btn{background:var(--glass);border:1px solid var(--border);border-radius:14px;color:var(--muted);font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;cursor:pointer;backdrop-filter:blur(20px);transition:all .2s;font-family:'Space Mono',monospace;outline:none;padding:4px 11px;flex-shrink:0}
 .t-btn:hover{color:var(--text);border-color:var(--border2)}
 .t-btn.active{background:rgba(163,230,53,.12);border-color:rgba(163,230,53,.45);color:#a3e635}
-#day-btn.day{background:rgba(251,191,36,.12);border-color:rgba(251,191,36,.45);color:#fbbf24}
+select#theme-btn{appearance:none;-webkit-appearance:none;background:var(--glass);border:1px solid var(--border);border-radius:14px;color:var(--muted);font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;cursor:pointer;font-family:'Space Mono',monospace;outline:none;padding:4px 22px 4px 11px;flex-shrink:0;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='5'%3E%3Cpath d='M0 0l4 5 4-5z' fill='%234e5a72'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 8px center}
+select#theme-btn:hover{color:var(--text);border-color:var(--border2)}
+select#theme-btn option{background:#070b18;color:var(--text);font-size:12px;letter-spacing:0;font-weight:400}
 #connect-btn.active{background:rgba(168,85,247,.15);border-color:rgba(168,85,247,.5);color:#a855f7}
 #hist-bar{position:fixed;top:48px;left:0;right:0;z-index:290;background:rgba(10,12,18,.96);border-bottom:1px solid rgba(163,230,53,.25);padding:8px 18px;display:none;align-items:center;gap:10px;font-family:'Space Mono',monospace;font-size:10px}
 #hist-bar.open{display:flex}
@@ -50,6 +54,9 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);font-famil
 #hb-status{font-size:10px;color:var(--muted);flex:1}
 .hb-exit{font-size:9px;color:#f87171;letter-spacing:1px;cursor:pointer;text-transform:uppercase;font-weight:700}
 .hb-exit:hover{color:#fca5a5}
+#sun-orb{position:fixed;width:120px;height:120px;border-radius:50%;pointer-events:none;z-index:1;display:none;
+  background:radial-gradient(circle,rgba(255,230,100,1) 0%,rgba(255,180,30,.7) 25%,rgba(255,120,0,.25) 55%,transparent 75%);
+  filter:blur(4px);mix-blend-mode:screen}
 #ptoggle{position:fixed;top:60px;left:300px;z-index:202;width:20px;height:34px;background:var(--glass);border:1px solid var(--border);border-left:none;border-radius:0 6px 6px 0;cursor:pointer;color:var(--muted);display:flex;align-items:center;justify-content:center;font-size:10px;backdrop-filter:blur(20px);transition:left .35s cubic-bezier(.4,0,.2,1);outline:none;user-select:none}
 #ptoggle:hover{color:var(--text)}
 #ptoggle.closed{left:0}
@@ -198,7 +205,11 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);font-famil
   <div class="t-spacer"></div>
   <button class="t-btn" id="hist-btn" onclick="toggleHistBar()">⏱ HISTORY</button>
   <div class="t-sep"></div>
-  <button class="t-btn" id="day-btn" onclick="toggleDay()">🌙 NIGHT</button>
+  <select id="theme-btn" onchange="setTheme(this.value)" class="t-btn">
+    <option value="0">🌙 NIGHT</option>
+    <option value="1">☀️ DAY</option>
+    <option value="2">🌍 IRL</option>
+  </select>
   <div class="t-sep"></div>
   <button class="t-btn" id="connect-btn" onclick="toggleConnect()">⟷ CONNECT</button>
   <div class="t-sep"></div>
@@ -217,7 +228,6 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);font-famil
   <input id="hb-year" type="number" min="1900" max="2025" placeholder="Year" value="1962">
   <button id="hb-go" onclick="loadHistory()">GO ›</button>
   <span id="hb-status"></span>
-  <span class="hb-exit" onclick="exitHistMode()" style="display:none" id="hb-exit">✕ Exit History</span>
 </div>
 <button id="ptoggle" onclick="togglePanel()">&#8249;</button>
 <div id="panel">
@@ -255,7 +265,9 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);font-famil
   <div class="lc-row" data-layer="flight"       onclick="toggleLayer(this)"><div class="lc-dot" style="background:var(--col-flight)"></div><span>Live Flights</span><div class="lc-live" id="ls-flight"></div><span class="lc-n" id="lc-flight">–</span></div>
   <div class="lc-row" data-layer="launch"       onclick="toggleLayer(this)"><div class="lc-dot" style="background:var(--col-launch)"></div><span>Launches</span><div class="lc-live" id="ls-launch"></div><span class="lc-n" id="lc-launch">–</span></div>
   <div class="lc-row" data-layer="connection"   onclick="toggleLayer(this)"><div class="lc-dot" style="background:var(--col-connection)"></div><span>Connections</span><div class="lc-live on" id="ls-connection"></div><span class="lc-n" id="lc-connection">–</span></div>
+  <div class="lc-row off" data-layer="history" onclick="toggleLayer(this)"><div class="lc-dot" style="background:var(--col-history)"></div><span>Historical</span><div class="lc-live" id="ls-history"></div><span class="lc-n" id="lc-history">–</span></div>
 </div>
+<div id="sun-orb"></div>
 <div id="ap"></div>
 <div id="detail">
   <button id="d-close" onclick="closeDetail()">&#x2715;</button>
@@ -387,13 +399,18 @@ var searchQ = '';
 var selectedId = null;
 var panelOpen = true;
 var watchTags = ['Gaza','Ukraine','AI','Markets','Fashion','Climate'];
-var layerVis = {news:true,conflict:true,disaster:true,storm:true,humanitarian:true,flight:true,launch:true,tech:true,fashion:true,astrology:true,connection:true,history:true};
+var layerVis = {news:true,conflict:true,disaster:true,storm:true,humanitarian:true,flight:true,launch:true,tech:true,fashion:true,astrology:true,connection:true,history:false};
 var globe;
-var dayMode = false;
+var themeMode = 0; // 0=NIGHT 1=DAY 2=IRL
+var dayMode = false; // kept for compat — true when themeMode===1
+var irlMode = false; // true when themeMode===2
 var connectMode = false;
 var connectedIds = [];
-var histMode = false;
-var histEvents = [];
+var histEvents = []; // historical layer — shown alongside live events when layerVis.history is true
+var irlCanvas = null, irlMaskCanvas = null, irlDayCanvas = null;
+var irlImgDay = null, irlImgNight = null, irlImgsLoaded = false;
+var irlBlobUrl = null;
+var sunOrbRAF = null;
 var tickerData = [
   {sym:'BTC',px:'–',chg:'',up:true},{sym:'ETH',px:'–',chg:'',up:true},
   {sym:'SOL',px:'–',chg:'',up:true},{sym:'EUR/USD',px:'–',chg:'',up:true},
@@ -531,7 +548,9 @@ function getNightPolygon(date) {
 }
 
 function updateTerminator() {
-  if (typeof globe !== 'undefined') globe.polygonsData(getNightPolygon());
+  if (typeof globe === 'undefined') return;
+  if (themeMode === 2) { globe.polygonsData([]); updateIRLTexture(); }
+  else globe.polygonsData(themeMode === 0 ? getNightPolygon() : []);
 }
 
 function moonPhaseName(date) {
@@ -878,8 +897,9 @@ function refreshGlobe() {
 // FILTER / LIST
 // =============================================================================
 function getFiltered() {
-  if (histMode) return histEvents;
-  var evs = allEvents;
+  var evs = histEvents.length && layerVis.history
+    ? allEvents.concat(histEvents)
+    : allEvents;
   if (currentTab !== 'all') evs = evs.filter(function(e){return e.type===currentTab;});
   if (searchQ) {
     var q = searchQ.toLowerCase();
@@ -1002,13 +1022,39 @@ function closeDetail() {
 // =============================================================================
 // UI CONTROLS
 // =============================================================================
-function toggleDay(){
-  dayMode=!dayMode;
-  globe.globeImageUrl(dayMode?DAY_IMG:NIGHT_IMG).atmosphereColor(dayMode?'#93c5fd':'#1e3a8a');
-  var btn=document.getElementById('day-btn');
-  btn.textContent=dayMode?'☀️ DAY':'🌙 NIGHT';
-  btn.classList.toggle('day',dayMode);
+function applyThemeMode() {
+  dayMode = (themeMode === 1);
+  irlMode = (themeMode === 2);
+  document.getElementById('theme-btn').value = themeMode;
+  if (themeMode === 0) {
+    if (sunOrbRAF) { cancelAnimationFrame(sunOrbRAF); sunOrbRAF = null; }
+    document.getElementById('sun-orb').style.display = 'none';
+    if (irlBlobUrl) { URL.revokeObjectURL(irlBlobUrl); irlBlobUrl = null; }
+    globe.globeImageUrl(NIGHT_IMG).atmosphereColor('#1e3a8a').atmosphereAltitude(0.14);
+    globe.polygonsData(getNightPolygon());
+  } else if (themeMode === 1) {
+    if (sunOrbRAF) { cancelAnimationFrame(sunOrbRAF); sunOrbRAF = null; }
+    document.getElementById('sun-orb').style.display = 'none';
+    if (irlBlobUrl) { URL.revokeObjectURL(irlBlobUrl); irlBlobUrl = null; }
+    globe.globeImageUrl(DAY_IMG).atmosphereColor('#93c5fd').atmosphereAltitude(0.14);
+    globe.polygonsData([]);
+  } else {
+    globe.atmosphereColor('#5bb8ff').atmosphereAltitude(0.22);
+    globe.polygonsData([]);
+    loadIRLImages().then(function() {
+      updateIRLTexture();
+      tickSunOrb();
+    }).catch(function() {
+      themeMode = 0; dayMode = false; irlMode = false;
+      document.getElementById('theme-btn').value = 0;
+      globe.globeImageUrl(NIGHT_IMG).atmosphereColor('#1e3a8a').atmosphereAltitude(0.14);
+      globe.polygonsData(getNightPolygon());
+    });
+  }
 }
+function setTheme(val) { themeMode = parseInt(val); applyThemeMode(); }
+function cycleTheme() { themeMode = (themeMode + 1) % 3; applyThemeMode(); }
+function toggleDay() { cycleTheme(); }
 function setTab(el){document.querySelectorAll('.tab').forEach(function(t){t.classList.remove('on');});el.classList.add('on');currentTab=el.dataset.tab;renderList();refreshGlobe();}
 function onSearch(){searchQ=document.getElementById('sinput').value.trim();if(searchQ)document.querySelectorAll('.wl-tag').forEach(function(t){t.classList.remove('on');});renderList();refreshGlobe();}
 function toggleLayer(el){var l=el.dataset.layer;layerVis[l]=!layerVis[l];el.classList.toggle('off',!layerVis[l]);refreshGlobe();}
@@ -1163,6 +1209,121 @@ function closeAP(){document.getElementById('ap').classList.remove('open');}
 function clearConnect(){connectedIds=[];syncConnectUI();closeAP();}
 
 // =============================================================================
+// IRL MODE — real-time day/night composite texture
+// =============================================================================
+function loadIRLImages() {
+  if (irlImgsLoaded) return Promise.resolve();
+  return new Promise(function(res, rej) {
+    var done = 0;
+    function onLoad() { if (++done === 2) { irlImgsLoaded = true; res(); } }
+    irlImgDay   = new Image(); irlImgNight = new Image();
+    irlImgDay.crossOrigin = irlImgNight.crossOrigin = 'anonymous';
+    irlImgDay.onload = irlImgNight.onload = onLoad;
+    irlImgDay.onerror = irlImgNight.onerror = rej;
+    irlImgDay.src   = 'https://unpkg.com/three-globe/example/img/earth-day.jpg';
+    irlImgNight.src = 'https://unpkg.com/three-globe/example/img/earth-night.jpg';
+  });
+}
+
+function buildIRLCanvas() {
+  var W = 2048, H = 1024;
+  if (!irlCanvas)     { irlCanvas     = document.createElement('canvas'); irlCanvas.width=W; irlCanvas.height=H; }
+  if (!irlMaskCanvas) { irlMaskCanvas = document.createElement('canvas'); irlMaskCanvas.width=W; irlMaskCanvas.height=H; }
+  if (!irlDayCanvas)  { irlDayCanvas  = document.createElement('canvas'); irlDayCanvas.width=W; irlDayCanvas.height=H; }
+
+  var sun = sunSubpoint(new Date());
+  var sunLat = sun.lat, sunLng = sun.lng;
+
+  // --- Build soft mask: white = day, black = night, blurred edge ---
+  var mc = irlMaskCanvas.getContext('2d');
+  mc.fillStyle = '#000'; mc.fillRect(0,0,W,H);
+  mc.save();
+  mc.filter = 'blur(32px)';
+  mc.fillStyle = '#fff';
+  mc.beginPath();
+  var first = true;
+  for (var i = 0; i <= 360; i++) {
+    var lng = i - 180;
+    var dlng = (lng - sunLng) * DEG;
+    var lat_rad = Math.abs(sunLat) < 0.5
+      ? (Math.cos(dlng) >= 0 ? Math.PI/2*0.999 : -Math.PI/2*0.999)
+      : Math.atan(-Math.cos(dlng) / Math.tan(sunLat * DEG));
+    var x = (lng + 180) / 360 * W;
+    var y = (90 - lat_rad * RAD) / 180 * H;
+    if (first) { mc.moveTo(x, y); first = false; } else mc.lineTo(x, y);
+  }
+  if (sunLat > 0) { mc.lineTo(W,0); mc.lineTo(0,0); }
+  else            { mc.lineTo(W,H); mc.lineTo(0,H); }
+  mc.closePath(); mc.fill();
+  mc.restore();
+
+  // --- Day canvas clipped to mask ---
+  var dc = irlDayCanvas.getContext('2d');
+  dc.clearRect(0,0,W,H);
+  dc.drawImage(irlImgDay, 0,0,W,H);
+  dc.globalCompositeOperation = 'destination-in';
+  dc.drawImage(irlMaskCanvas, 0,0,W,H);
+  dc.globalCompositeOperation = 'source-over';
+
+  // --- Composite: night base + day on top ---
+  var ctx = irlCanvas.getContext('2d');
+  ctx.drawImage(irlImgNight, 0,0,W,H);
+  ctx.drawImage(irlDayCanvas, 0,0,W,H);
+}
+
+function updateIRLTexture() {
+  if (themeMode !== 2 || !irlImgsLoaded) return;
+  buildIRLCanvas();
+  irlCanvas.toBlob(function(blob) {
+    var url = URL.createObjectURL(blob);
+    globe.globeImageUrl(url);
+    if (irlBlobUrl) URL.revokeObjectURL(irlBlobUrl);
+    irlBlobUrl = url;
+  }, 'image/jpeg', 0.88);
+}
+
+// Project a world-space point to screen coords using the globe's camera matrices
+function projectToScreen(wx, wy, wz) {
+  var cam = globe.camera();
+  var m = cam.matrixWorldInverse.elements;
+  var p = cam.projectionMatrix.elements;
+  var vx = m[0]*wx+m[4]*wy+m[8]*wz+m[12];
+  var vy = m[1]*wx+m[5]*wy+m[9]*wz+m[13];
+  var vz = m[2]*wx+m[6]*wy+m[10]*wz+m[14];
+  var vw = m[3]*wx+m[7]*wy+m[11]*wz+m[15];
+  var cx = p[0]*vx+p[4]*vy+p[8]*vz+p[12]*vw;
+  var cy = p[1]*vx+p[5]*vy+p[9]*vz+p[13]*vw;
+  var cw = p[3]*vx+p[7]*vy+p[11]*vz+p[15]*vw;
+  if (cw <= 0.01) return null;
+  var nx = cx/cw, ny = cy/cw;
+  if (Math.abs(nx) > 1.6 || Math.abs(ny) > 1.6) return null;
+  return { x:(nx+1)/2*window.innerWidth, y:(-ny+1)/2*window.innerHeight };
+}
+
+function tickSunOrb() {
+  sunOrbRAF = null;
+  var el = document.getElementById('sun-orb');
+  if (!el) return;
+  if (!irlMode) { el.style.display = 'none'; return; }
+  var sun = sunSubpoint(new Date());
+  var lat = sun.lat*DEG, lng = sun.lng*DEG;
+  var dist = 550; // globe units — far beyond the surface
+  var sp = projectToScreen(
+    dist*Math.cos(lat)*Math.sin(lng),
+    dist*Math.sin(lat),
+    dist*Math.cos(lat)*Math.cos(lng)
+  );
+  if (!sp) { el.style.display = 'none'; }
+  else {
+    el.style.display = 'block';
+    el.style.left = (sp.x - 60) + 'px';
+    el.style.top  = (sp.y - 60) + 'px';
+  }
+  sunOrbRAF = requestAnimationFrame(tickSunOrb);
+}
+
+
+// =============================================================================
 // HISTORY MODE
 // =============================================================================
 var MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
@@ -1183,13 +1344,9 @@ async function loadHistory() {
   document.getElementById('hb-go').disabled = true;
   try {
     var evs = await fetchHistoricalEvents(month, year);
-    if (!evs.length) { setHistStatus('No geolocatable events found — try another date'); document.getElementById('hb-go').disabled=false; return; }
     histEvents = evs;
-    histMode = true;
-    document.getElementById('hb-status').textContent = label + ' — ' + evs.length + ' events';
-    document.getElementById('hb-exit').style.display = '';
-    var sun = sunSubpoint(new Date(year, month-1, 15));
-    globe.pointOfView({lat:sun.lat, lng:sun.lng, altitude:2.0}, 1200);
+    layerVis.history = true;
+    setHistStatus(label + ' — ' + evs.length + ' events on globe');
     renderList(); refreshGlobe();
   } catch(e) {
     setHistStatus('Failed to load — try another date');
@@ -1197,44 +1354,93 @@ async function loadHistory() {
   document.getElementById('hb-go').disabled = false;
 }
 
-function exitHistMode() {
-  histMode = false; histEvents = [];
-  document.getElementById('hb-status').textContent = '';
-  document.getElementById('hb-exit').style.display = 'none';
-  document.getElementById('hist-bar').classList.remove('open');
-  document.getElementById('hist-btn').classList.remove('active');
-  renderList(); refreshGlobe();
-}
-
 function setHistStatus(msg) { document.getElementById('hb-status').textContent = msg; }
 
 async function fetchHistoricalEvents(month, year) {
   var monthName = MONTHS[month-1];
-  var title = monthName + '_' + year;
-  var url = 'https://en.wikipedia.org/w/api.php?action=query&prop=extracts&titles='+encodeURIComponent(title)+'&format=json&origin=*&explaintext=1&exsectionformat=plain';
-  var data = await apiFetch(url, 12000);
-  var pages = data.query && data.query.pages;
-  if (!pages) throw new Error('no pages');
-  var page = Object.values(pages)[0];
-  if (!page || page.missing !== undefined) return fetchHistSearch(monthName, year);
-  var evs = parseWikiExtract(page.extract || '', monthName, year);
-  return evs.length ? evs : fetchHistSearch(monthName, year);
+  // Run category fetch + article parse in parallel for maximum coverage
+  var results = await Promise.allSettled([
+    fetchHistCategory(monthName, year),
+    fetchHistArticle(monthName, year),
+    fetchHistSearch(monthName, year)
+  ]);
+  var combined = [];
+  results.forEach(function(r){ if (r.status==='fulfilled') combined = combined.concat(r.value); });
+  // Deduplicate by title prefix
+  var seen = {};
+  return combined.filter(function(e) {
+    var key = e.title.slice(0,40).toLowerCase();
+    if (seen[key]) return false;
+    seen[key] = true;
+    return true;
+  }).slice(0, 50);
 }
 
+// PRIMARY: Wikipedia category — fetches up to 50 articles tagged to this month/year
+async function fetchHistCategory(monthName, year) {
+  var catName = monthName + ' ' + year;
+  var url = 'https://en.wikipedia.org/w/api.php?' + [
+    'action=query','generator=categorymembers',
+    'gcmtitle=Category:'+encodeURIComponent(catName),
+    'gcmlimit=50','gcmtype=page',
+    'prop=extracts','exintro=1','explaintext=1','exchars=500',
+    'format=json','origin=*'
+  ].join('&');
+  var data = await apiFetch(url, 15000);
+  var pages = (data.query && data.query.pages) || {};
+  return makeHistEvents(Object.values(pages), monthName, year, 'histc_');
+}
+
+// SECONDARY: month-year article parsing
+async function fetchHistArticle(monthName, year) {
+  var url = 'https://en.wikipedia.org/w/api.php?action=query&prop=extracts&titles='+encodeURIComponent(monthName+'_'+year)+'&format=json&origin=*&explaintext=1&exsectionformat=plain';
+  var data = await apiFetch(url, 12000);
+  var pages = data.query && data.query.pages;
+  if (!pages) return [];
+  var page = Object.values(pages)[0];
+  if (!page || page.missing !== undefined) return [];
+  return parseWikiExtract(page.extract || '', monthName, year);
+}
+
+// TERTIARY: keyword search fallback
 async function fetchHistSearch(monthName, year) {
-  var url = 'https://en.wikipedia.org/w/api.php?action=query&list=search&srsearch='+encodeURIComponent(monthName+' '+year)+'&srnamespace=0&srlimit=30&format=json&origin=*';
+  var url = 'https://en.wikipedia.org/w/api.php?action=query&list=search&srsearch='+encodeURIComponent(monthName+' '+year)+'&srnamespace=0&srlimit=50&format=json&origin=*';
   var data = await apiFetch(url, 10000);
   var results = (data.query && data.query.search) || [];
   return results.map(function(r,i) {
     var text = r.title + ' ' + r.snippet.replace(/<[^>]*>/g,'');
     var ll = findLatLng(text);
     if (!ll) return null;
-    var loc = Object.keys(CC).sort(function(a,b){return b.length-a.length;}).find(function(c){return text.toLowerCase().indexOf(c.toLowerCase())!==-1;})||'Unknown';
+    var loc = geoLocText(text) || 'Unknown';
     var wikiUrl = 'https://en.wikipedia.org/wiki/'+encodeURIComponent(r.title.replace(/ /g,'_'));
-    return {id:'histf_'+i,type:'history',title:r.title,location:loc,lat:ll[0],lng:ll[1],severity:3,age:monthName+' '+year,
-      brief:r.snippet.replace(/<[^>]*>/g,'').trim(),url:wikiUrl,
-      sources:[{n:'Wikipedia',a:monthName+' '+year,url:wikiUrl}],tags:[String(year),monthName,'Historical',loc],_live:false};
+    return makeHistEvent('histf_'+i, r.title, loc, ll, monthName+' '+year,
+      r.snippet.replace(/<[^>]*>/g,'').trim(), wikiUrl, monthName, year);
   }).filter(Boolean);
+}
+
+function makeHistEvents(pages, monthName, year, prefix) {
+  return pages.map(function(page, i) {
+    if (!page || !page.extract) return null;
+    var text = page.title + '. ' + page.extract;
+    var ll = findLatLng(text);
+    if (!ll) return null;
+    var loc = geoLocText(text) || monthName + ' ' + year;
+    var wikiUrl = 'https://en.wikipedia.org/wiki/'+encodeURIComponent((page.title||'').replace(/ /g,'_'));
+    var brief = page.extract.slice(0,200) + (page.extract.length > 200 ? '…' : '');
+    return makeHistEvent(prefix+i, page.title, loc, ll, monthName+' '+year, brief, wikiUrl, monthName, year);
+  }).filter(Boolean);
+}
+
+function makeHistEvent(id, title, loc, ll, age, brief, url, monthName, year) {
+  return {id:id,type:'history',title:title,location:loc,lat:ll[0],lng:ll[1],
+    severity:3,age:age,brief:brief,url:url,
+    sources:[{n:'Wikipedia',a:age,url:url}],
+    tags:[String(year),monthName,'Historical',loc],_live:false};
+}
+
+function geoLocText(text) {
+  return Object.keys(CC).sort(function(a,b){return b.length-a.length;})
+    .find(function(c){return text.toLowerCase().indexOf(c.toLowerCase())!==-1;}) || null;
 }
 
 function parseWikiExtract(text, monthName, year) {
