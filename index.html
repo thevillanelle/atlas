@@ -352,271 +352,44 @@ async function apiFetch(url, timeout) {
   return r.json();
 }
 
-// Build GDELT URL — must use %20 (not +) for spaces
-function gdeltUrl(query, limit, timespan) {
-  limit = limit || 8;
-  timespan = timespan || '24h';
-  return 'https://api.gdeltproject.org/api/v2/geo/geo?' +
-    'query=' + encodeURIComponent(query) +
-    '&format=json&maxrecords=' + limit +
-    '&timespan=' + timespan + '&SOURCELANG=english';
+// Guardian Open Platform — cors=*, free with api-key=test
+function guardianUrl(section, query, pageSize) {
+  pageSize = pageSize || 10;
+  var base = 'https://content.guardianapis.com/search?api-key=test&show-fields=trailText,shortUrl&page-size=' + pageSize + '&order-by=newest&format=json';
+  if (section) base += '&section=' + encodeURIComponent(section);
+  if (query)   base += '&q=' + encodeURIComponent(query);
+  return base;
 }
 
-function findLatLng(text) {
-  if (!text) return null;
-  const lower = text.toLowerCase();
-  const sorted = Object.entries(CC).sort(function(a,b){return b[0].length - a[0].length;});
-  for (let i = 0; i < sorted.length; i++) {
-    if (lower.indexOf(sorted[i][0].toLowerCase()) !== -1) return sorted[i][1];
-  }
-  return null;
-}
-
-function dedupeByTitle(events) {
-  const seen = new Set();
-  return events.filter(function(e) {
-    const key = e.title.toLowerCase().replace(/[^a-z0-9]/g,'').slice(0,50);
-    if (seen.has(key)) return false;
-    seen.add(key); return true;
-  });
-}
-
-function setLayerStatus(layer, status) {
-  const el = document.getElementById('ls-' + layer);
-  if (el) { el.className = 'lc-live ' + status; }
-}
-
-// =============================================================================
-// ASTRONOMY — self-contained Meeus algorithms
-// =============================================================================
-const DEG = Math.PI / 180;
-const RAD = 180 / Math.PI;
-
-function jde(date) { return date.getTime() / 86400000 + 2440587.5; }
-function julT(date) { return (jde(date) - 2451545.0) / 36525; }
-function norm360(x) { return ((x % 360) + 360) % 360; }
-function norm180(x) { x = norm360(x); return x > 180 ? x - 360 : x; }
-
-function gmstDeg(date) {
-  const jd = jde(date);
-  const t = (jd - 2451545.0) / 36525;
-  return norm360(280.46061837 + 360.98564736629 * (jd - 2451545.0) + 0.000387933 * t * t - t * t * t / 38710000);
-}
-
-function sunSubpoint(date) {
-  const t = julT(date);
-  const L0 = norm360(280.46646 + 36000.76983 * t);
-  const M = norm360(357.52911 + 35999.05029 * t - 0.0001537 * t * t) * DEG;
-  const C = (1.914602 - 0.004817 * t) * Math.sin(M) + 0.019993 * Math.sin(2*M) + 0.000289 * Math.sin(3*M);
-  const lon = norm360(L0 + C);
-  const omega = norm360(125.04 - 1934.136 * t);
-  const lam = norm360(lon - 0.00569 - 0.00478 * Math.sin(omega * DEG));
-  const eps = (23.439291111 - 0.013004167 * t) * DEG;
-  const ra = Math.atan2(Math.cos(eps) * Math.sin(lam * DEG), Math.cos(lam * DEG)) * RAD;
-  const dec = Math.asin(Math.sin(eps) * Math.sin(lam * DEG)) * RAD;
-  return {lat: dec, lng: norm180(norm360(ra) - gmstDeg(date))};
-}
-
-function moonSubpoint(date) {
-  const t = julT(date);
-  const L1 = norm360(218.3164477 + 481267.88123421 * t);
-  const D = norm360(297.8501921 + 445267.1114034 * t) * DEG;
-  const M = norm360(357.5291092 + 35999.0502909 * t) * DEG;
-  const Mp = norm360(134.9633964 + 477198.8675055 * t) * DEG;
-  const F = norm360(93.2720950 + 483202.0175233 * t) * DEG;
-  const lonM = L1 + 6.288774*Math.sin(Mp) + 1.274027*Math.sin(2*D-Mp) + 0.658314*Math.sin(2*D) + 0.213618*Math.sin(2*Mp) - 0.185116*Math.sin(M) - 0.114332*Math.sin(2*F);
-  const latM = 5.128122*Math.sin(F) + 0.280602*Math.sin(Mp+F) + 0.277693*Math.sin(Mp-F) + 0.173237*Math.sin(2*D-F);
-  const eps = (23.439291111 - 0.013004167 * t) * DEG;
-  const lr = lonM * DEG, br = latM * DEG;
-  const ra = Math.atan2(Math.sin(lr)*Math.cos(eps) - Math.tan(br)*Math.sin(eps), Math.cos(lr)) * RAD;
-  const dec = Math.asin(Math.sin(br)*Math.cos(eps) + Math.cos(br)*Math.sin(eps)*Math.sin(lr)) * RAD;
-  return {lat: dec, lng: norm180(norm360(ra) - gmstDeg(date))};
-}
-
-function moonPhaseName(date) {
-  const t = julT(date);
-  const D = norm360(297.8501921 + 445267.1114034 * t);
-  const phases = ['🌑 New','🌒 Crescent','🌓 Quarter','🌔 Gibbous','🌕 Full','🌖 Gibbous','🌗 Quarter','🌘 Crescent'];
-  return phases[Math.floor(((D + 22.5) % 360) / 45)];
-}
-
-const PLANET_ELEMS = {
-  Mercury:{L:[252.250906,149472.6746358,-0.00000535],e:0.20563175},
-  Venus:  {L:[181.979801, 58517.8156760, 0.00000165],e:0.00677188},
-  Mars:   {L:[ 19.971970, 19140.302327,  0.00000097],e:0.09340062},
-  Jupiter:{L:[ 34.351432,  3034.905661, -0.00008501],e:0.04849485},
-  Saturn: {L:[ 50.077444,  1222.113849,  0.00021004],e:0.05550825},
-  Uranus: {L:[314.055070,   428.466998, -0.00000031],e:0.04629590},
-  Neptune:{L:[304.348791,   218.486200,  0.00000059],e:0.00898809}
-};
-
-function planetSubpoint(name, date) {
-  const el = PLANET_ELEMS[name];
-  const t = julT(date);
-  const L = norm360(el.L[0] + el.L[1]*t + el.L[2]*t*t) * DEG;
-  const eps = (23.439291111 - 0.013004167 * t) * DEG;
-  const ra = Math.atan2(Math.sin(L)*Math.cos(eps), Math.cos(L)) * RAD;
-  const dec = Math.asin(Math.sin(eps)*Math.sin(L)) * RAD;
-  return {lat: dec, lng: norm180(norm360(ra) - gmstDeg(date))};
-}
-
-const CONST_BANDS = [
-  [0,30,'Pisces'],[30,60,'Aries'],[60,90,'Taurus'],[90,120,'Gemini'],
-  [120,150,'Cancer'],[150,180,'Leo'],[180,210,'Virgo'],[210,240,'Libra'],
-  [240,270,'Scorpius'],[270,300,'Sagittarius'],[300,330,'Capricornus'],[330,360,'Aquarius']
-];
-function constellation(ra_deg) {
-  const ra = norm360(ra_deg);
-  const b = CONST_BANDS.find(function(b){return ra >= b[0] && ra < b[1];});
-  return b ? b[2] : 'Unknown';
-}
-
-const SKY_BODIES = [
-  {name:'Sun',    emoji:'☀️'},
-  {name:'Moon',   emoji:'🌕'},
-  {name:'Mercury',emoji:'☿'},
-  {name:'Venus',  emoji:'♀'},
-  {name:'Mars',   emoji:'♂'},
-  {name:'Jupiter',emoji:'♃'},
-  {name:'Saturn', emoji:'♄'},
-  {name:'Uranus', emoji:'♅'},
-  {name:'Neptune',emoji:'♆'}
-];
-
-function computeSkyEvents() {
-  const now = new Date();
-  const events = [];
-  for (let i = 0; i < SKY_BODIES.length; i++) {
-    const b = SKY_BODIES[i];
-    let pt;
-    if (b.name === 'Sun') pt = sunSubpoint(now);
-    else if (b.name === 'Moon') pt = moonSubpoint(now);
-    else pt = planetSubpoint(b.name, now);
-    const raApprox = norm360(gmstDeg(now) + pt.lng);
-    const con = constellation(raApprox);
-    const phase = b.name === 'Moon' ? (' Phase: ' + moonPhaseName(now) + '.') : '';
-    events.push({
-      id: 'sky_' + b.name.toLowerCase(),
-      type: 'astrology',
-      title: b.emoji + ' ' + b.name + ' — ' + con,
-      location: pt.lat.toFixed(2) + '°, ' + pt.lng.toFixed(2) + '°',
-      lat: pt.lat, lng: pt.lng,
-      severity: (b.name === 'Sun' || b.name === 'Moon') ? 3 : 2,
-      age: 'Live',
-      brief: 'Subpoint: ' + pt.lat.toFixed(3) + '°, ' + pt.lng.toFixed(3) + '°\nConstellation: ' + con + '.' + phase + '\n\nThe subpoint is the location on Earth directly beneath ' + b.name + ' right now.',
-      stats: [{label:'Constellation',val:con},{label:b.name==='Moon'?'Phase':'Sub-lat',val:b.name==='Moon'?moonPhaseName(now):pt.lat.toFixed(1)+'°'}],
-      sources: [{n:'Meeus Algorithms',a:'Computed live'}],
-      tags: ['Astronomy',b.name,con,'Sky'],
-      _live: true, _planet: b
-    });
-  }
-  return events;
-}
-
-// =============================================================================
-// API FETCHERS — only using APIs confirmed to have CORS *
-// =============================================================================
-
-// USGS Earthquakes — CORS *
-async function fetchUSGS() {
-  const p = new URLSearchParams();
-  p.set('format', 'geojson');
-  p.set('minmagnitude', '5.0');
-  p.set('limit', '25');
-  p.set('orderby', 'time');
-  const d = await apiFetch('https://earthquake.usgs.gov/fdsnws/event/1/query?' + p.toString(), 12000);
-  return (d.features || []).map(function(f, i) {
-    const mag = f.properties.mag || 0;
-    const place = f.properties.place || 'Unknown';
-    const depth = f.geometry.coordinates[2] || 0;
-    const tsunami = f.properties.tsunami === 1;
+async function fetchGuardian(section, query, type, pageSize) {
+  pageSize = pageSize || 10;
+  const d = await apiFetch(guardianUrl(section, query, pageSize), 10000);
+  const results = (d.response && d.response.results) || [];
+  return results.map(function(a, i) {
+    const fields = a.fields || {};
+    const ll = findLatLng(a.webTitle);
+    const hub = TECH_HUBS[i % TECH_HUBS.length];
     return {
-      id: 'usgs_' + i, type: 'disaster',
-      title: 'M' + mag.toFixed(1) + ' Earthquake — ' + place,
-      location: place,
-      lat: f.geometry.coordinates[1], lng: f.geometry.coordinates[0],
-      severity: mag >= 7.5 ? 5 : mag >= 6.5 ? 4 : mag >= 6 ? 3 : 2,
-      age: timeAgo(f.properties.time),
-      brief: 'M' + mag.toFixed(1) + ' earthquake ' + place + ' at ' + depth.toFixed(0) + ' km depth.' + (tsunami ? ' Tsunami advisory issued.' : '') + (f.properties.alert ? ' PAGER alert: ' + f.properties.alert.toUpperCase() + '.' : ''),
-      stats: [{label:'Magnitude',val:'M'+mag.toFixed(1)},{label:'Depth',val:depth.toFixed(0)+' km'}],
-      sources: [{n:'USGS',a:timeAgo(f.properties.time),url:'https://earthquake.usgs.gov'}],
-      tags: ['Earthquake','USGS',tsunami?'Tsunami':'Natural Disaster'],
-      _live: true
+      id: type + '_g_' + i, type: type,
+      title: a.webTitle,
+      location: ll ? (Object.keys(CC).find(function(c){ return a.webTitle.toLowerCase().indexOf(c.toLowerCase()) !== -1; }) || a.sectionName) : a.sectionName,
+      lat: ll ? ll[0] : hub[0], lng: ll ? ll[1] : hub[1],
+      severity: 2,
+      age: a.webPublicationDate ? timeAgo(a.webPublicationDate) : 'Recent',
+      brief: (fields.trailText || a.webTitle).replace(/<[^>]*>/g, '').trim(),
+      url: a.webUrl,
+      sources: [{n: 'The Guardian', a: a.webPublicationDate ? timeAgo(a.webPublicationDate) : 'Recent', url: a.webUrl}],
+      tags: [type, a.sectionName], _live: true
     };
   });
 }
 
-// GDELT — CORS * natively, called directly (no proxy)
-async function fetchGDELT(query, type, limit) {
-  limit = limit || 8;
-  const d = await apiFetch(gdeltUrl(query, limit, '24h'), 12000);
-  const articles = d.articles || [];
-  return dedupeByTitle(articles.map(function(a, i) {
-    const geo = a.geolocation;
-    let lat, lng, locName;
-    if (geo && geo.lat && geo.lon) {
-      lat = geo.lat; lng = geo.lon; locName = geo.fullname || geo.countrycode;
-    } else {
-      const ll = findLatLng(a.title);
-      if (!ll) return null;
-      lat = ll[0]; lng = ll[1]; locName = null;
-    }
-    const sd = a.seendate || '';
-    let date;
-    try {
-      date = sd.length >= 8 ? new Date(sd.slice(0,4) + '-' + sd.slice(4,6) + '-' + sd.slice(6,8) + 'T' + (sd.length >= 14 ? sd.slice(8,10) + ':' + sd.slice(10,12) : '12:00') + ':00Z') : new Date();
-    } catch(e) { date = new Date(); }
-    return {
-      id: 'gd_' + type + '_' + i, type: type,
-      title: a.title || 'Article',
-      location: locName || a.domain || a.sourcecountry || 'Global',
-      lat: lat, lng: lng,
-      severity: type === 'conflict' ? 3 : 2,
-      age: timeAgo(date),
-      brief: a.title + '\n\nSource: ' + (a.domain || 'Unknown'),
-      url: a.url,
-      sources: [{n: a.domain || 'GDELT', a: timeAgo(date), url: a.url}],
-      tags: [type, a.sourcecountry || 'International'],
-      _live: true
-    };
-  }).filter(Boolean));
-}
 
 // Multi-source world news via GDELT
-const NEWS_QUERIES = [
-  {q:'world politics government summit diplomacy',           region:'Global',        lat:48.86, lng:2.35},
-  {q:'Middle East Israel Iran Syria Lebanon Iraq war',       region:'Middle East',   lat:33.0,  lng:44.0},
-  {q:'Africa Nigeria Ethiopia Somalia Kenya Sudan crisis',   region:'Africa',        lat:8.0,   lng:25.0},
-  {q:'China Asia Pacific Taiwan Korea Japan trade',          region:'Asia-Pacific',  lat:25.0,  lng:110.0},
-  {q:'Japan Tokyo economy technology earthquake',            region:'Japan',         lat:35.69, lng:139.69},
-  {q:'India Pakistan South Asia economy election',           region:'South Asia',    lat:24.0,  lng:78.0},
-  {q:'Europe NATO EU Ukraine Russia energy election',        region:'Europe',        lat:50.0,  lng:15.0},
-  {q:'United Kingdom Britain Scotland parliament',           region:'UK',            lat:51.51, lng:-0.13},
-  {q:'Latin America Brazil Mexico Argentina Colombia',       region:'Latin America', lat:-15.0, lng:-60.0},
-  {q:'Canada Australia economy immigration climate',         region:'Canada',        lat:56.0,  lng:-106.0}
-];
-
 async function fetchMultiSourceNews() {
-  const settled = await Promise.allSettled(
-    NEWS_QUERIES.map(function(nq) { return fetchGDELT(nq.q, 'news', 3); })
-  );
-  const all = [];
-  settled.forEach(function(r, i) {
-    if (r.status !== 'fulfilled') return;
-    const region = NEWS_QUERIES[i].region;
-    const fb = NEWS_QUERIES[i];
-    (r.value || []).forEach(function(a, j) {
-      all.push(Object.assign({}, a, {
-        id: 'msn_' + i + '_' + j,
-        location: a.location !== 'Global' ? a.location : region,
-        lat: a.lat || fb.lat,
-        lng: a.lng || fb.lng,
-        tags: (a.tags || []).concat([region])
-      }));
-    });
-  });
-  return dedupeByTitle(all).slice(0, 35);
+  return fetchGuardian('world', null, 'news', 25);
 }
+
 
 // Hacker News — CORS *
 async function fetchHackerNews() {
@@ -641,57 +414,22 @@ async function fetchHackerNews() {
 }
 
 // Fashion — RSS feeds from Vogue, Vogue Business, Harper's Bazaar, WWD, BOF, Elle
-// rss2json.com: free, CORS *, converts any RSS to JSON
+// Fashion — Guardian fashion section (cors=*, no key needed)
 async function fetchFashionNews() {
-  const FASHION_RSS = [
-    {url:'https://www.vogue.com/feed/rss',              source:'Vogue',           lat:40.71,  lng:-74.01},
-    {url:'https://www.harpersbazaar.com/rss/all.xml',   source:"Harper's Bazaar", lat:40.71,  lng:-74.01},
-    {url:'https://wwd.com/feed/',                       source:'WWD',             lat:40.71,  lng:-74.01},
-    {url:'https://www.businessoffashion.com/feed',      source:'Business of Fashion', lat:51.51, lng:-0.13},
-    {url:'https://www.elle.com/rss/all.xml',            source:'Elle',            lat:48.86,  lng:2.35},
-    {url:'https://www.esquire.com/rss/all.xml',         source:'Esquire',         lat:40.71,  lng:-74.01},
-  ];
-  const settled = await Promise.allSettled(
-    FASHION_RSS.map(function(feed) {
-      return apiFetch(
-        'https://api.rss2json.com/v1/api.json?rss_url=' + encodeURIComponent(feed.url) + '&count=8',
-        10000
-      ).then(function(d) { return {d:d, feed:feed}; });
-    })
-  );
+  const [main, luxury, runway] = await Promise.allSettled([
+    fetchGuardian('fashion', null, 'fashion', 15),
+    fetchGuardian('fashion', 'Chanel OR Dior OR Gucci OR Prada OR LVMH OR Balenciaga OR luxury', 'fashion', 10),
+    fetchGuardian('fashion', 'runway OR collection OR designer OR couture', 'fashion', 10)
+  ]);
   const all = [];
-  settled.forEach(function(r, i) {
-    if (r.status !== 'fulfilled') return;
-    const feed = FASHION_RSS[i];
-    const items = (r.value && r.value.d && r.value.d.items) || [];
-    items.forEach(function(item, j) {
-      if (!item.title) return;
-      const ll = findLatLng(item.title) || findLatLng(item.description || '');
-      all.push({
-        id: 'fash_' + i + '_' + j,
-        type: 'fashion',
-        title: item.title.replace(/<[^>]*>/g,'').trim(),
-        location: ll ? (Object.keys(CC).find(function(c){return (item.title+' '+(item.description||'')).toLowerCase().indexOf(c.toLowerCase())!==-1;}) || feed.source) : feed.source,
-        lat: ll ? ll[0] : feed.lat,
-        lng: ll ? ll[1] : feed.lng,
-        severity: 1,
-        age: item.pubDate ? timeAgo(item.pubDate) : 'Recent',
-        brief: (item.description || item.content || item.title).replace(/<[^>]*>/g,'').trim().slice(0, 400),
-        url: item.link || item.guid || null,
-        sources: [{n: feed.source, a: item.pubDate ? timeAgo(item.pubDate) : 'Recent', url: item.link}],
-        tags: ['Fashion', feed.source],
-        _live: true
-      });
-    });
+  [main, luxury, runway].forEach(function(r) {
+    if (r.status === 'fulfilled') all.push.apply(all, r.value);
   });
-  return dedupeByTitle(all).slice(0, 40);
+  return dedupeByTitle(all).slice(0, 35);
 }
 
-// ISS — wheretheiss.at has CORS *
-async function fetchISS() {
-  const d = await apiFetch('https://api.wheretheiss.at/v1/satellites/25544', 8000);
-  return {lat: d.latitude, lng: d.longitude};
-}
+
+
 
 // NOAA SWPC — CORS *
 async function fetchAuroraKp() {
@@ -706,20 +444,7 @@ async function fetchSkyData() {
   const events = computeSkyEvents();
 
   // ISS
-  try {
-    const iss = await fetchISS();
-    events.push({
-      id:'sky_iss', type:'astrology',
-      title:'🛸 ISS — International Space Station',
-      location: iss.lat.toFixed(2) + '°, ' + iss.lng.toFixed(2) + '°',
-      lat: iss.lat, lng: iss.lng, severity:2, age:'Live',
-      brief:'The ISS is at ' + iss.lat.toFixed(3) + '°, ' + iss.lng.toFixed(3) + '°, orbiting at ~408 km altitude at 27,600 km/h.',
-      stats:[{label:'Altitude',val:'~408 km'},{label:'Speed',val:'27,600 km/h'}],
-      sources:[{n:'wheretheiss.at',a:'Live',url:'https://api.wheretheiss.at/v1/satellites/25544'}],
-      tags:['ISS','Space Station','NASA'],
-      _live:true, _planet:{emoji:'🛸',name:'ISS'}
-    });
-  } catch(_) {}
+  // ISS removed — SSL timeout from GitHub Pages catch(_) {}
 
   // Aurora
   try {
@@ -770,7 +495,7 @@ async function fetchLaunches() {
   return parsed.length ? parsed : FALLBACK_LAUNCHES;
 }
 
-// CoinGecko + Frankfurter
+// CoinGecko + open.er-api FX
 async function fetchMarkets() {
   const [cg, fx] = await Promise.allSettled([
     apiFetch('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum,solana,ripple,cardano&vs_currencies=usd&include_24hr_change=true', 8000),
@@ -1048,8 +773,8 @@ async function loadLiveData() {
   splash(35, 'GDELT World News (10 regions)…');
   const [gdeltNews, gdeltConflicts, gdeltStorms, hnTech, fashionNews] = await Promise.allSettled([
     fetchMultiSourceNews(),
-    fetchGDELT('attack killed military conflict war fighting', 'conflict', 8),
-    fetchGDELT('hurricane typhoon cyclone tropical storm tornado', 'storm', 5),
+    fetchGuardian('world', 'conflict OR war OR attack OR military', 'conflict', 10),
+    fetchGuardian('world', 'hurricane OR cyclone OR typhoon OR storm OR tornado', 'storm', 8),
     fetchHackerNews(),
     fetchFashionNews()
   ]);
