@@ -1019,7 +1019,7 @@ function tickPlanets() {
     if (opacity <= 0) { el.style.display = 'none'; return; }
     var pos = planetGeogLatLng(p, d);
     var lat = pos.lat * DEG, lng = pos.lng * DEG, dist = 620;
-    var sp = projectToScreen(dist*Math.cos(lat)*Math.sin(lng), dist*Math.sin(lat), dist*Math.cos(lat)*Math.cos(lng));
+    var sp = projectToScreen(dist*Math.cos(lat)*Math.sin(lng), dist*Math.sin(lat), dist*Math.cos(lat)*Math.cos(lng), true);
     if (!sp) { el.style.display = 'none'; return; }
     el.style.display = 'block';
     el.style.opacity = opacity;
@@ -1046,7 +1046,7 @@ function tickPlanets() {
       for (var i = 0; i <= pts.length; i++) {
         var pos = pts[i % pts.length];
         var lat = pos.lat * DEG, lng = pos.lng * DEG, dist = 620;
-        var sp = projectToScreen(dist*Math.cos(lat)*Math.sin(lng), dist*Math.sin(lat), dist*Math.cos(lat)*Math.cos(lng));
+        var sp = projectToScreen(dist*Math.cos(lat)*Math.sin(lng), dist*Math.sin(lat), dist*Math.cos(lat)*Math.cos(lng), true);
         if (!sp) { started = false; continue; }
         if (!started) { ctx.moveTo(sp.x, sp.y); started = true; } else ctx.lineTo(sp.x, sp.y);
       }
@@ -1068,7 +1068,7 @@ function tickPlanets() {
     if (!el) return;
     if (starOp <= 0) { el.style.display = 'none'; return; }
     var slat = s[2] * DEG, slng = norm180(s[1] - GMST_s) * DEG, dist = 618;
-    var sp = projectToScreen(dist*Math.cos(slat)*Math.sin(slng), dist*Math.sin(slat), dist*Math.cos(slat)*Math.cos(slng));
+    var sp = projectToScreen(dist*Math.cos(slat)*Math.sin(slng), dist*Math.sin(slat), dist*Math.cos(slat)*Math.cos(slng), true);
     if (!sp) { el.style.display = 'none'; return; }
     el.style.display = 'block';
     el.style.opacity = starOp;
@@ -1759,8 +1759,21 @@ function updateIRLTexture() {
 }
 
 // Project a world-space point to screen coords using the globe's camera matrices
-function projectToScreen(wx, wy, wz) {
+function projectToScreen(wx, wy, wz, occlude) {
   var cam = globe.camera();
+  // Cull sky objects behind the globe — dot product of point and camera position
+  // must be positive (same hemisphere). Threshold accounts for globe radius (~100 units).
+  if (occlude) {
+    var cp = cam.position;
+    if (wx*cp.x + wy*cp.y + wz*cp.z < 100 * Math.sqrt(wx*wx+wy*wy+wz*wz)) {
+      // Extra check: only cull if actually behind the sphere (angle > horizon)
+      var dot = wx*cp.x + wy*cp.y + wz*cp.z;
+      var camDist = Math.sqrt(cp.x*cp.x+cp.y*cp.y+cp.z*cp.z);
+      var ptDist  = Math.sqrt(wx*wx+wy*wy+wz*wz);
+      // Cull if dot product normalized is below the globe's horizon threshold
+      if (dot / (camDist * ptDist) < 0) return null;
+    }
+  }
   var m = cam.matrixWorldInverse.elements;
   var p = cam.projectionMatrix.elements;
   var vx = m[0]*wx+m[4]*wy+m[8]*wz+m[12];
