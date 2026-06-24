@@ -1208,7 +1208,13 @@ function toggleConnect() {
   var btn = document.getElementById('connect-btn');
   btn.classList.toggle('active', connectMode);
   btn.textContent = connectMode ? '⟷ ON' : '⟷ CONNECT';
-  if (!connectMode) { connectedIds = []; syncConnectUI(); closeAP(); }
+  if (connectMode) {
+    // Seed with the currently open event so you don't have to re-click it
+    if (selectedId && connectedIds.indexOf(selectedId) === -1) connectedIds.push(selectedId);
+    syncConnectUI(); renderAP();
+  } else {
+    connectedIds = []; syncConnectUI(); closeAP();
+  }
   var hint = document.getElementById('hb-connect-hint');
   if (hint) hint.style.display = connectMode && document.getElementById('hist-bar').classList.contains('open') ? 'inline' : 'none';
 }
