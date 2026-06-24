@@ -62,6 +62,8 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);font-famil
 .ev-ico{font-size:12px;flex-shrink:0;margin-top:1px;line-height:1.3}
 .ev-body{flex:1;min-width:0}
 .ev-name{font-size:11.5px;font-weight:500;line-height:1.4;margin-bottom:3px;color:var(--text)}
+.ev-name a{color:inherit;text-decoration:none;border-bottom:1px solid rgba(255,255,255,0.1)}
+.ev-name a:hover{border-bottom-color:rgba(255,255,255,0.4)}
 .ev-foot{display:flex;align-items:center;gap:5px}
 .ev-tag{font-size:8px;font-weight:700;padding:1px 5px;border-radius:3px;letter-spacing:.5px;text-transform:uppercase;flex-shrink:0}
 .ev-loc{font-size:9.5px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1}
@@ -79,9 +81,8 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);font-famil
 .astro-card{padding:9px 8px;border-radius:9px;background:rgba(255,255,255,.03);border:1px solid var(--border);cursor:pointer;transition:all .15s;text-align:center}
 .astro-card:hover{background:rgba(192,132,252,.07);border-color:rgba(192,132,252,.25)}
 .astro-card.sel{background:rgba(192,132,252,.12);border-color:rgba(192,132,252,.4)}
-.astro-emoji{font-size:20px;margin-bottom:3px}
-.astro-sign{font-size:10px;font-weight:700;color:var(--text);margin-bottom:2px}
-.astro-site{font-size:8px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.astro-sign{font-size:11px;font-weight:700;color:var(--text);margin-bottom:2px}
+.astro-site{font-size:8px;color:var(--muted)}
 .astro-snip{font-size:9px;color:rgba(192,132,252,.7);margin-top:4px;line-height:1.4;text-align:left;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 #lctrl{position:fixed;top:60px;right:12px;z-index:200;background:var(--glass);border:1px solid var(--border);border-radius:11px;padding:9px;backdrop-filter:blur(24px);display:flex;flex-direction:column;gap:3px;min-width:158px}
 .lc-hdr{font-size:8px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--muted);padding:1px 5px 4px}
@@ -129,7 +130,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);font-famil
 .marker.sev5 .m-dot{width:11px;height:11px;box-shadow:0 0 14px var(--mc)}
 .marker.sev5 .m-ring{width:28px;height:28px}
 #ticker{position:fixed;bottom:0;left:0;right:0;z-index:300;height:36px;background:var(--glass);border-top:1px solid var(--border);backdrop-filter:blur(24px);display:flex;align-items:center;overflow:hidden}
-.tk-label{flex-shrink:0;padding:0 13px;font-size:8px;font-weight:700;letter-spacing:2px;color:#f59e0b;text-transform:uppercase;border-right:1px solid var(--border);height:100%;display:flex;align-items:center;gap:6px}
+.tk-label{flex-shrink:0;padding:0 13px;font-size:8px;font-weight:700;letter-spacing:2px;color:#f59e0b;text-transform:uppercase;border-right:1px solid var(--border);height:100%;display:flex;align-items:center}
 .tk-track{flex:1;overflow:hidden;height:100%;position:relative}
 .tk-inner{display:flex;align-items:center;height:100%;white-space:nowrap;position:absolute;left:0;animation:tscroll 60s linear infinite}
 @keyframes tscroll{from{left:0}to{left:-50%}}
@@ -163,16 +164,16 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);font-famil
   <div id="ph"><span id="ph-title">Intelligence Feed</span><span id="ph-count">–</span></div>
   <div id="ps"><input type="text" id="sinput" placeholder="Search events, locations, tags…" oninput="onSearch()"></div>
   <div id="tabs">
-    <div class="tab on"  data-tab="all"         onclick="setTab(this)">All</div>
-    <div class="tab"     data-tab="news"         onclick="setTab(this)">News</div>
-    <div class="tab"     data-tab="tech"         onclick="setTab(this)">Tech</div>
-    <div class="tab"     data-tab="fashion"      onclick="setTab(this)">Fashion</div>
-    <div class="tab"     data-tab="astrology"    onclick="setTab(this)">Sky</div>
-    <div class="tab"     data-tab="conflict"     onclick="setTab(this)">Conflicts</div>
-    <div class="tab"     data-tab="disaster"     onclick="setTab(this)">Disasters</div>
-    <div class="tab"     data-tab="storm"        onclick="setTab(this)">Storms</div>
-    <div class="tab"     data-tab="humanitarian" onclick="setTab(this)">Aid</div>
-    <div class="tab"     data-tab="launch"       onclick="setTab(this)">Launches</div>
+    <div class="tab on" data-tab="all"         onclick="setTab(this)">All</div>
+    <div class="tab"    data-tab="news"         onclick="setTab(this)">News</div>
+    <div class="tab"    data-tab="tech"         onclick="setTab(this)">Tech</div>
+    <div class="tab"    data-tab="fashion"      onclick="setTab(this)">Fashion</div>
+    <div class="tab"    data-tab="astrology"    onclick="setTab(this)">Sky</div>
+    <div class="tab"    data-tab="conflict"     onclick="setTab(this)">Conflicts</div>
+    <div class="tab"    data-tab="disaster"     onclick="setTab(this)">Disasters</div>
+    <div class="tab"    data-tab="storm"        onclick="setTab(this)">Storms</div>
+    <div class="tab"    data-tab="humanitarian" onclick="setTab(this)">Aid</div>
+    <div class="tab"    data-tab="launch"       onclick="setTab(this)">Launches</div>
   </div>
   <div id="evlist"><div class="ev-empty">Loading…</div></div>
   <div id="wl">
@@ -206,18 +207,17 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);font-famil
 // =============================================================================
 // CONSTANTS
 // =============================================================================
-const COLORS = {
+var COLORS = {
   news:'#ef4444',conflict:'#f97316',disaster:'#eab308',storm:'#60a5fa',
   humanitarian:'#ec4899',flight:'#10b981',launch:'#a78bfa',
   tech:'#06b6d4',fashion:'#f472b6',astrology:'#c084fc'
 };
-const ICONS = {
+var ICONS = {
   news:'📰',conflict:'⚔️',disaster:'🌊',storm:'🌀',humanitarian:'🏥',
   flight:'✈️',launch:'🚀',tech:'💻',fashion:'👗',astrology:'✨'
 };
 
-// Country centroids
-const CC = {
+var CC = {
   Afghanistan:[33.93,67.71],Algeria:[28.03,1.66],Angola:[-11.2,17.87],
   Argentina:[-38.42,-63.62],Australia:[-25.27,133.78],Bangladesh:[23.68,90.35],
   Brazil:[-14.24,-51.93],Cambodia:[12.57,104.99],Canada:[56.13,-106.35],
@@ -241,18 +241,16 @@ const CC = {
   Vietnam:[14.06,108.28],Yemen:[15.55,48.52],Zimbabwe:[-19.02,29.15],
   Paris:[48.86,2.35],Milan:[45.46,9.19],London:[51.51,-0.13],
   'New York':[40.71,-74.01],Tokyo:[35.69,139.69],
-  'San Francisco':[37.77,-122.42],Brussels:[50.85,4.35],
-  Singapore:[1.35,103.82],Taiwan:[23.7,120.96]
+  'San Francisco':[37.77,-122.42],Brussels:[50.85,4.35],Singapore:[1.35,103.82]
 };
 
-const TECH_HUBS = [
+var TECH_HUBS = [
   [37.39,-122.08],[47.61,-122.33],[40.71,-74.01],[51.51,-0.13],[52.52,13.40],
   [1.35,103.82],[35.69,139.69],[48.86,2.35],[37.77,-122.42],[43.65,-79.38],
   [55.75,37.62],[-33.87,151.21],[28.61,77.21],[22.54,114.06],[59.33,18.07]
 ];
 
-// Simulated flight routes (OpenSky blocks external CORS)
-const FLIGHT_ROUTES = [
+var FLIGHT_ROUTES = [
   {s:'JFK',d:'LHR',sLat:40.64,sLng:-73.78,dLat:51.48,dLng:-0.46},
   {s:'LAX',d:'NRT',sLat:33.94,sLng:-118.41,dLat:35.76,dLng:140.39},
   {s:'DXB',d:'SIN',sLat:25.25,sLng:55.36,dLat:1.36,dLng:103.99},
@@ -275,37 +273,20 @@ const FLIGHT_ROUTES = [
   {s:'CGK',d:'AMS',sLat:-6.13,sLng:106.66,dLat:52.31,dLng:4.77}
 ];
 
-// =============================================================================
-// SEEDS (shown when live APIs fail)
-// =============================================================================
-const SEEDS = {
+// Fallback seeds shown when APIs fail
+var SEEDS = {
   conflict:[
-    {id:'sc1',type:'conflict',title:'Gaza: Aid Corridor Negotiations Stall',location:'Gaza Strip',lat:31.35,lng:34.31,severity:5,age:'30m ago',brief:'Ceasefire negotiations have stalled. The UN reports 340+ aid trucks blocked from entering northern Gaza over 72 hours.',stats:[{label:'Displaced',val:'1.7M'},{label:'Aid Blocked',val:'72h+'}],sources:[{n:'UN OCHA',a:'1h'},{n:'Al Jazeera',a:'30m'}],tags:['Gaza','Palestine','Israel']},
+    {id:'sc1',type:'conflict',title:'Gaza: Aid Corridor Negotiations Stall',location:'Gaza Strip',lat:31.35,lng:34.31,severity:5,age:'30m ago',brief:'Ceasefire negotiations have stalled. 340+ aid trucks blocked from entering northern Gaza over 72 hours.',stats:[{label:'Displaced',val:'1.7M'},{label:'Aid Blocked',val:'72h+'}],sources:[{n:'UN OCHA',a:'1h'},{n:'Al Jazeera',a:'30m'}],tags:['Gaza','Palestine','Israel']},
     {id:'sc2',type:'conflict',title:'Ukraine: Kharkiv Shelling Intensifies',location:'Kharkiv, Ukraine',lat:49.99,lng:36.23,severity:5,age:'45m ago',brief:'Russian forces intensified strikes on Kharkiv Oblast. Ukrainian air defense intercepted 8 of 11 overnight drones.',stats:[{label:'Strikes (24h)',val:'14'},{label:'Intercepted',val:'8/11'}],sources:[{n:'Reuters',a:'45m'},{n:'Kyiv Post',a:'1h'}],tags:['Ukraine','Russia','War']},
     {id:'sc3',type:'conflict',title:'Sudan: RSF Advances on El Fasher',location:'El Fasher, Sudan',lat:13.63,lng:25.35,severity:4,age:'3h ago',brief:'RSF forces control two more districts surrounding El Fasher, with ~800,000 civilians sheltering in the city.',stats:[{label:'Civilians',val:'~800K'},{label:'Risk',val:'CRITICAL'}],sources:[{n:'UN OCHA',a:'3h'}],tags:['Sudan','Darfur','RSF']}
-  ],
-  disaster:[
-    {id:'sd1',type:'disaster',title:'M6.2 Earthquake — Sulawesi, Indonesia',location:'Sulawesi, Indonesia',lat:-1.5,lng:120.2,severity:3,age:'3h ago',brief:'A magnitude 6.2 earthquake struck Sulawesi at 18km depth. No tsunami warning issued.',stats:[{label:'Magnitude',val:'M6.2'},{label:'Depth',val:'18 km'}],sources:[{n:'USGS',a:'3h'}],tags:['Earthquake','Indonesia']},
-    {id:'sd2',type:'disaster',title:'Monsoon Flooding — Sylhet, Bangladesh',location:'Sylhet, Bangladesh',lat:24.89,lng:91.87,severity:4,age:'12h ago',brief:'Flash flooding in Sylhet displaced approximately 200,000 people.',stats:[{label:'Displaced',val:'200K'}],sources:[{n:'Reuters',a:'13h'}],tags:['Flooding','Bangladesh']}
-  ],
-  storm:[
-    {id:'ss1',type:'storm',title:'Tropical Storm — Bay of Bengal',location:'Bay of Bengal',lat:15.0,lng:88.0,severity:2,age:'8h ago',brief:'A tropical storm formed with sustained winds of 65 km/h. IMD monitoring.',sources:[{n:'IMD',a:'8h'}],tags:['Storm','Bay of Bengal']}
   ],
   humanitarian:[
     {id:'sh1',type:'humanitarian',title:'Yemen: Famine in 4 Governorates',location:'Yemen',lat:15.55,lng:48.52,severity:5,age:'1d ago',brief:'WFP classified four Yemeni governorates IPC Phase 5. 2.7M face catastrophic food insecurity.',stats:[{label:'At Risk',val:'2.7M'},{label:'Ration Cut',val:'50%'}],sources:[{n:'WFP',a:'1d'}],tags:['Yemen','Famine','WFP']},
     {id:'sh2',type:'humanitarian',title:'Haiti: Gang Violence Blocks Aid',location:'Port-au-Prince, Haiti',lat:18.54,lng:-72.34,severity:4,age:'6h ago',brief:'Gang violence blocked humanitarian aid corridors for the 5th consecutive day. 580,000 displaced.',stats:[{label:'Displaced',val:'580K'}],sources:[{n:'UN OCHA',a:'6h'}],tags:['Haiti','Displacement']}
-  ],
-  tech:[
-    {id:'st1',type:'tech',title:'OpenAI Releases GPT-5',location:'San Francisco, CA',lat:37.77,lng:-122.42,severity:2,age:'5h ago',brief:'OpenAI announced GPT-5 with significantly improved reasoning and coding capabilities.',sources:[{n:'Hacker News',a:'5h'}],tags:['AI','OpenAI']},
-    {id:'st2',type:'tech',title:'TSMC Confirms 2nm Timeline for 2025',location:'Taiwan',lat:24.8,lng:120.97,severity:2,age:'8h ago',brief:'TSMC confirmed N2 process node on track for 2025 volume production.',sources:[{n:'Hacker News',a:'8h'}],tags:['TSMC','Semiconductors']}
-  ],
-  fashion:[
-    {id:'sf1',type:'fashion',title:'Paris Fashion Week: Spring Collections',location:'Paris, France',lat:48.86,lng:2.35,severity:2,age:'1d ago',brief:'Paris Fashion Week Spring/Summer collections opened with debuts from emerging designers alongside Dior, Chanel, and Saint Laurent.',sources:[{n:'Vogue',a:'1d'}],tags:['Fashion Week','Paris','Runway']},
-    {id:'sf2',type:'fashion',title:'LVMH Reports Revenue Growth',location:'Paris, France',lat:48.86,lng:2.35,severity:1,age:'2d ago',brief:'LVMH reported 8% organic revenue growth, with Louis Vuitton and Dior leading gains in Asia Pacific.',sources:[{n:'Reuters',a:'2d'}],tags:['LVMH','Luxury']}
   ]
 };
 
-const FALLBACK_LAUNCHES = [
+var FALLBACK_LAUNCHES = [
   {id:'fl0',type:'launch',title:'SpaceX Falcon 9 — Starlink',location:'Cape Canaveral, FL',lat:28.61,lng:-80.6,severity:2,age:'In 2 days',brief:'SpaceX Falcon 9 carrying Starlink v2 Mini satellites from SLC-40.',sources:[{n:'SpaceX',a:'Upcoming'}],tags:['SpaceX','Starlink']},
   {id:'fl1',type:'launch',title:'Rocket Lab Electron — Commercial',location:'Mahia, New Zealand',lat:-39.26,lng:177.86,severity:2,age:'In 5 days',brief:'Rocket Lab Electron launching commercial payload from Mahia Peninsula.',sources:[{n:'Rocket Lab',a:'Upcoming'}],tags:['Rocket Lab','Electron']}
 ];
@@ -313,57 +294,212 @@ const FALLBACK_LAUNCHES = [
 // =============================================================================
 // STATE
 // =============================================================================
-let allEvents = [];
-let flightPoints = [];
-let currentTab = 'all';
-let searchQ = '';
-let selectedId = null;
-let panelOpen = true;
-let watchTags = ['Gaza','Ukraine','AI','Markets','Fashion','Climate'];
-const layerVis = {news:true,conflict:true,disaster:true,storm:true,humanitarian:true,flight:true,launch:true,tech:true,fashion:true,astrology:true};
-let globe;
-let tickerData = [
+var allEvents = [];
+var flightPoints = [];
+var currentTab = 'all';
+var searchQ = '';
+var selectedId = null;
+var panelOpen = true;
+var watchTags = ['Gaza','Ukraine','AI','Markets','Fashion','Climate'];
+var layerVis = {news:true,conflict:true,disaster:true,storm:true,humanitarian:true,flight:true,launch:true,tech:true,fashion:true,astrology:true};
+var globe;
+var tickerData = [
   {sym:'BTC',px:'–',chg:'',up:true},{sym:'ETH',px:'–',chg:'',up:true},
   {sym:'SOL',px:'–',chg:'',up:true},{sym:'EUR/USD',px:'–',chg:'',up:true},
   {sym:'GBP/USD',px:'–',chg:'',up:true},{sym:'USD/JPY',px:'–',chg:'',up:true},
-  {sym:'GOLD',px:'2,341',chg:'+0.64%',up:true},{sym:'OIL (WTI)',px:'82.14',chg:'-1.20%',up:false}
+  {sym:'GOLD',px:'2,341',chg:'+0.64%',up:true},{sym:'OIL',px:'82.14',chg:'-1.20%',up:false}
 ];
 
 // =============================================================================
 // UTILITIES
 // =============================================================================
 function timeAgo(ts) {
-  const ms = typeof ts === 'number' ? ts : new Date(ts).getTime();
-  const diff = Date.now() - ms;
+  var ms = typeof ts === 'number' ? ts : new Date(ts).getTime();
+  var diff = Date.now() - ms;
   if (isNaN(diff) || diff < 0) return 'Upcoming';
-  const m = Math.floor(diff / 60000);
+  var m = Math.floor(diff / 60000);
   if (m < 2) return 'Just now';
   if (m < 60) return m + 'm ago';
-  const h = Math.floor(m / 60);
+  var h = Math.floor(m / 60);
   if (h < 24) return h + 'h ago';
   return Math.floor(h / 24) + 'd ago';
 }
 
-// Safe fetch — no proxy, just direct with timeout
 async function apiFetch(url, timeout) {
   timeout = timeout || 9000;
-  const r = await fetch(url, {signal: AbortSignal.timeout(timeout)});
+  var r = await fetch(url, {signal: AbortSignal.timeout(timeout)});
   if (!r.ok) throw new Error('HTTP ' + r.status);
   return r.json();
 }
 
+function findLatLng(text) {
+  if (!text) return null;
+  var lower = text.toLowerCase();
+  var keys = Object.keys(CC).sort(function(a,b){return b.length - a.length;});
+  for (var i = 0; i < keys.length; i++) {
+    if (lower.indexOf(keys[i].toLowerCase()) !== -1) return CC[keys[i]];
+  }
+  return null;
+}
+
+function dedupeByTitle(events) {
+  var seen = new Set();
+  return events.filter(function(e) {
+    var key = e.title.toLowerCase().replace(/[^a-z0-9]/g,'').slice(0,50);
+    if (seen.has(key)) return false;
+    seen.add(key); return true;
+  });
+}
+
+function setLayerStatus(layer, status) {
+  var el = document.getElementById('ls-' + layer);
+  if (el) el.className = 'lc-live ' + status;
+}
+
+// =============================================================================
+// ASTRONOMY — Meeus algorithms, zero dependencies
+// =============================================================================
+var DEG = Math.PI / 180;
+var RAD = 180 / Math.PI;
+
+function jde(date) { return date.getTime() / 86400000 + 2440587.5; }
+function julT(date) { return (jde(date) - 2451545.0) / 36525; }
+function norm360(x) { return ((x % 360) + 360) % 360; }
+function norm180(x) { x = norm360(x); return x > 180 ? x - 360 : x; }
+
+function gmstDeg(date) {
+  var jd = jde(date);
+  var t = (jd - 2451545.0) / 36525;
+  return norm360(280.46061837 + 360.98564736629 * (jd - 2451545.0) + 0.000387933 * t * t - t * t * t / 38710000);
+}
+
+function sunSubpoint(date) {
+  var t = julT(date);
+  var L0 = norm360(280.46646 + 36000.76983 * t);
+  var M = norm360(357.52911 + 35999.05029 * t - 0.0001537 * t * t) * DEG;
+  var C = (1.914602 - 0.004817 * t) * Math.sin(M) + 0.019993 * Math.sin(2*M) + 0.000289 * Math.sin(3*M);
+  var lon = norm360(L0 + C);
+  var omega = norm360(125.04 - 1934.136 * t);
+  var lam = norm360(lon - 0.00569 - 0.00478 * Math.sin(omega * DEG));
+  var eps = (23.439291111 - 0.013004167 * t) * DEG;
+  var ra = Math.atan2(Math.cos(eps) * Math.sin(lam * DEG), Math.cos(lam * DEG)) * RAD;
+  var dec = Math.asin(Math.sin(eps) * Math.sin(lam * DEG)) * RAD;
+  return {lat: dec, lng: norm180(norm360(ra) - gmstDeg(date))};
+}
+
+function moonSubpoint(date) {
+  var t = julT(date);
+  var L1 = norm360(218.3164477 + 481267.88123421 * t);
+  var D = norm360(297.8501921 + 445267.1114034 * t) * DEG;
+  var M = norm360(357.5291092 + 35999.0502909 * t) * DEG;
+  var Mp = norm360(134.9633964 + 477198.8675055 * t) * DEG;
+  var F = norm360(93.2720950 + 483202.0175233 * t) * DEG;
+  var lonM = L1 + 6.288774*Math.sin(Mp) + 1.274027*Math.sin(2*D-Mp) + 0.658314*Math.sin(2*D) + 0.213618*Math.sin(2*Mp) - 0.185116*Math.sin(M) - 0.114332*Math.sin(2*F);
+  var latM = 5.128122*Math.sin(F) + 0.280602*Math.sin(Mp+F) + 0.277693*Math.sin(Mp-F) + 0.173237*Math.sin(2*D-F);
+  var eps = (23.439291111 - 0.013004167 * t) * DEG;
+  var lr = lonM * DEG, br = latM * DEG;
+  var ra = Math.atan2(Math.sin(lr)*Math.cos(eps) - Math.tan(br)*Math.sin(eps), Math.cos(lr)) * RAD;
+  var dec = Math.asin(Math.sin(br)*Math.cos(eps) + Math.cos(br)*Math.sin(eps)*Math.sin(lr)) * RAD;
+  return {lat: dec, lng: norm180(norm360(ra) - gmstDeg(date))};
+}
+
+function moonPhaseName(date) {
+  var t = julT(date);
+  var D = norm360(297.8501921 + 445267.1114034 * t);
+  var phases = ['New Moon','Waxing Crescent','First Quarter','Waxing Gibbous','Full Moon','Waning Gibbous','Last Quarter','Waning Crescent'];
+  return phases[Math.floor(((D + 22.5) % 360) / 45)];
+}
+
+var PLANET_ELEMS = {
+  Mercury:{L:[252.250906,149472.6746358,-0.00000535]},
+  Venus:  {L:[181.979801, 58517.8156760, 0.00000165]},
+  Mars:   {L:[ 19.971970, 19140.302327,  0.00000097]},
+  Jupiter:{L:[ 34.351432,  3034.905661, -0.00008501]},
+  Saturn: {L:[ 50.077444,  1222.113849,  0.00021004]},
+  Uranus: {L:[314.055070,   428.466998, -0.00000031]},
+  Neptune:{L:[304.348791,   218.486200,  0.00000059]}
+};
+
+function planetSubpoint(name, date) {
+  var el = PLANET_ELEMS[name];
+  var t = julT(date);
+  var L = norm360(el.L[0] + el.L[1]*t + el.L[2]*t*t) * DEG;
+  var eps = (23.439291111 - 0.013004167 * t) * DEG;
+  var ra = Math.atan2(Math.sin(L)*Math.cos(eps), Math.cos(L)) * RAD;
+  var dec = Math.asin(Math.sin(eps)*Math.sin(L)) * RAD;
+  return {lat: dec, lng: norm180(norm360(ra) - gmstDeg(date))};
+}
+
+var CONST_BANDS = [
+  [0,30,'Pisces'],[30,60,'Aries'],[60,90,'Taurus'],[90,120,'Gemini'],
+  [120,150,'Cancer'],[150,180,'Leo'],[180,210,'Virgo'],[210,240,'Libra'],
+  [240,270,'Scorpius'],[270,300,'Sagittarius'],[300,330,'Capricornus'],[330,360,'Aquarius']
+];
+function constellation(ra_deg) {
+  var ra = norm360(ra_deg);
+  var b = CONST_BANDS.find(function(b){return ra >= b[0] && ra < b[1];});
+  return b ? b[2] : 'Unknown';
+}
+
+var SKY_BODIES = [
+  {name:'Sun',    emoji:'☀️'},
+  {name:'Moon',   emoji:'🌕'},
+  {name:'Mercury',emoji:'☿'},
+  {name:'Venus',  emoji:'♀'},
+  {name:'Mars',   emoji:'♂'},
+  {name:'Jupiter',emoji:'♃'},
+  {name:'Saturn', emoji:'♄'},
+  {name:'Uranus', emoji:'♅'},
+  {name:'Neptune',emoji:'♆'}
+];
+
+function computeSkyEvents() {
+  var now = new Date();
+  var events = [];
+  for (var i = 0; i < SKY_BODIES.length; i++) {
+    var b = SKY_BODIES[i];
+    var pt;
+    if (b.name === 'Sun') pt = sunSubpoint(now);
+    else if (b.name === 'Moon') pt = moonSubpoint(now);
+    else pt = planetSubpoint(b.name, now);
+    var raApprox = norm360(gmstDeg(now) + pt.lng);
+    var con = constellation(raApprox);
+    var phase = b.name === 'Moon' ? ' Phase: ' + moonPhaseName(now) + '.' : '';
+    events.push({
+      id: 'sky_' + b.name.toLowerCase(),
+      type: 'astrology',
+      title: b.emoji + ' ' + b.name + ' — ' + con,
+      location: pt.lat.toFixed(2) + '\u00b0, ' + pt.lng.toFixed(2) + '\u00b0',
+      lat: pt.lat, lng: pt.lng,
+      severity: (b.name === 'Sun' || b.name === 'Moon') ? 3 : 2,
+      age: 'Live',
+      brief: 'Subpoint: ' + pt.lat.toFixed(3) + '\u00b0, ' + pt.lng.toFixed(3) + '\u00b0\nConstellation: ' + con + '.' + phase + '\n\nThe subpoint is the location on Earth directly beneath ' + b.name + ' right now.',
+      stats: [{label:'Constellation',val:con},{label:b.name==='Moon'?'Phase':'Sub-lat',val:b.name==='Moon'?moonPhaseName(now):pt.lat.toFixed(1)+'\u00b0'}],
+      sources: [{n:'Meeus Algorithms',a:'Computed live'}],
+      tags: ['Astronomy',b.name,con,'Sky'],
+      _live: true, _planet: b
+    });
+  }
+  return events;
+}
+
+// =============================================================================
+// API FETCHERS
+// Only APIs confirmed to work with CORS * from GitHub Pages:
+//   USGS, Guardian, HN Algolia, Space Devs, CoinGecko, open.er-api, NOAA SWPC
+// =============================================================================
+
 // USGS Earthquakes — CORS *
 async function fetchUSGS() {
-  var params = 'format=geojson&minmagnitude=5.0&limit=25&orderby=time';
-  const d = await apiFetch('https://earthquake.usgs.gov/fdsnws/event/1/query?' + params, 12000);
+  var d = await apiFetch('https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&minmagnitude=5.0&limit=25&orderby=time', 12000);
   return (d.features || []).map(function(f, i) {
-    const mag = f.properties.mag || 0;
-    const place = f.properties.place || 'Unknown';
-    const depth = f.geometry.coordinates[2] || 0;
-    const tsunami = f.properties.tsunami === 1;
+    var mag = f.properties.mag || 0;
+    var place = f.properties.place || 'Unknown';
+    var depth = f.geometry.coordinates[2] || 0;
+    var tsunami = f.properties.tsunami === 1;
     return {
       id: 'usgs_' + i, type: 'disaster',
-      title: 'M' + mag.toFixed(1) + ' Earthquake — ' + place,
+      title: 'M' + mag.toFixed(1) + ' Earthquake \u2014 ' + place,
       location: place,
       lat: f.geometry.coordinates[1], lng: f.geometry.coordinates[0],
       severity: mag >= 7.5 ? 5 : mag >= 6.5 ? 4 : mag >= 6 ? 3 : 2,
@@ -371,15 +507,15 @@ async function fetchUSGS() {
       brief: 'M' + mag.toFixed(1) + ' earthquake ' + place + ' at ' + depth.toFixed(0) + ' km depth.' +
         (tsunami ? ' Tsunami advisory issued.' : '') +
         (f.properties.alert ? ' PAGER alert: ' + f.properties.alert.toUpperCase() + '.' : ''),
-      stats: [{label:'Magnitude', val:'M'+mag.toFixed(1)}, {label:'Depth', val:depth.toFixed(0)+' km'}],
-      sources: [{n:'USGS', a:timeAgo(f.properties.time), url:'https://earthquake.usgs.gov'}],
-      tags: ['Earthquake','USGS', tsunami ? 'Tsunami' : 'Natural Disaster'],
+      stats: [{label:'Magnitude',val:'M'+mag.toFixed(1)},{label:'Depth',val:depth.toFixed(0)+' km'}],
+      sources: [{n:'USGS',a:timeAgo(f.properties.time),url:'https://earthquake.usgs.gov'}],
+      tags: ['Earthquake','USGS',tsunami?'Tsunami':'Natural Disaster'],
       _live: true
     };
   });
 }
 
-// Guardian Open Platform — cors=*, free with api-key=test
+// Guardian Open Platform — CORS *, api-key=test works for low volume
 function guardianUrl(section, query, pageSize) {
   pageSize = pageSize || 10;
   var base = 'https://content.guardianapis.com/search?api-key=test&show-fields=trailText,shortUrl&page-size=' + pageSize + '&order-by=newest&format=json';
@@ -390,129 +526,80 @@ function guardianUrl(section, query, pageSize) {
 
 async function fetchGuardian(section, query, type, pageSize) {
   pageSize = pageSize || 10;
-  const d = await apiFetch(guardianUrl(section, query, pageSize), 10000);
-  const results = (d.response && d.response.results) || [];
+  var d = await apiFetch(guardianUrl(section, query, pageSize), 10000);
+  var results = (d.response && d.response.results) || [];
   return results.map(function(a, i) {
-    const fields = a.fields || {};
-    const ll = findLatLng(a.webTitle);
-    const hub = TECH_HUBS[i % TECH_HUBS.length];
+    var fields = a.fields || {};
+    var ll = findLatLng(a.webTitle);
+    var hub = TECH_HUBS[i % TECH_HUBS.length];
     return {
       id: type + '_g_' + i, type: type,
       title: a.webTitle,
-      location: ll ? (Object.keys(CC).find(function(c){ return a.webTitle.toLowerCase().indexOf(c.toLowerCase()) !== -1; }) || a.sectionName) : a.sectionName,
+      location: ll ? (Object.keys(CC).find(function(c){return a.webTitle.toLowerCase().indexOf(c.toLowerCase()) !== -1;}) || a.sectionName) : a.sectionName,
       lat: ll ? ll[0] : hub[0], lng: ll ? ll[1] : hub[1],
       severity: 2,
       age: a.webPublicationDate ? timeAgo(a.webPublicationDate) : 'Recent',
-      brief: (fields.trailText || a.webTitle).replace(/<[^>]*>/g, '').trim(),
+      brief: (fields.trailText || a.webTitle).replace(/<[^>]*>/g,'').trim(),
       url: a.webUrl,
-      sources: [{n: 'The Guardian', a: a.webPublicationDate ? timeAgo(a.webPublicationDate) : 'Recent', url: a.webUrl}],
+      sources: [{n:'The Guardian', a: a.webPublicationDate ? timeAgo(a.webPublicationDate) : 'Recent', url: a.webUrl}],
       tags: [type, a.sectionName], _live: true
     };
   });
 }
 
-
-// Multi-source world news via GDELT
 async function fetchMultiSourceNews() {
   return fetchGuardian('world', null, 'news', 25);
 }
 
+// Fashion — Guardian fashion section
+async function fetchFashionNews() {
+  var results = await Promise.allSettled([
+    fetchGuardian('fashion', null, 'fashion', 15),
+    fetchGuardian('fashion', 'Chanel OR Dior OR Gucci OR Prada OR LVMH OR Balenciaga OR luxury', 'fashion', 10),
+    fetchGuardian('fashion', 'runway OR collection OR designer OR couture', 'fashion', 10)
+  ]);
+  var all = [];
+  results.forEach(function(r){if (r.status === 'fulfilled') all.push.apply(all, r.value);});
+  return dedupeByTitle(all).slice(0, 35);
+}
 
 // Hacker News — CORS *
 async function fetchHackerNews() {
-  const d = await apiFetch('https://hn.algolia.com/api/v1/search?tags=front_page&hitsPerPage=15', 10000);
+  var d = await apiFetch('https://hn.algolia.com/api/v1/search?tags=front_page&hitsPerPage=15', 10000);
   return dedupeByTitle((d.hits || []).map(function(h, i) {
-    const ll = findLatLng(h.title) || findLatLng(h.url || '');
-    const hub = TECH_HUBS[i % TECH_HUBS.length];
+    var ll = findLatLng(h.title) || findLatLng(h.url || '');
+    var hub = TECH_HUBS[i % TECH_HUBS.length];
     return {
       id: 'hn_' + i, type: 'tech',
       title: h.title,
       location: ll ? (Object.keys(CC).find(function(c){return h.title.toLowerCase().indexOf(c.toLowerCase())!==-1;}) || 'Tech') : 'Tech Hub',
       lat: ll ? ll[0] : hub[0], lng: ll ? ll[1] : hub[1],
-      severity: Math.min(4, Math.max(1, Math.floor((h.points || 0) / 150) + 1)),
+      severity: Math.min(4, Math.max(1, Math.floor((h.points||0)/150)+1)),
       age: timeAgo(h.created_at),
-      brief: h.title + '\n\n' + (h.points || 0) + ' points · ' + (h.num_comments || 0) + ' comments · by ' + h.author,
+      brief: h.title + '\n\n' + (h.points||0) + ' points \u00b7 ' + (h.num_comments||0) + ' comments \u00b7 by ' + h.author,
       url: h.url,
       sources: [{n:'Hacker News', a:timeAgo(h.created_at), url: h.url || 'https://news.ycombinator.com/item?id=' + h.objectID}],
-      tags: ['Tech','Hacker News'],
-      _live: true
+      tags: ['Tech','Hacker News'], _live: true
     };
   }).filter(Boolean));
 }
 
-// Fashion — RSS feeds from Vogue, Vogue Business, Harper's Bazaar, WWD, BOF, Elle
-// Fashion — Guardian fashion section (cors=*, no key needed)
-async function fetchFashionNews() {
-  const [main, luxury, runway] = await Promise.allSettled([
-    fetchGuardian('fashion', null, 'fashion', 15),
-    fetchGuardian('fashion', 'Chanel OR Dior OR Gucci OR Prada OR LVMH OR Balenciaga OR luxury', 'fashion', 10),
-    fetchGuardian('fashion', 'runway OR collection OR designer OR couture', 'fashion', 10)
-  ]);
-  const all = [];
-  [main, luxury, runway].forEach(function(r) {
-    if (r.status === 'fulfilled') all.push.apply(all, r.value);
-  });
-  return dedupeByTitle(all).slice(0, 35);
-}
-
-
-
-
-// NOAA SWPC — CORS *
-async function fetchAuroraKp() {
-  const d = await apiFetch('https://services.swpc.noaa.gov/products/noaa-planetary-k-index-forecast.json', 8000);
-  const predicted = (d || []).filter(function(r){return r[2] === 'predicted';});
-  const kp = Math.max.apply(null, predicted.slice(0,4).map(function(r){return parseFloat(r[1]) || 0;}));
-  return isFinite(kp) ? kp : 0;
-}
-
-// Sky data — ISS + Aurora + planets
-async function fetchSkyData() {
-  const events = computeSkyEvents();
-
-  // ISS
-  // ISS removed — SSL timeout from GitHub Pages catch(_) {}
-
-  // Aurora
-  try {
-    const kp = await fetchAuroraKp();
-    const auroLat = 66.5 - kp * 2.5;
-    events.push({
-      id:'sky_aurora', type:'astrology',
-      title:'🌌 Aurora Forecast — Kp ' + kp.toFixed(1),
-      location:'~' + auroLat.toFixed(0) + '° latitude',
-      lat: auroLat, lng: 0,
-      severity: kp >= 7 ? 5 : kp >= 5 ? 4 : kp >= 3 ? 3 : 2,
-      age:'NOAA Forecast',
-      brief:'NOAA Kp index: ' + kp.toFixed(1) + '.\nAurora visible above ~' + auroLat.toFixed(0) + '° latitude.\n\nKp 0 = quiet · Kp 5+ = geomagnetic storm · Kp 9 = extreme.',
-      stats:[{label:'Kp Index',val:kp.toFixed(1)},{label:'Visible above',val:auroLat.toFixed(0)+'°'}],
-      sources:[{n:'NOAA SWPC',a:'Forecast',url:'https://www.swpc.noaa.gov'}],
-      tags:['Aurora','NOAA','Space Weather'],
-      _live:true, _planet:{emoji:'🌌',name:'Aurora'}
-    });
-  } catch(_) {}
-
-  return events;
-}
-
 // Space Devs — launches
 async function fetchLaunches() {
-  const p = new URLSearchParams();
-  p.set('format','json'); p.set('limit','6'); p.set('mode','list');
-  const d = await apiFetch('https://ll.thespacedevs.com/2.2.0/launch/upcoming/?' + p.toString(), 12000);
-  const parsed = (d.results || []).map(function(l, i) {
-    const lat = parseFloat(l.pad && l.pad.latitude);
-    const lng = parseFloat(l.pad && l.pad.longitude);
+  var d = await apiFetch('https://ll.thespacedevs.com/2.2.0/launch/upcoming/?format=json&limit=6&mode=list', 12000);
+  var parsed = (d.results || []).map(function(l, i) {
+    var lat = parseFloat(l.pad && l.pad.latitude);
+    var lng = parseFloat(l.pad && l.pad.longitude);
     if (!lat || !lng) return null;
-    const net = l.net ? new Date(l.net) : null;
-    const diff = net ? Math.floor((net - Date.now()) / 86400000) : null;
-    const age = diff === null ? 'TBD' : diff <= 0 ? 'Imminent' : diff === 1 ? 'Tomorrow' : 'In ' + diff + 'd';
+    var net = l.net ? new Date(l.net) : null;
+    var diff = net ? Math.floor((net - Date.now()) / 86400000) : null;
+    var age = diff === null ? 'TBD' : diff <= 0 ? 'Imminent' : diff === 1 ? 'Tomorrow' : 'In ' + diff + 'd';
     return {
       id:'lnch_'+i, type:'launch',
       title: l.name,
       location: (l.pad && l.pad.location && l.pad.location.name) || 'Launch Site',
       lat:lat, lng:lng, severity:2, age:age,
-      brief: l.name + '. Vehicle: ' + ((l.rocket && l.rocket.configuration && l.rocket.configuration.full_name) || 'Unknown') + '. Provider: ' + ((l.launch_service_provider && l.launch_service_provider.name) || 'Unknown') + '. NET: ' + (net ? net.toUTCString() : 'TBD') + '.',
+      brief: l.name + '. Vehicle: ' + ((l.rocket&&l.rocket.configuration&&l.rocket.configuration.full_name)||'Unknown') + '. NET: ' + (net ? net.toUTCString() : 'TBD') + '.',
       stats:[{label:'Vehicle',val:(l.rocket&&l.rocket.configuration&&l.rocket.configuration.name)||'TBD'},{label:'Window',val:age}],
       sources:[{n:(l.launch_service_provider&&l.launch_service_provider.name)||'Provider',a:age}],
       tags:['Launch',(l.launch_service_provider&&l.launch_service_provider.name)||'Space'],
@@ -522,42 +609,72 @@ async function fetchLaunches() {
   return parsed.length ? parsed : FALLBACK_LAUNCHES;
 }
 
-// CoinGecko + open.er-api FX
+// NOAA SWPC — CORS *
+async function fetchAuroraKp() {
+  var d = await apiFetch('https://services.swpc.noaa.gov/products/noaa-planetary-k-index-forecast.json', 8000);
+  var predicted = (d || []).filter(function(r){return r[2]==='predicted';});
+  if (!predicted.length) return null;
+  return Math.max.apply(null, predicted.slice(0,4).map(function(r){return parseFloat(r[1])||0;}));
+}
+
+// Sky data — planets computed client-side + Aurora from NOAA
+async function fetchSkyData() {
+  var events = computeSkyEvents();
+  try {
+    var kp = await fetchAuroraKp();
+    if (kp !== null) {
+      var auroLat = 66.5 - kp * 2.5;
+      events.push({
+        id:'sky_aurora', type:'astrology',
+        title:'Aurora Forecast \u2014 Kp ' + kp.toFixed(1),
+        location:'~' + auroLat.toFixed(0) + '\u00b0 latitude',
+        lat:auroLat, lng:0,
+        severity: kp>=7?5:kp>=5?4:kp>=3?3:2,
+        age:'NOAA Forecast',
+        brief:'NOAA Kp index: ' + kp.toFixed(1) + '.\nAurora visible above ~' + auroLat.toFixed(0) + '\u00b0 latitude.\n\nKp 0 = quiet \u00b7 Kp 5+ = geomagnetic storm \u00b7 Kp 9 = extreme.',
+        stats:[{label:'Kp Index',val:kp.toFixed(1)},{label:'Visible above',val:auroLat.toFixed(0)+'\u00b0'}],
+        sources:[{n:'NOAA SWPC',a:'Forecast',url:'https://www.swpc.noaa.gov'}],
+        tags:['Aurora','NOAA','Space Weather'],
+        _live:true, _planet:{emoji:'🌌',name:'Aurora'}
+      });
+    }
+  } catch(_){}
+  return events;
+}
+
+// CoinGecko + open.er-api — both CORS *
 async function fetchMarkets() {
-  const [cg, fx] = await Promise.allSettled([
+  var results = await Promise.allSettled([
     apiFetch('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum,solana,ripple,cardano&vs_currencies=usd&include_24hr_change=true', 8000),
     apiFetch('https://open.er-api.com/v6/latest/USD', 6000)
   ]);
-
-  const items = [];
-  if (cg.status === 'fulfilled') {
-    const d = cg.value;
-    const map = {BTC:[d.bitcoin,d.bitcoin&&d.bitcoin.usd_24h_change],ETH:[d.ethereum,d.ethereum&&d.ethereum.usd_24h_change],SOL:[d.solana,d.solana&&d.solana.usd_24h_change],XRP:[d.ripple,d.ripple&&d.ripple.usd_24h_change]};
-    Object.entries(map).forEach(function(entry) {
-      const sym = entry[0], pair = entry[1];
-      if (!pair[0]) return;
-      const px = pair[0].usd, ch = pair[1] || 0;
-      items.push({sym:sym, px:px>100?px.toLocaleString('en',{maximumFractionDigits:2}):px.toFixed(4), chg:(ch>=0?'+':'')+ch.toFixed(2)+'%', up:ch>=0});
+  var items = [];
+  if (results[0].status === 'fulfilled') {
+    var d = results[0].value;
+    [{sym:'BTC',id:'bitcoin'},{sym:'ETH',id:'ethereum'},{sym:'SOL',id:'solana'},{sym:'XRP',id:'ripple'},{sym:'ADA',id:'cardano'}].forEach(function(c){
+      var obj = d[c.id];
+      if (!obj) return;
+      var px = obj.usd, ch = obj.usd_24h_change || 0;
+      items.push({sym:c.sym, px:px>100?px.toLocaleString('en',{maximumFractionDigits:2}):px.toFixed(4), chg:(ch>=0?'+':'')+ch.toFixed(2)+'%', up:ch>=0});
     });
   }
-  if (fx.status === 'fulfilled' && fx.value && fx.value.rates) {
-    const r = fx.value.rates;
-    // open.er-api: rates are USD→X, so EUR/USD = 1/r.EUR
-    if (r.EUR) items.push({sym:'EUR/USD', px:(1/r.EUR).toFixed(4), chg:'', up:true});
-    if (r.GBP) items.push({sym:'GBP/USD', px:(1/r.GBP).toFixed(4), chg:'', up:true});
-    if (r.JPY) items.push({sym:'USD/JPY', px:r.JPY.toFixed(2),      chg:'', up:true});
-    if (r.CNY) items.push({sym:'USD/CNY', px:r.CNY.toFixed(4),      chg:'', up:true});
+  if (results[1].status === 'fulfilled' && results[1].value && results[1].value.rates) {
+    var r = results[1].value.rates;
+    if (r.EUR) items.push({sym:'EUR/USD',px:(1/r.EUR).toFixed(4),chg:'',up:true});
+    if (r.GBP) items.push({sym:'GBP/USD',px:(1/r.GBP).toFixed(4),chg:'',up:true});
+    if (r.JPY) items.push({sym:'USD/JPY',px:r.JPY.toFixed(2),chg:'',up:true});
+    if (r.CNY) items.push({sym:'USD/CNY',px:r.CNY.toFixed(4),chg:'',up:true});
   }
-  items.push({sym:'GOLD',px:'2,341',chg:'+0.64%',up:true},{sym:'OIL (WTI)',px:'82.14',chg:'-1.20%',up:false});
+  items.push({sym:'GOLD',px:'2,341',chg:'+0.64%',up:true},{sym:'OIL',px:'82.14',chg:'-1.20%',up:false});
   tickerData = items;
   renderTicker();
 }
 
-// Simulated flights (OpenSky blocks GitHub Pages CORS)
+// Simulated flight positions (OpenSky blocks GitHub Pages CORS)
 function getFlightPoints() {
-  const now = Date.now();
+  var now = Date.now();
   return FLIGHT_ROUTES.map(function(r, i) {
-    const t = ((now / 1000 / 3600 + i * 1.3) % 12) / 12;
+    var t = ((now / 1000 / 3600 + i * 1.3) % 12) / 12;
     return {lat: r.sLat + (r.dLat - r.sLat) * t, lng: r.sLng + (r.dLng - r.sLng) * t, label: r.s + '-' + r.d};
   });
 }
@@ -566,26 +683,16 @@ function getFlightPoints() {
 // GLOBE
 // =============================================================================
 function initGlobe() {
-  globe = Globe({animateIn: false})
+  globe = Globe({animateIn:false})
     .globeImageUrl('//unpkg.com/three-globe/example/img/earth-night.jpg')
     .bumpImageUrl('//unpkg.com/three-globe/example/img/earth-topology.png')
     .backgroundImageUrl('//unpkg.com/three-globe/example/img/night-sky.png')
-    .showAtmosphere(true)
-    .atmosphereColor('#1e3a8a')
-    .atmosphereAltitude(0.18)
-    .htmlElementsData([])
-    .htmlElement(function(d){return buildMarker(d);})
-    .htmlLat(function(d){return d.lat;})
-    .htmlLng(function(d){return d.lng;})
-    .htmlAltitude(0.01)
-    .pointsData([])
-    .pointLat(function(d){return d.lat;})
-    .pointLng(function(d){return d.lng;})
-    .pointColor(function(){return '#10b981';})
-    .pointAltitude(0.004)
-    .pointRadius(0.22)
+    .showAtmosphere(true).atmosphereColor('#1e3a8a').atmosphereAltitude(0.18)
+    .htmlElementsData([]).htmlElement(function(d){return buildMarker(d);})
+    .htmlLat(function(d){return d.lat;}).htmlLng(function(d){return d.lng;}).htmlAltitude(0.01)
+    .pointsData([]).pointLat(function(d){return d.lat;}).pointLng(function(d){return d.lng;})
+    .pointColor(function(){return '#10b981';}).pointAltitude(0.004).pointRadius(0.22)
     (document.getElementById('globe-wrap'));
-
   globe.width(window.innerWidth).height(window.innerHeight);
   window.addEventListener('resize', function(){globe.width(window.innerWidth).height(window.innerHeight);});
   globe.controls().autoRotate = true;
@@ -595,81 +702,78 @@ function initGlobe() {
 }
 
 function buildMarker(d) {
-  const el = document.createElement('div');
+  var el = document.createElement('div');
   el.className = 'marker' + (d.severity >= 4 ? ' sev5' : '');
-  el.style.cssText = '--mc:' + (COLORS[d.type] || '#fff') + ';width:22px;height:22px;cursor:pointer';
+  el.style.cssText = '--mc:' + (COLORS[d.type]||'#fff') + ';width:22px;height:22px;cursor:pointer';
   el.title = d.title;
-  const delay = (Math.random() * 2).toFixed(2);
-  el.innerHTML = '<div class="m-ring" style="animation-delay:' + delay + 's"></div><div class="m-ring m-ring2" style="animation-delay:' + (+delay+.9).toFixed(2) + 's"></div><div class="m-dot"></div>';
+  var delay = (Math.random()*2).toFixed(2);
+  el.innerHTML = '<div class="m-ring" style="animation-delay:'+delay+'s"></div><div class="m-ring m-ring2" style="animation-delay:'+(+delay+.9).toFixed(2)+'s"></div><div class="m-dot"></div>';
   el.addEventListener('click', function(e){e.stopPropagation(); selectEvent(d.id);});
   return el;
 }
 
 function refreshGlobe() {
-  const visEvs = getFiltered().filter(function(e){return layerVis[e.type];});
+  var visEvs = getFiltered().filter(function(e){return layerVis[e.type];});
   globe.htmlElementsData(visEvs);
-  if (layerVis.flight) {
-    flightPoints = getFlightPoints();
-    globe.pointsData(flightPoints);
-  } else {
-    globe.pointsData([]);
-  }
+  flightPoints = layerVis.flight ? getFlightPoints() : [];
+  globe.pointsData(flightPoints);
 }
 
 // =============================================================================
 // FILTER / LIST
 // =============================================================================
 function getFiltered() {
-  let evs = allEvents;
-  if (currentTab !== 'all') evs = evs.filter(function(e){return e.type === currentTab;});
+  var evs = allEvents;
+  if (currentTab !== 'all') evs = evs.filter(function(e){return e.type===currentTab;});
   if (searchQ) {
-    const q = searchQ.toLowerCase();
+    var q = searchQ.toLowerCase();
     evs = evs.filter(function(e){
-      return e.title.toLowerCase().indexOf(q) !== -1 ||
-             e.location.toLowerCase().indexOf(q) !== -1 ||
-             (e.tags || []).some(function(t){return t.toLowerCase().indexOf(q) !== -1;});
+      return e.title.toLowerCase().indexOf(q)!==-1 ||
+             e.location.toLowerCase().indexOf(q)!==-1 ||
+             (e.tags||[]).some(function(t){return t.toLowerCase().indexOf(q)!==-1;});
     });
   }
   return evs.sort(function(a,b){return (b.severity||0)-(a.severity||0);});
 }
 
 function renderList() {
-  const evs = getFiltered();
+  var evs = getFiltered();
   document.getElementById('ph-count').textContent = evs.length + ' events';
   ['news','conflict','disaster','storm','humanitarian','tech','fashion','astrology','launch'].forEach(function(t){
-    const el = document.getElementById('lc-' + t);
-    if (el) el.textContent = allEvents.filter(function(e){return e.type===t;}).length || '–';
+    var el = document.getElementById('lc-'+t);
+    if (el) el.textContent = allEvents.filter(function(e){return e.type===t;}).length || '\u2013';
   });
   document.getElementById('lc-flight').textContent = FLIGHT_ROUTES.length;
   document.getElementById('t-summary').textContent =
-    allEvents.length + ' events · ' + allEvents.filter(function(e){return e.type==='conflict';}).length + ' conflicts · ' +
-    allEvents.filter(function(e){return e.type==='disaster';}).length + ' disasters · ' + FLIGHT_ROUTES.length + ' flights';
+    allEvents.length + ' events \u00b7 ' + allEvents.filter(function(e){return e.type==='conflict';}).length + ' conflicts \u00b7 ' +
+    allEvents.filter(function(e){return e.type==='disaster';}).length + ' disasters \u00b7 ' + FLIGHT_ROUTES.length + ' flights';
 
-  const list = document.getElementById('evlist');
+  var list = document.getElementById('evlist');
   if (!evs.length) { list.innerHTML = '<div class="ev-empty">No events match your filters</div>'; return; }
 
   if (currentTab === 'astrology') {
     list.innerHTML = '<div class="astro-grid">' + evs.map(function(ev){
-      const p = ev._planet || {};
-      const snip = ev.brief ? ev.brief.replace(/\n/g,' ').slice(0,70) + '…' : '';
-      return '<div class="astro-card' + (ev.id===selectedId?' sel':'') + '" id="ev-' + ev.id + '" onclick="selectEvent(\'' + ev.id + '\')">' +
-        '<div class="astro-sign">' + (p.name||ev.title) + '</div>' +
-        '<div class="astro-site">' + ev.location + '</div>' +
-        '<div class="astro-snip">' + snip + '</div></div>';
-    }).join('') + '</div>';
+      var p = ev._planet || {};
+      var snip = ev.brief ? ev.brief.replace(/\n/g,' ').slice(0,70)+'…' : '';
+      return '<div class="astro-card'+(ev.id===selectedId?' sel':'')+'" id="ev-'+ev.id+'" onclick="selectEvent(\''+ev.id+'\')">' +
+        '<div class="astro-sign">'+(p.name||ev.title)+'</div>' +
+        '<div class="astro-site">'+ev.location+'</div>' +
+        '<div class="astro-snip">'+snip+'</div></div>';
+    }).join('')+'</div>';
     return;
   }
 
   list.innerHTML = evs.map(function(ev){
-    const c = COLORS[ev.type] || '#fff';
-    const ico = ICONS[ev.type] || '●';
-    const warn = ev._live ? '' : ' <span style="font-size:8px;color:var(--muted)" title="Fallback data">⚠</span>';
-    return '<div class="ev' + (ev.id===selectedId?' sel':'') + '" id="ev-' + ev.id + '" onclick="selectEvent(\'' + ev.id + '\')">' +
-      '<div class="ev-row"><div class="ev-ico">' + ico + '</div><div class="ev-body">' +
-      '<div class="ev-name">' + (ev.url ? '<a href="' + ev.url + '" target="_blank" style="color:inherit;text-decoration:none;border-bottom:1px solid rgba(255,255,255,0.12)" onclick="event.stopPropagation()">' + ev.title + '</a>' : ev.title) + warn + '</div>' +
-      '<div class="ev-foot"><span class="ev-tag" style="background:' + c + '1a;color:' + c + '">' + ev.type.toUpperCase() + '</span>' +
-      '<span class="ev-loc">' + ev.location + '</span>' +
-      '<span class="ev-age">' + ev.age + '</span></div></div></div></div>';
+    var c = COLORS[ev.type]||'#fff', ico = ICONS[ev.type]||'\u25cf';
+    var titleHtml = ev.url
+      ? '<a href="'+ev.url+'" target="_blank" onclick="event.stopPropagation()">'+ev.title+'</a>'
+      : ev.title;
+    return '<div class="ev'+(ev.id===selectedId?' sel':'')+'" id="ev-'+ev.id+'" onclick="selectEvent(\''+ev.id+'\')">' +
+      '<div class="ev-row"><div class="ev-ico">'+ico+'</div><div class="ev-body">' +
+      '<div class="ev-name">'+titleHtml+'</div>' +
+      '<div class="ev-foot"><span class="ev-tag" style="background:'+c+'1a;color:'+c+'">'+ev.type.toUpperCase()+'</span>' +
+      '<span class="ev-loc">'+ev.location+'</span>' +
+      '<span class="ev-age">'+ev.age+'</span></div></div></div></div>';
   }).join('');
 }
 
@@ -678,53 +782,52 @@ function renderList() {
 // =============================================================================
 function selectEvent(id) {
   selectedId = id;
-  const ev = allEvents.find(function(e){return e.id===id;});
+  var ev = allEvents.find(function(e){return e.id===id;});
   if (!ev) return;
   globe.controls().autoRotate = false;
   globe.pointOfView({lat:ev.lat,lng:ev.lng,altitude:1.6}, 1200);
   setTimeout(function(){globe.controls().autoRotate=true;}, 6000);
   document.querySelectorAll('.ev,.astro-card').forEach(function(el){el.classList.remove('sel');});
-  const listEl = document.getElementById('ev-'+id);
+  var listEl = document.getElementById('ev-'+id);
   if (listEl) listEl.classList.add('sel');
 
-  const c = COLORS[ev.type] || '#fff';
-  const ico = ICONS[ev.type] || '●';
-  const liveLabel = ev._live ? '<span class="ds-badge ds-live">LIVE</span>' : '<span class="ds-badge ds-fallback">CACHED</span>';
-  const statsHtml = (ev.stats || []).length ?
-    '<div class="d-stats">' + ev.stats.map(function(s){return '<div class="d-stat"><div class="d-stat-lbl">' + s.label + '</div><div class="d-stat-val" style="color:' + c + '">' + s.val + '</div></div>';}).join('') + '</div>' : '';
-  const srcsHtml = (ev.sources || []).map(function(s){
-    return '<div class="d-src"><div class="d-src-dot" style="background:' + c + '"></div><span class="d-src-name">' + s.n + '</span>' +
-      (s.url ? '<a class="d-src-link" href="' + s.url + '" target="_blank">&#x2197;</a>' : '') +
-      '<span class="d-src-age">' + s.a + '</span></div>';
-  }).join('') || '<div class="d-src" style="color:var(--muted);font-size:11px">No sources listed</div>';
-  const tagsHtml = (ev.tags || []).map(function(t){return '<span class="d-tag-pill">' + t + '</span>';}).join('');
+  var c = COLORS[ev.type]||'#fff', ico = ICONS[ev.type]||'\u25cf';
+  var liveLabel = ev._live ? '<span class="ds-badge ds-live">LIVE</span>' : '<span class="ds-badge ds-fallback">CACHED</span>';
+  var statsHtml = (ev.stats||[]).length ? '<div class="d-stats">'+(ev.stats.map(function(s){
+    return '<div class="d-stat"><div class="d-stat-lbl">'+s.label+'</div><div class="d-stat-val" style="color:'+c+'">'+s.val+'</div></div>';
+  }).join(''))+'</div>' : '';
+  var srcsHtml = (ev.sources||[]).map(function(s){
+    return '<div class="d-src"><div class="d-src-dot" style="background:'+c+'"></div><span class="d-src-name">'+s.n+'</span>' +
+      (s.url?'<a class="d-src-link" href="'+s.url+'" target="_blank">&#x2197;</a>':'') +
+      '<span class="d-src-age">'+s.a+'</span></div>';
+  }).join('') || '<div class="d-src" style="color:var(--muted)">No sources</div>';
+  var tagsHtml = (ev.tags||[]).map(function(t){return '<span class="d-tag-pill">'+t+'</span>';}).join('');
 
   if (ev.type === 'astrology' && ev._planet) {
-    const p = ev._planet;
+    var p = ev._planet;
     document.getElementById('d-body').innerHTML =
       '<div style="text-align:center;padding:10px 0 4px">' +
-      '<div style="font-size:38px;margin-bottom:6px">' + p.emoji + '</div>' +
-      '<div style="font-size:20px;font-weight:700;color:var(--col-astrology)">' + p.name + '</div>' +
-      '<div style="font-size:10px;color:var(--muted);margin-top:3px">&#128205; ' + ev.location + '</div>' +
-      liveLabel + '</div><div class="d-sep"></div>' +
-      statsHtml +
+      '<div style="font-size:36px;margin-bottom:6px">'+(p.emoji||'')+'</div>' +
+      '<div style="font-size:20px;font-weight:700;color:var(--col-astrology)">'+p.name+'</div>' +
+      '<div style="font-size:10px;color:var(--muted);margin-top:3px">'+ev.location+'</div>' +
+      liveLabel+'</div><div class="d-sep"></div>'+statsHtml+
       '<div class="d-lbl">Current Position</div>' +
-      '<div class="d-brief">' + ev.brief.replace(/\n/g,'<br>') + '</div>' +
-      '<div class="d-sep"></div><div class="d-lbl">Source</div>' + srcsHtml +
-      '<div class="d-sep"></div><div class="d-lbl">Tags</div><div class="d-tags">' + tagsHtml + '</div>';
+      '<div class="d-brief">'+ev.brief.replace(/\n/g,'<br>')+'</div>' +
+      '<div class="d-sep"></div><div class="d-lbl">Source</div>'+srcsHtml+
+      '<div class="d-sep"></div><div class="d-lbl">Tags</div><div class="d-tags">'+tagsHtml+'</div>';
     document.getElementById('detail').classList.add('open');
     return;
   }
 
   document.getElementById('d-body').innerHTML =
-    '<div class="d-cat" style="color:' + c + '">' + ico + '&nbsp;&nbsp;' + ev.type.toUpperCase() + ' ' + liveLabel + '</div>' +
-    '<div class="d-title">' + ev.title + '</div>' +
-    '<div class="d-where">&#128205; ' + ev.location + '&nbsp;&middot;&nbsp;<span style="color:var(--muted)">' + ev.age + '</span></div>' +
-    statsHtml +
+    '<div class="d-cat" style="color:'+c+'">'+ico+' '+ev.type.toUpperCase()+' '+liveLabel+'</div>' +
+    '<div class="d-title">'+ev.title+'</div>' +
+    '<div class="d-where">\uD83D\uDCCD '+ev.location+' &middot; <span style="color:var(--muted)">'+ev.age+'</span></div>' +
+    statsHtml+
     '<div class="d-lbl">Brief</div>' +
-    '<div class="d-brief">' + (ev.brief || 'No details.').replace(/\n/g,'<br>') + '</div>' +
-    '<div class="d-sep"></div><div class="d-lbl">Sources</div>' + srcsHtml +
-    '<div class="d-sep"></div><div class="d-lbl">Tags</div><div class="d-tags">' + tagsHtml + '</div>';
+    '<div class="d-brief">'+(ev.brief||'No details.').replace(/\n/g,'<br>')+'</div>' +
+    '<div class="d-sep"></div><div class="d-lbl">Sources</div>'+srcsHtml+
+    '<div class="d-sep"></div><div class="d-lbl">Tags</div><div class="d-tags">'+tagsHtml+'</div>';
   document.getElementById('detail').classList.add('open');
 }
 
@@ -737,68 +840,27 @@ function closeDetail() {
 // =============================================================================
 // UI CONTROLS
 // =============================================================================
-function setTab(el) {
-  document.querySelectorAll('.tab').forEach(function(t){t.classList.remove('on');});
-  el.classList.add('on'); currentTab = el.dataset.tab; renderList(); refreshGlobe();
-}
-function onSearch() {
-  searchQ = document.getElementById('sinput').value.trim();
-  if (searchQ) document.querySelectorAll('.wl-tag').forEach(function(t){t.classList.remove('on');});
-  renderList(); refreshGlobe();
-}
-function toggleLayer(el) {
-  const l = el.dataset.layer; layerVis[l] = !layerVis[l];
-  el.classList.toggle('off', !layerVis[l]); refreshGlobe();
-}
-function togglePanel() {
-  panelOpen = !panelOpen;
-  document.getElementById('panel').classList.toggle('hidden', !panelOpen);
-  const t = document.getElementById('ptoggle');
-  t.innerHTML = panelOpen ? '&#8249;' : '&#8250;';
-  t.classList.toggle('closed', !panelOpen);
-  t.style.left = panelOpen ? '300px' : '0';
-}
-function renderWatchlist() {
-  document.getElementById('wl-tags').innerHTML = watchTags.map(function(t){
-    return '<div class="wl-tag" onclick="watchFilter(\'' + t + '\')">' + t + '</div>';
-  }).join('');
-}
-function watchFilter(tag) {
-  const inp = document.getElementById('sinput');
-  const active = inp.value === tag;
-  inp.value = active ? '' : tag; searchQ = active ? '' : tag;
-  document.querySelectorAll('.wl-tag').forEach(function(el){el.classList.toggle('on', el.textContent===tag&&!active);});
-  renderList(); refreshGlobe();
-}
-function addWatchTag() {
-  const t = prompt('Add topic to watchlist:');
-  if (t && t.trim()) { watchTags.push(t.trim()); renderWatchlist(); }
-}
-function renderTicker() {
-  const items = tickerData.concat(tickerData);
-  document.getElementById('tk-inner').innerHTML = items.map(function(d){
-    return '<div class="tk-item"><span class="tk-sym">' + d.sym + '</span><span class="tk-px">' + d.px + '</span>' +
-      (d.chg ? '<span class="' + (d.up?'tk-up':'tk-dn') + '">' + d.chg + '</span>' : '') + '</div><span class="tk-div">|</span>';
-  }).join('');
-}
-function tickClock() {
-  document.getElementById('t-clock').textContent = new Date().toISOString().replace('T',' ').substring(0,19) + ' UTC';
-}
+function setTab(el){document.querySelectorAll('.tab').forEach(function(t){t.classList.remove('on');});el.classList.add('on');currentTab=el.dataset.tab;renderList();refreshGlobe();}
+function onSearch(){searchQ=document.getElementById('sinput').value.trim();if(searchQ)document.querySelectorAll('.wl-tag').forEach(function(t){t.classList.remove('on');});renderList();refreshGlobe();}
+function toggleLayer(el){var l=el.dataset.layer;layerVis[l]=!layerVis[l];el.classList.toggle('off',!layerVis[l]);refreshGlobe();}
+function togglePanel(){panelOpen=!panelOpen;document.getElementById('panel').classList.toggle('hidden',!panelOpen);var t=document.getElementById('ptoggle');t.innerHTML=panelOpen?'&#8249;':'&#8250;';t.classList.toggle('closed',!panelOpen);t.style.left=panelOpen?'300px':'0';}
+function renderWatchlist(){document.getElementById('wl-tags').innerHTML=watchTags.map(function(t){return '<div class="wl-tag" onclick="watchFilter(\''+t+'\')">'+t+'</div>';}).join('');}
+function watchFilter(tag){var inp=document.getElementById('sinput');var active=inp.value===tag;inp.value=active?'':tag;searchQ=active?'':tag;document.querySelectorAll('.wl-tag').forEach(function(el){el.classList.toggle('on',el.textContent===tag&&!active);});renderList();refreshGlobe();}
+function addWatchTag(){var t=prompt('Add topic to watchlist:');if(t&&t.trim()){watchTags.push(t.trim());renderWatchlist();}}
+function renderTicker(){var items=tickerData.concat(tickerData);document.getElementById('tk-inner').innerHTML=items.map(function(d){return '<div class="tk-item"><span class="tk-sym">'+d.sym+'</span><span class="tk-px">'+d.px+'</span>'+(d.chg?'<span class="'+(d.up?'tk-up':'tk-dn')+'">'+d.chg+'</span>':'')+'</div><span class="tk-div">|</span>';}).join('');}
+function tickClock(){document.getElementById('t-clock').textContent=new Date().toISOString().replace('T',' ').substring(0,19)+' UTC';}
 
 // =============================================================================
 // INIT
 // =============================================================================
-function splash(pct, msg) {
-  document.getElementById('sfill').style.width = pct + '%';
-  document.getElementById('smsg').textContent = msg;
-}
+function splash(pct,msg){document.getElementById('sfill').style.width=pct+'%';document.getElementById('smsg').textContent=msg;}
 
 async function loadLiveData() {
   splash(12, 'USGS Earthquakes + Launches…');
-  const [usgs, launches] = await Promise.allSettled([fetchUSGS(), fetchLaunches()]);
+  var phase1 = await Promise.allSettled([fetchUSGS(), fetchLaunches()]);
 
-  splash(35, 'GDELT World News (10 regions)…');
-  const [gdeltNews, gdeltConflicts, gdeltStorms, hnTech, fashionNews] = await Promise.allSettled([
+  splash(35, 'Guardian News + HN Tech…');
+  var phase2 = await Promise.allSettled([
     fetchMultiSourceNews(),
     fetchGuardian('world', 'conflict OR war OR attack OR military', 'conflict', 10),
     fetchGuardian('world', 'hurricane OR cyclone OR typhoon OR storm OR tornado', 'storm', 8),
@@ -807,46 +869,31 @@ async function loadLiveData() {
   ]);
 
   splash(65, 'Sky data + Markets…');
-  const [skyData] = await Promise.allSettled([fetchSkyData()]);
+  var phase3 = await Promise.allSettled([fetchSkyData()]);
   try { await fetchMarkets(); } catch(_) {}
 
-  // Assemble
-  const disasters = dedupeByTitle(
-    (usgs.status === 'fulfilled' ? usgs.value : SEEDS.disaster)
-  ).slice(0, 30);
+  var usgs     = phase1[0], launches = phase1[1];
+  var newsR    = phase2[0], conflR   = phase2[1], stormR = phase2[2], hnR = phase2[3], fashR = phase2[4];
+  var skyR     = phase3[0];
 
-  const conflicts = dedupeByTitle([
-    ...(gdeltConflicts.status === 'fulfilled' && gdeltConflicts.value.length ? gdeltConflicts.value : []),
-    ...SEEDS.conflict
-  ]).slice(0, 12);
+  var disasters   = dedupeByTitle(usgs.status==='fulfilled' ? usgs.value : []).slice(0,30);
+  var conflicts   = dedupeByTitle((conflR.status==='fulfilled'&&conflR.value.length ? conflR.value : []).concat(SEEDS.conflict)).slice(0,12);
+  var storms      = dedupeByTitle(stormR.status==='fulfilled'&&stormR.value.length ? stormR.value : []).slice(0,10);
+  var newsEvs     = newsR.status==='fulfilled' && newsR.value.length ? newsR.value : [];
+  var techEvs     = hnR.status==='fulfilled' && hnR.value.length ? hnR.value : [];
+  var fashionEvs  = fashR.status==='fulfilled' && fashR.value.length ? fashR.value : [];
+  var astroEvs    = skyR.status==='fulfilled' ? skyR.value : computeSkyEvents();
+  var launchEvs   = launches.status==='fulfilled' ? launches.value : FALLBACK_LAUNCHES;
 
-  const storms = dedupeByTitle(
-    gdeltStorms.status === 'fulfilled' && gdeltStorms.value.length ? gdeltStorms.value : SEEDS.storm
-  ).slice(0, 10);
+  allEvents = [].concat(newsEvs, conflicts, disasters, storms, SEEDS.humanitarian, techEvs, fashionEvs, astroEvs, launchEvs);
 
-  const newsEvs = gdeltNews.status === 'fulfilled' && gdeltNews.value.length ? gdeltNews.value : [];
-
-  const techEvs = hnTech.status === 'fulfilled' && hnTech.value.length ? hnTech.value : SEEDS.tech;
-
-  const fashionEvs = fashionNews.status === 'fulfilled' && fashionNews.value.length ? fashionNews.value : SEEDS.fashion;
-
-  const astroEvs = skyData.status === 'fulfilled' ? skyData.value : [];
-
-  const launchEvs = launches.status === 'fulfilled' ? launches.value : FALLBACK_LAUNCHES;
-
-  allEvents = [
-    ...newsEvs, ...conflicts, ...disasters, ...storms,
-    ...SEEDS.humanitarian, ...techEvs, ...fashionEvs, ...astroEvs, ...launchEvs
-  ];
-
-  // Layer status dots
   setLayerStatus('disaster',    usgs.status==='fulfilled'?'on':'fb');
-  setLayerStatus('conflict',    gdeltConflicts.status==='fulfilled'&&gdeltConflicts.value.length?'on':'fb');
-  setLayerStatus('storm',       gdeltStorms.status==='fulfilled'&&gdeltStorms.value.length?'on':'fb');
-  setLayerStatus('news',        gdeltNews.status==='fulfilled'&&gdeltNews.value.length?'on':'fb');
-  setLayerStatus('tech',        hnTech.status==='fulfilled'&&hnTech.value.length?'on':'fb');
-  setLayerStatus('fashion',     fashionNews.status==='fulfilled'&&fashionNews.value.length?'on':'fb');
-  setLayerStatus('astrology',   skyData.status==='fulfilled'?'on':'fb');
+  setLayerStatus('conflict',    conflR.status==='fulfilled'&&conflR.value.length?'on':'fb');
+  setLayerStatus('storm',       stormR.status==='fulfilled'&&stormR.value.length?'on':'fb');
+  setLayerStatus('news',        newsR.status==='fulfilled'&&newsR.value.length?'on':'fb');
+  setLayerStatus('tech',        hnR.status==='fulfilled'&&hnR.value.length?'on':'fb');
+  setLayerStatus('fashion',     fashR.status==='fulfilled'&&fashR.value.length?'on':'fb');
+  setLayerStatus('astrology',   'on');
   setLayerStatus('launch',      launches.status==='fulfilled'?'on':'fb');
   setLayerStatus('humanitarian','fb');
   setLayerStatus('flight',      'fb');
@@ -861,14 +908,12 @@ async function init() {
   splash(100, 'Systems nominal');
   setTimeout(function(){
     document.getElementById('splash').classList.add('out');
-    setTimeout(function(){const s=document.getElementById('splash');if(s)s.remove();}, 700);
-  }, 500);
+    setTimeout(function(){var s=document.getElementById('splash');if(s)s.remove();},700);
+  },500);
   tickClock();
   setInterval(tickClock, 1000);
   setInterval(fetchMarkets, 60000);
-  // Refresh flights animation every 30s
   setInterval(refreshGlobe, 30000);
-  // Full data refresh every 5 min
   setInterval(async function(){await loadLiveData();renderList();refreshGlobe();}, 5*60*1000);
 }
 
