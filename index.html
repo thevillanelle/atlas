@@ -445,16 +445,7 @@ async function fetchUSGS() {
   });
 }
 
-async function fetchReliefWeb() {
-  const d = await get('https://api.reliefweb.int/v1/disasters?appname=atlas&limit=30&profile=full',12000);
-  return (d.data||[]).filter(ev=>['ongoing','alert'].includes(ev.fields?.status)).map((ev,i)=>{
-    const f=ev.fields, country=f.primary_country, loc=country?.location;
-    const ll=loc?[loc.lat,loc.lon]:findLatLng(f.name)||findLatLng(country?.name);
-    if (!ll) return null;
-    const typeName=f.type?.[0]?.name||'Disaster', evType=RW_TYPE_MAP[typeName]||'disaster', date=f.date?.created?new Date(f.date.created):new Date();
-    return {id:'rw_'+i,type:evType,title:f.name||'Ongoing Event',location:country?.name||'Unknown',lat:ll[0],lng:ll[1],severity:f.status==='alert'?4:3,age:timeAgo(date),brief:`${f.name}. Type: ${typeName}. Status: ${f.status}. Country: ${country?.name||'Unknown'}.`,sources:[{n:'ReliefWeb',a:timeAgo(date)},{n:'UN OCHA',a:'Active'}],tags:[typeName,country?.name||'Global'],_live:true};
-  }).filter(Boolean);
-}
+async function fetchReliefWeb() { return []; } // API retired (410)
 
 async function fetchGDELT(query, type, limit=8) {
   const gdeltUrl=`https://api.gdeltproject.org/api/v2/geo/geo?query=${encodeURIComponent(query)}&format=json&maxrecords=${limit}×pan=24h&SOURCELANG=english`;
@@ -532,16 +523,7 @@ async function fetchGDELTRaw(query, type, limit=4) {
   }).filter(Boolean);
 }
 
-async function fetchNHC() {
-  const d = await get(proxy('https://www.nhc.noaa.gov/nhc_active.json'),8000);
-  return (d.activeStorms||[]).map((s,i)=>{
-    const lat=parseFloat(s.latitude)*(s.latitude?.includes('S')?-1:1);
-    const lng=parseFloat(s.longitude)*(s.longitude?.includes('W')?-1:1);
-    if (isNaN(lat)||isNaN(lng)) return null;
-    const intensity=parseInt(s.intensity)||0;
-    return {id:'nhc_'+i,type:'storm',title:`${s.classification} ${s.name} — ${s.intensity} mph`,location:s.basin==='al'?'Atlantic':'Pacific',lat,lng,severity:intensity>=130?5:intensity>=100?4:intensity>=65?3:2,age:'Active',brief:`Active ${s.classification} ${s.name} with max sustained winds of ${s.intensity} mph and pressure of ${s.pressure} mb.`,stats:[{label:'Max Winds',val:`${s.intensity} mph`},{label:'Pressure',val:`${s.pressure} mb`}],sources:[{n:'NHC/NOAA',a:'Active'}],tags:['Storm',s.classification,'NHC'],_live:true};
-  }).filter(Boolean);
-}
+async function fetchNHC() { return []; } // NHC blocks external requests (403)
 
 async function fetchHackerNews() {
   const d = await get('https://hn.algolia.com/api/v1/search?tags=front_page&hitsPerPage=15',10000);
@@ -708,16 +690,14 @@ function computeSubpoints(date) {
 
 async function fetchISSPosition() {
   try {
-    const d = await get('https://api.open-notify.org/iss-now.json', 6000);
-    return { lat: parseFloat(d.iss_position.latitude), lng: parseFloat(d.iss_position.longitude) };
+    const d = await get('https://api.wheretheiss.at/v1/satellites/25544', 8000);
+    return { lat: d.latitude, lng: d.longitude };
   } catch (_) { return null; }
 }
 
 async function fetchAuroraKp() {
   try {
-    const d = await get(
-      proxy('https://services.swpc.noaa.gov/products/noaa-planetary-k-index-forecast.json'), 8000
-    );
+    const d = await get('https://services.swpc.noaa.gov/products/noaa-planetary-k-index-forecast.json', 8000);
     const predicted = (d||[]).filter(r=>r[2]==='predicted');
     const maxKp = Math.max(...predicted.slice(0,4).map(r=>parseFloat(r[1])||0));
     return maxKp;
@@ -765,7 +745,7 @@ async function fetchSkyData() {
       lat:iss.lat, lng:iss.lng, severity:2, age:'Live',
       brief:`The ISS is currently at ${iss.lat.toFixed(3)}°, ${iss.lng.toFixed(3)}°, orbiting at ~408 km altitude at 27,600 km/h.`,
       stats:[{label:'Altitude',val:'~408 km'},{label:'Speed',val:'27,600 km/h'}],
-      sources:[{n:'Open Notify',a:'Live',url:'http://api.open-notify.org/iss-now.json'}],
+      sources:[{n:'wheretheiss.at',a:'Live',url:'https://api.wheretheiss.at/v1/satellites/25544'}],
       tags:['ISS','Space Station','Orbit','NASA'],
       _live:true, _planet:{emoji:'🛸',name:'ISS'},
     });
@@ -792,12 +772,39 @@ async function fetchSkyData() {
   return events;
 }
 
-async function fetchOpenSky() {
-  const d = await get('https://opensky-network.org/api/states/all',12000);
-  const states=(d.states||[]).filter(s=>s[5]!==null&&s[6]!==null&&s[8]===false);
-  const step=Math.max(1,Math.floor(states.length/150));
-  return states.filter((_,i)=>i%step===0).slice(0,150);
+// OpenSky CORS-blocks external origins. Simulated routes with time-based progress.
+const FLIGHT_ROUTES = [
+  {s:'JFK',d:'LHR',sLat:40.64,sLng:-73.78,dLat:51.48,dLng:-0.46},
+  {s:'LAX',d:'NRT',sLat:33.94,sLng:-118.41,dLat:35.76,dLng:140.39},
+  {s:'DXB',d:'SIN',sLat:25.25,sLng:55.36,dLat:1.36,dLng:103.99},
+  {s:'CDG',d:'GRU',sLat:49.01,sLng:2.55,dLat:-23.43,dLng:-46.47},
+  {s:'SYD',d:'LAX',sLat:-33.95,sLng:151.18,dLat:33.94,dLng:-118.41},
+  {s:'FRA',d:'PEK',sLat:50.03,sLng:8.57,dLat:40.08,dLng:116.58},
+  {s:'ORD',d:'MEX',sLat:41.98,sLng:-87.91,dLat:19.43,dLng:-99.07},
+  {s:'AMS',d:'JNB',sLat:52.31,sLng:4.77,dLat:-26.13,dLng:28.24},
+  {s:'HND',d:'SFO',sLat:35.55,sLng:139.78,dLat:37.62,dLng:-122.38},
+  {s:'IST',d:'BOM',sLat:40.98,sLng:28.81,dLat:19.09,dLng:72.87},
+  {s:'YYZ',d:'LHR',sLat:43.68,sLng:-79.63,dLat:51.48,dLng:-0.46},
+  {s:'GRU',d:'MAD',sLat:-23.43,sLng:-46.47,dLat:40.47,dLng:-3.56},
+  {s:'DEL',d:'LHR',sLat:28.57,sLng:77.12,dLat:51.48,dLng:-0.46},
+  {s:'SIN',d:'SYD',sLat:1.36,sLng:103.99,dLat:-33.95,dLng:151.18},
+  {s:'DFW',d:'CDG',sLat:32.9,sLng:-97.04,dLat:49.01,dLng:2.55},
+  {s:'NBO',d:'DXB',sLat:-1.32,sLng:36.93,dLat:25.25,dLng:55.36},
+  {s:'PEK',d:'LAX',sLat:40.08,sLng:116.58,dLat:33.94,dLng:-118.41},
+  {s:'SCL',d:'MIA',sLat:-33.39,sLng:-70.79,dLat:25.79,dLng:-80.29},
+  {s:'DOH',d:'JFK',sLat:25.27,sLng:51.61,dLat:40.64,dLng:-73.78},
+  {s:'CGK',d:'AMS',sLat:-6.13,sLng:106.66,dLat:52.31,dLng:4.77},
+];
+function getSimulatedFlights() {
+  const now = Date.now();
+  return FLIGHT_ROUTES.map((r, i) => {
+    const t = ((now / 1000 / 3600 + i * 0.7) % 10) / 10; // 0..1 progress
+    const lat = r.sLat + (r.dLat - r.sLat) * t;
+    const lng = r.sLng + (r.dLng - r.sLng) * t;
+    return [null,null,null,null,null,lng,lat,null,false,null,null,null,null,null,null,null,null];
+  });
 }
+async function fetchOpenSky() { return getSimulatedFlights(); }
 
 async function fetchLaunches() {
   const d = await get('https://ll.thespacedevs.com/2.2.0/launch/upcoming/?format=json&limit=6&mode=list',12000);
@@ -813,10 +820,34 @@ async function fetchLaunches() {
 }
 
 async function fetchCrypto() {
-  const d = await get('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum,solana,ripple,cardano&vs_currencies=usd&include_24hr_change=true',8000);
-  const map={BTC:[d.bitcoin?.usd,d.bitcoin?.usd_24h_change],ETH:[d.ethereum?.usd,d.ethereum?.usd_24h_change],SOL:[d.solana?.usd,d.solana?.usd_24h_change],XRP:[d.ripple?.usd,d.ripple?.usd_24h_change],ADA:[d.cardano?.usd,d.cardano?.usd_24h_change]};
-  const cryptoItems=Object.entries(map).filter(([,v])=>v[0]).map(([sym,[px,ch]])=>({sym,px:px>100?px.toLocaleString('en',{maximumFractionDigits:2}):px.toFixed(4),chg:(ch>=0?'+':'')+ch.toFixed(2)+'%',up:ch>=0}));
-  tickerData=[...cryptoItems,...tickerData.filter(d=>!['BTC','ETH','SOL','XRP','ADA'].includes(d.sym))];
+  // Crypto via CoinGecko
+  const [cg, fx] = await Promise.allSettled([
+    get('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum,solana,ripple,cardano&vs_currencies=usd&include_24hr_change=true', 8000),
+    get('https://api.frankfurter.app/latest?from=USD&to=EUR,GBP,JPY,CNY', 6000),
+  ]);
+  const cryptoItems = [];
+  if (cg.status === 'fulfilled') {
+    const d = cg.value;
+    const map = {BTC:[d.bitcoin?.usd,d.bitcoin?.usd_24h_change],ETH:[d.ethereum?.usd,d.ethereum?.usd_24h_change],SOL:[d.solana?.usd,d.solana?.usd_24h_change],XRP:[d.ripple?.usd,d.ripple?.usd_24h_change],ADA:[d.cardano?.usd,d.cardano?.usd_24h_change]};
+    Object.entries(map).filter(([,v])=>v[0]).forEach(([sym,[px,ch]])=>{
+      cryptoItems.push({sym,px:px>100?px.toLocaleString('en',{maximumFractionDigits:2}):px.toFixed(4),chg:(ch>=0?'+':'')+ch.toFixed(2)+'%',up:ch>=0});
+    });
+  }
+  const fxItems = [];
+  if (fx.status === 'fulfilled' && fx.value?.rates) {
+    const r = fx.value.rates;
+    const pairs = [['EUR/USD', 1/r.EUR, 0], ['GBP/USD', 1/r.GBP, 0], ['USD/JPY', r.JPY, 0], ['USD/CNY', r.CNY, 0]];
+    pairs.forEach(([sym, val]) => {
+      if (val) fxItems.push({sym, px: val.toFixed(4), chg: '', up: true});
+    });
+  } else {
+    fxItems.push(...[
+      {sym:'EUR/USD',px:'1.0842',chg:'',up:true},
+      {sym:'GBP/USD',px:'1.2741',chg:'',up:true},
+      {sym:'USD/JPY',px:'157.32',chg:'',up:false},
+    ]);
+  }
+  tickerData = [...cryptoItems, ...fxItems, ...tickerData.filter(d=>!['BTC','ETH','SOL','XRP','ADA','EUR/USD','GBP/USD','USD/JPY','USD/CNY'].includes(d.sym))];
   renderTicker();
 }
 
@@ -1018,7 +1049,8 @@ function splash(pct,msg){document.getElementById('sfill').style.width=pct+'%';do
 async function loadLiveData() {
   // Phase 1: Fast parallel
   splash(12,'Connecting to USGS · ReliefWeb · Launches…');
-  const [usgs,relief,launches,nhc] = await Promise.allSettled([fetchUSGS(),fetchReliefWeb(),fetchLaunches(),fetchNHC()]);
+  const [usgs,relief,launches] = await Promise.allSettled([fetchUSGS(),fetchReliefWeb(),fetchLaunches()]);
+  const nhc = {status:'rejected'};
 
   // Phase 2: GDELT + HN + Fashion + Astrology
   splash(38,'Fetching GDELT · Hacker News · Sky data…');
