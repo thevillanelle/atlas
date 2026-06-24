@@ -449,7 +449,7 @@ async function fetchReliefWeb() { return []; } // API retired (410)
 
 async function fetchGDELT(query, type, limit=8) {
   const gdeltUrl=`https://api.gdeltproject.org/api/v2/geo/geo?query=${encodeURIComponent(query)}&format=json&maxrecords=${limit}×pan=24h&SOURCELANG=english`;
-  const d = await get(proxy(gdeltUrl),12000);
+  const d = await get(gdeltUrl, 12000);
   return dedupeByTitle((d.articles||[]).map((a,i)=>{
     const geo=a.geolocation; let lat,lng,locName;
     if (geo?.lat&&geo?.lon){lat=geo.lat;lng=geo.lon;locName=geo.fullname||geo.countrycode;}
@@ -511,7 +511,7 @@ async function fetchMultiSourceNews() {
 // Raw GDELT fetch that returns partial objects (no id, allows caller to assign)
 async function fetchGDELTRaw(query, type, limit=4) {
   const gdeltUrl=`https://api.gdeltproject.org/api/v2/geo/geo?query=${encodeURIComponent(query)}&format=json&maxrecords=${limit}×pan=24h&SOURCELANG=english`;
-  const d = await get(proxy(gdeltUrl),12000);
+  const d = await get(gdeltUrl, 12000);
   return (d.articles||[]).map((a)=>{
     const geo=a.geolocation; let lat,lng,locName;
     if (geo?.lat&&geo?.lon){lat=geo.lat;lng=geo.lon;locName=geo.fullname||geo.countrycode;}
