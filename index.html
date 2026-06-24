@@ -867,7 +867,7 @@ function initGlobe() {
 function buildMarker(d) {
   var el = document.createElement('div');
   el.className = 'marker' + (d.severity >= 4 ? ' sev5' : '') + (connectedIds.indexOf(d.id)!==-1?' csel':'');
-  el.style.cssText = '--mc:' + (COLORS[d.type]||'#fff') + ';width:22px;height:22px;cursor:pointer';
+  el.style.cssText = '--mc:' + (COLORS[d.type]||'#fff') + ';width:22px;height:22px;cursor:pointer;pointer-events:auto';
   el.setAttribute('data-id', d.id);
   el.title = d.title;
   var delay = (Math.random()*2).toFixed(2);
