@@ -465,6 +465,46 @@ function moonSubpoint(date) {
   return {lat: dec, lng: norm180(norm360(ra) - gmstDeg(date))};
 }
 
+// Returns [lng, lat] pairs tracing the night-side polygon for globe.polygonsData
+function getNightPolygon(date) {
+  var sun = sunSubpoint(date || new Date());
+  var slat = sun.lat * DEG;
+  var slng = sun.lng;
+  var coords = [];
+
+  // Walk every degree of longitude; solve for terminator latitude
+  for (var lng = -180; lng <= 180; lng++) {
+    var dlng = (lng - slng) * DEG;
+    var lat_rad;
+    if (Math.abs(sun.lat) < 0.5) {
+      // Near equinox — terminator runs roughly pole-to-pole at ±90° from sun
+      lat_rad = (Math.cos(dlng) >= 0 ? -1 : 1) * Math.PI / 2 * 0.999;
+    } else {
+      var cosD = Math.cos(dlng);
+      lat_rad = Math.atan(-cosD / Math.tan(slat));
+    }
+    coords.push([lng, lat_rad * RAD]);
+  }
+
+  // Close the polygon over the night pole (hemisphere opposite the sun's lat)
+  if (sun.lat >= 0) {
+    // Sun is north → night pole is south
+    coords.push([180, -90]);
+    coords.push([-180, -90]);
+  } else {
+    // Sun is south → night pole is north
+    coords.push([180, 90]);
+    coords.push([-180, 90]);
+  }
+  coords.push(coords[0]);
+
+  return [{geo: {type: 'Polygon', coordinates: [coords]}}];
+}
+
+function updateTerminator() {
+  if (typeof globe !== 'undefined') globe.polygonsData(getNightPolygon());
+}
+
 function moonPhaseName(date) {
   var t = julT(date);
   var D = norm360(297.8501921 + 445267.1114034 * t);
@@ -760,6 +800,12 @@ function initGlobe() {
     .arcEndLat(function(d){return d.eLat;}).arcEndLng(function(d){return d.eLng;})
     .arcColor(function(d){return d.color;}).arcDashLength(0.4).arcDashGap(0.15)
     .arcDashAnimateTime(1800).arcStroke(function(d){return d.w;}).arcAltitude(0.18);
+  globe.polygonsData([])
+    .polygonGeoJsonGeometry(function(d){return d.geo;})
+    .polygonCapColor(function(){return 'rgba(0,4,28,0.42)';})
+    .polygonSideColor(function(){return 'rgba(0,0,0,0)';})
+    .polygonStrokeColor(function(){return 'rgba(99,140,255,0.18)';})
+    .polygonAltitude(0.001);
   globe.width(window.innerWidth).height(window.innerHeight);
   window.addEventListener('resize', function(){globe.width(window.innerWidth).height(window.innerHeight);});
   globe.controls().autoRotate = true;
@@ -767,6 +813,7 @@ function initGlobe() {
   globe.controls().enableDamping = true;
   var sun = sunSubpoint(new Date());
   globe.pointOfView({lat:sun.lat, lng:sun.lng, altitude:2.2}, 0);
+  updateTerminator();
 }
 
 function buildMarker(d) {
@@ -795,6 +842,7 @@ function refreshGlobe() {
   globe.htmlElementsData(visEvs);
   flightPoints = layerVis.flight ? getFlightPoints() : [];
   globe.pointsData(flightPoints);
+  updateTerminator();
 }
 
 // =============================================================================
