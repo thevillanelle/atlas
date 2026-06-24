@@ -13,7 +13,7 @@
   --text:#d8dde8;--muted:#4e5a72;--accent:#3b82f6;
   --col-news:#ef4444;--col-conflict:#f97316;--col-disaster:#eab308;
   --col-storm:#60a5fa;--col-humanitarian:#ec4899;--col-flight:#10b981;
-  --col-launch:#a78bfa;--col-tech:#06b6d4;--col-fashion:#f472b6;--col-astrology:#c084fc;
+  --col-launch:#a78bfa;--col-tech:#06b6d4;--col-fashion:#f472b6;--col-astrology:#c084fc;--col-astronomy:#38bdf8;
   --col-connection:#f59e0b;
   --col-history:#a3e635;
 }
@@ -265,7 +265,8 @@ body.hist-open #panel{top:92px}body.hist-open #detail{top:92px}body.hist-open #l
     <div class="tab"    data-tab="news"         onclick="setTab(this)">News</div>
     <div class="tab"    data-tab="tech"         onclick="setTab(this)">Tech</div>
     <div class="tab"    data-tab="fashion"      onclick="setTab(this)">Fashion</div>
-    <div class="tab"    data-tab="astrology"    onclick="setTab(this)">Sky</div>
+    <div class="tab"    data-tab="astrology"    onclick="setTab(this)">Astrology</div>
+    <div class="tab"    data-tab="astronomy"    onclick="setTab(this)">Astronomy</div>
     <div class="tab"    data-tab="conflict"     onclick="setTab(this)">Conflicts</div>
     <div class="tab"    data-tab="disaster"     onclick="setTab(this)">Disasters</div>
     <div class="tab"    data-tab="storm"        onclick="setTab(this)">Storms</div>
@@ -288,7 +289,8 @@ body.hist-open #panel{top:92px}body.hist-open #detail{top:92px}body.hist-open #l
   <div class="lc-row" data-layer="humanitarian" onclick="toggleLayer(this)"><div class="lc-dot" style="background:var(--col-humanitarian)"></div><span>Humanitarian</span><div class="lc-live" id="ls-humanitarian"></div><span class="lc-n" id="lc-humanitarian">–</span></div>
   <div class="lc-row" data-layer="tech"         onclick="toggleLayer(this)"><div class="lc-dot" style="background:var(--col-tech)"></div><span>Tech</span><div class="lc-live" id="ls-tech"></div><span class="lc-n" id="lc-tech">–</span></div>
   <div class="lc-row" data-layer="fashion"      onclick="toggleLayer(this)"><div class="lc-dot" style="background:var(--col-fashion)"></div><span>Fashion</span><div class="lc-live" id="ls-fashion"></div><span class="lc-n" id="lc-fashion">–</span></div>
-  <div class="lc-row" data-layer="astrology"    onclick="toggleLayer(this)"><div class="lc-dot" style="background:var(--col-astrology)"></div><span>Sky</span><div class="lc-live" id="ls-astrology"></div><span class="lc-n" id="lc-astrology">–</span></div>
+  <div class="lc-row" data-layer="astrology"    onclick="toggleLayer(this)"><div class="lc-dot" style="background:var(--col-astrology)"></div><span>Astrology</span><div class="lc-live" id="ls-astrology"></div><span class="lc-n" id="lc-astrology">–</span></div>
+  <div class="lc-row" data-layer="astronomy"    onclick="toggleLayer(this)"><div class="lc-dot" style="background:var(--col-astronomy)"></div><span>Astronomy</span><div class="lc-live" id="ls-astronomy"></div><span class="lc-n" id="lc-astronomy">–</span></div>
   <div class="lc-row" data-layer="flight"       onclick="toggleLayer(this)"><div class="lc-dot" style="background:var(--col-flight)"></div><span>Live Flights</span><div class="lc-live" id="ls-flight"></div><span class="lc-n" id="lc-flight">–</span></div>
   <div class="lc-row" data-layer="launch"       onclick="toggleLayer(this)"><div class="lc-dot" style="background:var(--col-launch)"></div><span>Launches</span><div class="lc-live" id="ls-launch"></div><span class="lc-n" id="lc-launch">–</span></div>
   <div class="lc-row" data-layer="connection"   onclick="toggleLayer(this)"><div class="lc-dot" style="background:var(--col-connection)"></div><span>Connections</span><div class="lc-live on" id="ls-connection"></div><span class="lc-n" id="lc-connection">–</span></div>
@@ -315,11 +317,11 @@ body.hist-open #panel{top:92px}body.hist-open #detail{top:92px}body.hist-open #l
 var COLORS = {
   news:'#ef4444',conflict:'#f97316',disaster:'#eab308',storm:'#60a5fa',
   humanitarian:'#ec4899',flight:'#10b981',launch:'#a78bfa',
-  tech:'#06b6d4',fashion:'#f472b6',astrology:'#c084fc',connection:'#f59e0b',history:'#a3e635'
+  tech:'#06b6d4',fashion:'#f472b6',astrology:'#c084fc',astronomy:'#38bdf8',connection:'#f59e0b',history:'#a3e635'
 };
 var ICONS = {
   news:'📰',conflict:'⚔️',disaster:'🌊',storm:'🌀',humanitarian:'🏥',
-  flight:'✈️',launch:'🚀',tech:'💻',fashion:'👗',astrology:'✨',connection:'🔗',history:'🕰️'
+  flight:'✈️',launch:'🚀',tech:'💻',fashion:'👗',astrology:'✨',astronomy:'🔭',connection:'🔗',history:'🕰️'
 };
 var DAY_IMG   = '//unpkg.com/three-globe/example/img/earth-day.jpg';
 var NIGHT_IMG = '//unpkg.com/three-globe/example/img/earth-night.jpg';
@@ -429,7 +431,7 @@ var searchQ = '';
 var selectedId = null;
 var panelOpen = true;
 var watchTags = ['Gaza','Ukraine','AI','Markets','Fashion','Climate'];
-var layerVis = {news:true,conflict:true,disaster:true,storm:true,humanitarian:true,flight:true,launch:true,tech:true,fashion:true,astrology:true,connection:true,history:false};
+var layerVis = {news:true,conflict:true,disaster:true,storm:true,humanitarian:true,flight:true,launch:true,tech:true,fashion:true,astrology:true,astronomy:true,connection:true,history:false};
 var globe;
 var themeMode = 0; // 0=NIGHT 1=DAY 2=IRL
 var dayMode = false; // kept for compat — true when themeMode===1
@@ -744,6 +746,77 @@ async function fetchFashionNews() {
   var all = [];
   results.forEach(function(r){if (r.status === 'fulfilled') all.push.apply(all, r.value);});
   return dedupeByTitle(all).slice(0, 35);
+}
+
+// Astronomy — Guardian science section, articles pinned to planet/star sky positions
+async function fetchAstronomyNews() {
+  var queries = [
+    'Mercury OR Venus OR Mars OR Jupiter OR Saturn OR Uranus OR Neptune',
+    'NASA OR "space telescope" OR "James Webb" OR asteroid OR comet',
+    'Sirius OR Betelgeuse OR Vega OR Arcturus OR "neutron star" OR supernova OR nebula'
+  ];
+  var raw = await Promise.allSettled(queries.map(function(q){
+    return apiFetch(guardianUrl('science', q, 10), 10000);
+  }));
+  var articles = [];
+  raw.forEach(function(r){
+    if (r.status === 'fulfilled') {
+      var res = (r.value.response && r.value.response.results) || [];
+      articles.push.apply(articles, res);
+    }
+  });
+  articles = dedupeByTitle(articles.map(function(a){ return {webTitle: a.webTitle, _raw: a}; }))
+    .map(function(x){ return x._raw || x; });
+
+  var d = daysSinceJ2000(new Date());
+  var gmst = norm360(280.46061837 + 360.98564736629 * d);
+
+  return articles.map(function(a, i) {
+    var fields = a.fields || {};
+    var titleLow = a.webTitle.toLowerCase();
+
+    var matchedPlanet = null;
+    for (var pi = 0; pi < PLANET_DEFS.length; pi++) {
+      if (titleLow.indexOf(PLANET_DEFS[pi].name.toLowerCase()) !== -1) { matchedPlanet = PLANET_DEFS[pi]; break; }
+    }
+    var matchedStar = null;
+    if (!matchedPlanet) {
+      for (var si = 0; si < STAR_CATALOG.length; si++) {
+        if (titleLow.indexOf(STAR_CATALOG[si][0].toLowerCase()) !== -1) { matchedStar = STAR_CATALOG[si]; break; }
+      }
+    }
+
+    var lat, lng;
+    if (matchedPlanet) {
+      var pos = planetGeogLatLng(matchedPlanet, d);
+      lat = pos.lat; lng = pos.lng;
+    } else if (matchedStar) {
+      var ra = matchedStar[1], dec = matchedStar[2];
+      lng = ra - gmst; if (lng > 180) lng -= 360; if (lng < -180) lng += 360;
+      lat = dec;
+    } else {
+      // Default: spread around known observatories
+      var obs = [[19.8,-155.5],[28.7,-17.9],[-30.2,-70.7],[31.9,35.0],[-23.2,16.5]];
+      var o = obs[i % obs.length];
+      lat = o[0] + (Math.random()-0.5)*4; lng = o[1] + (Math.random()-0.5)*4;
+    }
+
+    return {
+      id: 'astro_news_' + i, type: 'astronomy',
+      title: a.webTitle,
+      location: matchedPlanet ? matchedPlanet.name : matchedStar ? matchedStar[0] : 'Deep Space',
+      lat: lat, lng: lng,
+      severity: 2,
+      age: a.webPublicationDate ? timeAgo(a.webPublicationDate) : 'Recent',
+      brief: (fields.trailText || a.webTitle).replace(/<[^>]*>/g,'').trim(),
+      url: a.webUrl,
+      sources: [{n:'The Guardian', a: a.webPublicationDate ? timeAgo(a.webPublicationDate) : 'Recent', url: a.webUrl}],
+      tags: ['Astronomy', matchedPlanet ? matchedPlanet.name : matchedStar ? matchedStar[0] : 'Space'],
+      _live: true,
+      _planet: matchedPlanet || null,
+      _star: matchedStar || null
+    };
+  }).filter(Boolean);
 }
 
 // Hacker News — CORS *
@@ -1239,7 +1312,7 @@ function getFiltered() {
 function renderList() {
   var evs = getFiltered();
   document.getElementById('ph-count').textContent = evs.length + ' events';
-  ['news','conflict','disaster','storm','humanitarian','tech','fashion','astrology','launch','connection'].forEach(function(t){
+  ['news','conflict','disaster','storm','humanitarian','tech','fashion','astrology','astronomy','launch','connection'].forEach(function(t){
     var el = document.getElementById('lc-'+t);
     if (el) el.textContent = allEvents.filter(function(e){return e.type===t;}).length || '\u2013';
   });
@@ -1260,6 +1333,21 @@ function renderList() {
         '<div class="astro-site">'+ev.location+'</div>' +
         '<div class="astro-snip">'+snip+'</div></div>';
     }).join('')+'</div>';
+    return;
+  }
+
+  if (currentTab === 'astronomy') {
+    list.innerHTML = evs.map(function(ev){
+      var body = ev._planet ? ev._planet.name : ev._star ? ev._star[0] : 'Space';
+      var color = ev._planet ? ev._planet.color : '#38bdf8';
+      var snip = ev.brief ? ev.brief.replace(/\n/g,' ').slice(0,90)+'…' : '';
+      return '<div class="ev'+(ev.id===selectedId?' sel':'')+'" id="ev-'+ev.id+'" onclick="selectEvent(\''+ev.id+'\')">' +
+        '<div class="ev-row"><div class="ev-ico" style="color:'+color+'">🔭</div><div class="ev-body">' +
+        '<div class="ev-name">'+(ev.url?'<a href="'+ev.url+'" target="_blank" onclick="event.stopPropagation()">'+ev.title+'</a>':ev.title)+'</div>' +
+        '<div class="ev-meta"><span style="color:'+color+';font-weight:700">'+body+'</span> · <span style="color:var(--muted)">'+ev.age+'</span></div>' +
+        '<div class="ev-loc" style="color:var(--muted);font-size:10px;margin-top:2px">'+snip+'</div>' +
+        '</div></div></div>';
+    }).join('');
     return;
   }
 
@@ -1315,6 +1403,40 @@ function selectEvent(id) {
       '<div class="d-lbl">Current Position</div>' +
       '<div class="d-brief">'+ev.brief.replace(/\n/g,'<br>')+'</div>' +
       '<div class="d-sep"></div><div class="d-lbl">Source</div>'+srcsHtml+
+      '<div class="d-sep"></div><div class="d-lbl">Tags</div><div class="d-tags">'+tagsHtml+'</div>';
+    document.getElementById('detail').classList.add('open');
+    return;
+  }
+
+  if (ev.type === 'astronomy') {
+    var body = ev._planet || null, star = ev._star || null;
+    var bodyColor = body ? body.color : '#38bdf8';
+    var bodyData = body ? (PLANET_DATA[body.name] || {}) : {};
+    var bodyName = body ? body.name : star ? star[0] : 'Deep Space';
+    var readBtn2 = ev.url
+      ? '<a href="'+ev.url+'" target="_blank" style="display:flex;align-items:center;justify-content:center;gap:7px;margin:14px 0;padding:10px 16px;background:rgba(56,189,248,.12);border:1px solid rgba(56,189,248,.3);border-radius:8px;color:#38bdf8;font-size:12px;font-weight:700;letter-spacing:.5px;text-decoration:none" onmouseover="this.style.background=\'rgba(56,189,248,.22)\'" onmouseout="this.style.background=\'rgba(56,189,248,.12)\'">&#x2197; READ FULL ARTICLE</a>'
+      : '';
+    var bodyBlock = body
+      ? '<div class="d-sep"></div><div class="d-lbl">About ' + body.name + '</div>' +
+        '<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:10px">' +
+          '<div style="background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:6px;padding:7px 9px"><div style="font-size:8px;letter-spacing:1px;color:var(--muted);text-transform:uppercase;margin-bottom:2px">Distance</div><div style="font-size:13px;font-weight:700;color:'+bodyColor+'">'+(bodyData.dist||'—')+'</div></div>' +
+          '<div style="background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:6px;padding:7px 9px"><div style="font-size:8px;letter-spacing:1px;color:var(--muted);text-transform:uppercase;margin-bottom:2px">Period</div><div style="font-size:13px;font-weight:700;color:var(--text)">'+(bodyData.period||'—')+'</div></div>' +
+        '</div>' +
+        '<div style="font-size:11px;line-height:1.6;color:rgba(216,221,232,.8);margin-bottom:10px">'+(bodyData.note||'')+'</div>'
+      : star
+        ? '<div class="d-sep"></div><div class="d-lbl">About ' + star[0] + '</div>' +
+          '<div style="font-size:11px;line-height:1.6;color:rgba(216,221,232,.8);margin-bottom:10px">'+star[6]+' · '+star[4]+' · '+star[5]+' light-years · '+star[7]+'</div>'
+        : '';
+    document.getElementById('d-body').innerHTML =
+      '<div class="d-cat" style="color:#38bdf8">🔭 ASTRONOMY ' + liveLabel + '</div>' +
+      '<div class="d-title" style="font-size:14px;line-height:1.5;margin-bottom:6px">'+ev.title+'</div>' +
+      '<div style="display:inline-block;padding:3px 8px;border-radius:12px;background:'+bodyColor+'22;border:1px solid '+bodyColor+'55;color:'+bodyColor+';font-size:10px;font-weight:700;letter-spacing:.5px;margin-bottom:4px">'+bodyName+'</div>' +
+      ' <span style="font-size:10px;color:var(--muted)">'+ev.age+'</span>' +
+      readBtn2 +
+      '<div class="d-lbl">Summary</div>' +
+      '<div class="d-brief">'+(ev.brief||ev.title)+'</div>' +
+      bodyBlock +
+      '<div class="d-sep"></div><div class="d-lbl">Source</div>' + srcsHtml +
       '<div class="d-sep"></div><div class="d-lbl">Tags</div><div class="d-tags">'+tagsHtml+'</div>';
     document.getElementById('detail').classList.add('open');
     return;
@@ -1386,7 +1508,7 @@ function toggleLayer(el){
   // History and flight stay as simple toggles
   if(l==='history'||l==='flight'){layerVis[l]=!layerVis[l];el.classList.toggle('off',!layerVis[l]);refreshGlobe();return;}
   // All other layers: isolate on click, reset to all-on if already isolated
-  var contentLayers=['news','conflict','disaster','storm','humanitarian','tech','fashion','astrology','launch','connection','launch'];
+  var contentLayers=['news','conflict','disaster','storm','humanitarian','tech','fashion','astrology','astronomy','launch','connection'];
   var activeCount=contentLayers.filter(function(k){return layerVis[k];}).length;
   if(layerVis[l]&&activeCount===1){
     // Already isolated — reset all on
@@ -1980,13 +2102,13 @@ async function loadLiveData() {
     fetchFashionNews()
   ]);
 
-  splash(65, 'Sky data + Markets…');
-  var phase3 = await Promise.allSettled([fetchSkyData()]);
+  splash(65, 'Sky data + Astronomy news + Markets…');
+  var phase3 = await Promise.allSettled([fetchSkyData(), fetchAstronomyNews()]);
   try { await fetchMarkets(); } catch(_) {}
 
   var usgs     = phase1[0], launches = phase1[1];
   var newsR    = phase2[0], conflR   = phase2[1], stormR = phase2[2], hnR = phase2[3], fashR = phase2[4];
-  var skyR     = phase3[0];
+  var skyR     = phase3[0], astroNewsR = phase3[1];
 
   var disasters   = dedupeByTitle(usgs.status==='fulfilled' ? usgs.value : []).slice(0,30);
   var conflicts   = dedupeByTitle((conflR.status==='fulfilled'&&conflR.value.length ? conflR.value : []).concat(SEEDS.conflict)).slice(0,12);
@@ -1995,10 +2117,11 @@ async function loadLiveData() {
   var techEvs     = hnR.status==='fulfilled' && hnR.value.length ? hnR.value : [];
   var fashionEvs  = fashR.status==='fulfilled' && fashR.value.length ? fashR.value : [];
   var astroEvs    = skyR.status==='fulfilled' ? skyR.value : computeSkyEvents();
+  var astronomyEvs = astroNewsR.status==='fulfilled' ? astroNewsR.value : [];
   var launchEvs   = launches.status==='fulfilled' ? launches.value : FALLBACK_LAUNCHES;
 
   var connectionEvs = [].concat(CHOKEPOINTS, ECONOMIC_STRESS, POLITICAL_FLASH);
-  allEvents = [].concat(newsEvs, conflicts, disasters, storms, SEEDS.humanitarian, techEvs, fashionEvs, astroEvs, launchEvs, connectionEvs);
+  allEvents = [].concat(newsEvs, conflicts, disasters, storms, SEEDS.humanitarian, techEvs, fashionEvs, astroEvs, astronomyEvs, launchEvs, connectionEvs);
   setLayerStatus('connection','on');
 
   setLayerStatus('disaster',    usgs.status==='fulfilled'?'on':'fb');
@@ -2008,6 +2131,7 @@ async function loadLiveData() {
   setLayerStatus('tech',        hnR.status==='fulfilled'&&hnR.value.length?'on':'fb');
   setLayerStatus('fashion',     fashR.status==='fulfilled'&&fashR.value.length?'on':'fb');
   setLayerStatus('astrology',   'on');
+  setLayerStatus('astronomy',   astroNewsR.status==='fulfilled'&&astroNewsR.value.length?'on':'fb');
   setLayerStatus('launch',      launches.status==='fulfilled'?'on':'fb');
   setLayerStatus('humanitarian','fb');
   setLayerStatus('flight',      'fb');
