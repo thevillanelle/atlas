@@ -14,6 +14,7 @@
   --col-news:#ef4444;--col-conflict:#f97316;--col-disaster:#eab308;
   --col-storm:#60a5fa;--col-humanitarian:#ec4899;--col-flight:#10b981;
   --col-launch:#a78bfa;--col-tech:#06b6d4;--col-fashion:#f472b6;--col-astrology:#c084fc;
+  --col-connection:#f59e0b;
 }
 html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);font-family:'Inter',sans-serif;color:var(--text)}
 #globe-wrap{position:fixed;inset:0;z-index:0}
@@ -122,6 +123,9 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);font-famil
 .ds-badge{display:inline-flex;align-items:center;gap:3px;font-size:8px;font-weight:700;letter-spacing:1px;padding:2px 5px;border-radius:3px;text-transform:uppercase;vertical-align:middle;margin-left:4px}
 .ds-live{background:rgba(16,185,129,.15);color:#10b981;border:1px solid rgba(16,185,129,.25)}
 .ds-fallback{background:rgba(245,158,11,.12);color:#f59e0b;border:1px solid rgba(245,158,11,.2)}
+#day-btn{position:fixed;top:12px;right:270px;z-index:310;padding:5px 13px;background:var(--glass);border:1px solid var(--border);border-radius:16px;color:var(--muted);font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;cursor:pointer;backdrop-filter:blur(20px);transition:all .2s;font-family:'Space Mono',monospace;outline:none}
+#day-btn:hover{color:var(--text);border-color:var(--border2)}
+#day-btn.day{background:rgba(251,191,36,.12);border-color:rgba(251,191,36,.45);color:#fbbf24}
 #connect-btn{position:fixed;top:12px;right:160px;z-index:310;padding:5px 13px;background:var(--glass);border:1px solid var(--border);border-radius:16px;color:var(--muted);font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;cursor:pointer;backdrop-filter:blur(20px);transition:all .2s;font-family:'Space Mono',monospace;outline:none}
 #connect-btn:hover{color:var(--text);border-color:var(--border2)}
 #connect-btn.active{background:rgba(168,85,247,.15);border-color:rgba(168,85,247,.5);color:#a855f7}
@@ -201,6 +205,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);font-famil
     <div class="tab"    data-tab="storm"        onclick="setTab(this)">Storms</div>
     <div class="tab"    data-tab="humanitarian" onclick="setTab(this)">Aid</div>
     <div class="tab"    data-tab="launch"       onclick="setTab(this)">Launches</div>
+    <div class="tab"    data-tab="connection"   onclick="setTab(this)">Connections</div>
   </div>
   <div id="evlist"><div class="ev-empty">Loading…</div></div>
   <div id="wl">
@@ -220,7 +225,9 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);font-famil
   <div class="lc-row" data-layer="astrology"    onclick="toggleLayer(this)"><div class="lc-dot" style="background:var(--col-astrology)"></div><span>Sky</span><div class="lc-live" id="ls-astrology"></div><span class="lc-n" id="lc-astrology">–</span></div>
   <div class="lc-row" data-layer="flight"       onclick="toggleLayer(this)"><div class="lc-dot" style="background:var(--col-flight)"></div><span>Live Flights</span><div class="lc-live" id="ls-flight"></div><span class="lc-n" id="lc-flight">–</span></div>
   <div class="lc-row" data-layer="launch"       onclick="toggleLayer(this)"><div class="lc-dot" style="background:var(--col-launch)"></div><span>Launches</span><div class="lc-live" id="ls-launch"></div><span class="lc-n" id="lc-launch">–</span></div>
+  <div class="lc-row" data-layer="connection"   onclick="toggleLayer(this)"><div class="lc-dot" style="background:var(--col-connection)"></div><span>Connections</span><div class="lc-live on" id="ls-connection"></div><span class="lc-n" id="lc-connection">–</span></div>
 </div>
+<button id="day-btn" onclick="toggleDay()">🌙 NIGHT</button>
 <button id="connect-btn" onclick="toggleConnect()">⟷ CONNECT</button>
 <div id="ap"></div>
 <div id="detail">
@@ -239,12 +246,35 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);font-famil
 var COLORS = {
   news:'#ef4444',conflict:'#f97316',disaster:'#eab308',storm:'#60a5fa',
   humanitarian:'#ec4899',flight:'#10b981',launch:'#a78bfa',
-  tech:'#06b6d4',fashion:'#f472b6',astrology:'#c084fc'
+  tech:'#06b6d4',fashion:'#f472b6',astrology:'#c084fc',connection:'#f59e0b'
 };
 var ICONS = {
   news:'📰',conflict:'⚔️',disaster:'🌊',storm:'🌀',humanitarian:'🏥',
-  flight:'✈️',launch:'🚀',tech:'💻',fashion:'👗',astrology:'✨'
+  flight:'✈️',launch:'🚀',tech:'💻',fashion:'👗',astrology:'✨',connection:'🔗'
 };
+var DAY_IMG   = '//unpkg.com/three-globe/example/img/earth-day.jpg';
+var NIGHT_IMG = '//unpkg.com/three-globe/example/img/earth-night.jpg';
+var BUMP_IMG  = '//unpkg.com/three-globe/example/img/earth-topology.png';
+var CHOKEPOINTS = [
+  {id:'cp_hormuz',type:'connection',subtype:'chokepoint',title:'Strait of Hormuz — Oil Chokepoint',location:'Strait of Hormuz',lat:26.59,lng:56.25,severity:5,age:'Structural',brief:'~20% of global oil transit daily. Iran controls the northern shore. A closure would spike oil prices 40%+ within weeks and cascade into every conflict zone dependent on Gulf funding.',stats:[{label:'Daily Oil Transit',val:'~17M bbl/d'},{label:'Global Oil Share',val:'~20%'}],sources:[{n:'EIA',a:'2024'}],tags:['Energy','Iran','Saudi Arabia','Oil','Chokepoint']},
+  {id:'cp_suez',type:'connection',subtype:'chokepoint',title:'Suez Canal — Asia-Europe Artery',location:'Suez Canal, Egypt',lat:30.46,lng:32.35,severity:5,age:'Structural',brief:'~12% of global trade by volume. Houthi attacks in the Red Sea since late 2023 forced most shipping to reroute via Cape of Good Hope — adding 10–14 days and $1M+ per voyage. Egypt Suez revenue down ~60%.',stats:[{label:'Global Trade Share',val:'~12%'},{label:'Egypt Revenue Loss',val:'~60%'}],sources:[{n:'Suez Canal Authority',a:'2024'},{n:'UNCTAD',a:'2024'}],tags:['Trade','Egypt','Red Sea','Houthi','Chokepoint','Yemen']},
+  {id:'cp_malacca',type:'connection',subtype:'chokepoint',title:'Strait of Malacca — Asia Pacific Gateway',location:'Strait of Malacca',lat:2.5,lng:101.5,severity:4,age:'Structural',brief:'~40% of global trade passes through. China, Japan, and South Korea depend on it for ~80% of oil imports. Any blockage triggers immediate energy market panic across Asia.',stats:[{label:'Global Trade Share',val:'~40%'},{label:'Asian Oil Imports',val:'~80%'}],sources:[{n:'IMO',a:'2024'}],tags:['Trade','China','Japan','Energy','Chokepoint']},
+  {id:'cp_panama',type:'connection',subtype:'chokepoint',title:'Panama Canal — Americas Route',location:'Panama Canal',lat:9.08,lng:-79.68,severity:4,age:'Structural',brief:'~5% of global trade. 2023–2024 drought reduced canal capacity by 40%, forcing rerouting. A structural vulnerability exposed by climate change, further complicated by US political pressure.',stats:[{label:'Global Trade Share',val:'~5%'},{label:'2024 Drought Impact',val:'-40% capacity'}],sources:[{n:'Panama Canal Authority',a:'2024'}],tags:['Trade','Panama','Americas','Climate','Chokepoint']},
+  {id:'cp_bosphorus',type:'connection',subtype:'chokepoint',title:'Bosphorus Strait — Black Sea Gate',location:'Istanbul, Turkey',lat:41.11,lng:29.08,severity:3,age:'Structural',brief:'Only exit from the Black Sea to the Mediterranean. Turkey controls access under the Montreux Convention. Ukraine war made this a critical choke for grain exports and military logistics.',stats:[{label:'Grain Exports',val:'Ukraine / Russia'},{label:'Legal Control',val:'Turkey (Montreux)'}],sources:[{n:'IMO',a:'2024'}],tags:['Trade','Turkey','Ukraine','Russia','Grain','Chokepoint']},
+  {id:'cp_babelmandeb',type:'connection',subtype:'chokepoint',title:'Bab-el-Mandeb — Red Sea Entry',location:'Djibouti',lat:12.58,lng:43.35,severity:5,age:'Structural',brief:'The gateway into the Red Sea and Suez Canal. Houthi attacks since late 2023 have diverted 80%+ of commercial shipping. Connects Yemen conflict directly to global trade disruption and Egypt\'s economic crisis.',stats:[{label:'Ships Diverted',val:'>80%'},{label:'Suez Revenue Hit',val:'-60%'}],sources:[{n:'UNCTAD',a:'2024'}],tags:['Yemen','Houthi','Trade','Red Sea','Egypt','Chokepoint']}
+];
+var ECONOMIC_STRESS = [
+  {id:'ec_argentina',type:'connection',subtype:'economic',title:'Argentina — Hyperinflation Crisis',location:'Argentina',lat:-38.42,lng:-63.62,severity:4,age:'Ongoing',brief:'Milei\'s shock therapy austerity. Inflation peaked at 211% in 2023, now declining with cuts. IMF $44B program. Peso devalued 50%+. A case study in whether fiscal brutalism stabilizes or implodes.',stats:[{label:'Peak Inflation',val:'211%'},{label:'IMF Program',val:'$44B'}],sources:[{n:'IMF',a:'2024'}],tags:['Argentina','Inflation','IMF','Economic Crisis']},
+  {id:'ec_egypt',type:'connection',subtype:'economic',title:'Egypt — Currency & Suez Crisis',location:'Egypt',lat:26.82,lng:30.80,severity:4,age:'Ongoing',brief:'Lost $10B+ in annual Suez Canal revenue to Houthi-driven shipping diversions. Pound devalued 60%. Secured $50B IMF package. The Gaza war, Houthi attacks, and economic collapse are one interconnected story.',stats:[{label:'Suez Revenue Lost',val:'$10B+'},{label:'IMF Package',val:'$50B'}],sources:[{n:'IMF',a:'2024'}],tags:['Egypt','Suez','IMF','Currency','Economic Crisis','Gaza']},
+  {id:'ec_pakistan',type:'connection',subtype:'economic',title:'Pakistan — IMF Lifeline',location:'Pakistan',lat:30.38,lng:69.35,severity:3,age:'Ongoing',brief:'$7B IMF bailout secured in 2024. Inflation >20%. Political instability post-Imran Khan arrest compounds economic fragility. Nuclear state on a debt treadmill.',stats:[{label:'IMF Bailout',val:'$7B'},{label:'Inflation',val:'>20%'}],sources:[{n:'IMF',a:'2024'}],tags:['Pakistan','IMF','Inflation','Economic Crisis']},
+  {id:'ec_turkey',type:'connection',subtype:'economic',title:'Turkey — Post-Election Stabilization',location:'Turkey',lat:38.96,lng:35.24,severity:3,age:'Ongoing',brief:'Inflation peaked at 85% in 2022. Erdogan reversed unorthodox monetary policy after 2023 election. Lira down 80%+ since 2018. Controls Bosphorus, mediates between Russia and Ukraine — economic leverage deployed politically.',stats:[{label:'Lira Decline (5yr)',val:'-80%+'},{label:'Peak Inflation',val:'85%'}],sources:[{n:'CBRT',a:'2024'}],tags:['Turkey','Lira','Inflation','Economic Crisis','Bosphorus']}
+];
+var POLITICAL_FLASH = [
+  {id:'pf_taiwan',type:'connection',subtype:'political',title:'Taiwan — Cross-Strait Flashpoint',location:'Taiwan',lat:23.7,lng:120.96,severity:5,age:'Structural',brief:'Lai Ching-te (pro-independence) won January 2024 election. China responded with military exercises. US "strategic ambiguity" under strain. Control of Taiwan Strait = control of global semiconductor supply.',stats:[{label:'PRC Response',val:'Military exercises'},{label:'Semiconductor Share',val:'>60% advanced chips'}],sources:[{n:'Reuters',a:'2024'}],tags:['Taiwan','China','USA','Military','Semiconductor','Political','Chokepoint']},
+  {id:'pf_iran',type:'connection',subtype:'political',title:'Iran — Post-Raisi Nuclear Posture',location:'Iran',lat:32.43,lng:53.69,severity:4,age:'Ongoing',brief:'Raisi died in helicopter crash May 2024. Reformist Pezeshkian won snap election. Nuclear enrichment at 60%+. Proxy network (Hezbollah, Houthi, Hamas, PMF) active across 5 countries — Iran as thread connecting multiple conflict dots.',stats:[{label:'Uranium Enrichment',val:'60%+ (U-235)'},{label:'Active Proxies',val:'5 countries'}],sources:[{n:'IAEA',a:'2024'}],tags:['Iran','Nuclear','Hezbollah','Houthi','Hamas','Middle East','Political']},
+  {id:'pf_sahel',type:'connection',subtype:'political',title:'Sahel — The Coup Belt',location:'Mali',lat:17.57,lng:-3.99,severity:4,age:'Structural',brief:'Mali, Burkina Faso, and Niger all fell to military coups (2020–2023). Formed the Alliance of Sahel States, expelled French forces, invited Wagner/Russia. A template for anti-Western realignment spreading south.',stats:[{label:'Coups (2020-23)',val:'3 countries'},{label:'French Forces',val:'Expelled'}],sources:[{n:'ECOWAS',a:'2024'}],tags:['Mali','Niger','Burkina Faso','Coup','Russia','Wagner','Sahel','Political']},
+  {id:'pf_venezuela',type:'connection',subtype:'political',title:'Venezuela — Stolen Election',location:'Venezuela',lat:6.42,lng:-66.59,severity:4,age:'Ongoing',brief:'Maduro claimed 2024 election victory. Carter Center and most international observers rejected results. Edmundo González fled to Spain. Ongoing arrests of opposition. Migration crisis — 7M+ Venezuelans abroad — is the region\'s largest displacement.',stats:[{label:'Venezuelans Abroad',val:'7M+'},  {label:'Int\'l Recognition',val:'Widely disputed'}],sources:[{n:'Carter Center',a:'2024'}],tags:['Venezuela','Maduro','Election','Migration','Political']}
+];
 
 var CC = {
   Afghanistan:[33.93,67.71],Algeria:[28.03,1.66],Angola:[-11.2,17.87],
@@ -330,8 +360,9 @@ var searchQ = '';
 var selectedId = null;
 var panelOpen = true;
 var watchTags = ['Gaza','Ukraine','AI','Markets','Fashion','Climate'];
-var layerVis = {news:true,conflict:true,disaster:true,storm:true,humanitarian:true,flight:true,launch:true,tech:true,fashion:true,astrology:true};
+var layerVis = {news:true,conflict:true,disaster:true,storm:true,humanitarian:true,flight:true,launch:true,tech:true,fashion:true,astrology:true,connection:true};
 var globe;
+var dayMode = false;
 var connectMode = false;
 var connectedIds = [];
 var tickerData = [
@@ -734,7 +765,8 @@ function initGlobe() {
   globe.controls().autoRotate = true;
   globe.controls().autoRotateSpeed = 0.22;
   globe.controls().enableDamping = true;
-  globe.pointOfView({lat:20,lng:15,altitude:2.2}, 0);
+  var sun = sunSubpoint(new Date());
+  globe.pointOfView({lat:sun.lat, lng:sun.lng, altitude:2.2}, 0);
 }
 
 function buildMarker(d) {
@@ -782,7 +814,7 @@ function getFiltered() {
 function renderList() {
   var evs = getFiltered();
   document.getElementById('ph-count').textContent = evs.length + ' events';
-  ['news','conflict','disaster','storm','humanitarian','tech','fashion','astrology','launch'].forEach(function(t){
+  ['news','conflict','disaster','storm','humanitarian','tech','fashion','astrology','launch','connection'].forEach(function(t){
     var el = document.getElementById('lc-'+t);
     if (el) el.textContent = allEvents.filter(function(e){return e.type===t;}).length || '\u2013';
   });
@@ -863,13 +895,14 @@ function selectEvent(id) {
     return;
   }
 
+  var subtypeLabel = ev.subtype ? ' · <span style="font-size:8px;font-weight:700;letter-spacing:1px;padding:2px 5px;border-radius:3px;background:'+c+'1a;color:'+c+'">'+ev.subtype.toUpperCase()+'</span>' : '';
   var readBtn = ev.url
     ? '<a href="'+ev.url+'" target="_blank" style="display:flex;align-items:center;justify-content:center;gap:7px;margin:14px 0;padding:10px 16px;background:rgba(59,130,246,.15);border:1px solid rgba(59,130,246,.35);border-radius:8px;color:#60a5fa;font-size:12px;font-weight:700;letter-spacing:.5px;text-decoration:none;transition:background .15s" onmouseover="this.style.background=\'rgba(59,130,246,.25)\'" onmouseout="this.style.background=\'rgba(59,130,246,.15)\'">&#x2197; READ FULL ARTICLE</a>'
     : '';
   document.getElementById('d-body').innerHTML =
     '<div class="d-cat" style="color:'+c+'">'+ico+' '+ev.type.toUpperCase()+' '+liveLabel+'</div>' +
     '<div class="d-title">'+ev.title+'</div>' +
-    '<div class="d-where">\uD83D\uDCCD '+ev.location+' &middot; <span style="color:var(--muted)">'+ev.age+'</span></div>' +
+    '<div class="d-where">\uD83D\uDCCD '+ev.location+subtypeLabel+' &middot; <span style="color:var(--muted)">'+ev.age+'</span></div>' +
     readBtn+
     statsHtml+
     '<div class="d-lbl">Brief</div>' +
@@ -888,6 +921,13 @@ function closeDetail() {
 // =============================================================================
 // UI CONTROLS
 // =============================================================================
+function toggleDay(){
+  dayMode=!dayMode;
+  globe.globeImageUrl(dayMode?DAY_IMG:NIGHT_IMG).atmosphereColor(dayMode?'#93c5fd':'#1e3a8a');
+  var btn=document.getElementById('day-btn');
+  btn.textContent=dayMode?'☀️ DAY':'🌙 NIGHT';
+  btn.classList.toggle('day',dayMode);
+}
 function setTab(el){document.querySelectorAll('.tab').forEach(function(t){t.classList.remove('on');});el.classList.add('on');currentTab=el.dataset.tab;renderList();refreshGlobe();}
 function onSearch(){searchQ=document.getElementById('sinput').value.trim();if(searchQ)document.querySelectorAll('.wl-tag').forEach(function(t){t.classList.remove('on');});renderList();refreshGlobe();}
 function toggleLayer(el){var l=el.dataset.layer;layerVis[l]=!layerVis[l];el.classList.toggle('off',!layerVis[l]);refreshGlobe();}
@@ -1076,7 +1116,9 @@ async function loadLiveData() {
   var astroEvs    = skyR.status==='fulfilled' ? skyR.value : computeSkyEvents();
   var launchEvs   = launches.status==='fulfilled' ? launches.value : FALLBACK_LAUNCHES;
 
-  allEvents = [].concat(newsEvs, conflicts, disasters, storms, SEEDS.humanitarian, techEvs, fashionEvs, astroEvs, launchEvs);
+  var connectionEvs = [].concat(CHOKEPOINTS, ECONOMIC_STRESS, POLITICAL_FLASH);
+  allEvents = [].concat(newsEvs, conflicts, disasters, storms, SEEDS.humanitarian, techEvs, fashionEvs, astroEvs, launchEvs, connectionEvs);
+  setLayerStatus('connection','on');
 
   setLayerStatus('disaster',    usgs.status==='fulfilled'?'on':'fb');
   setLayerStatus('conflict',    conflR.status==='fulfilled'&&conflR.value.length?'on':'fb');
