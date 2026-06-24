@@ -432,7 +432,8 @@ var connectMode = false;
 var connectedIds = [];
 var activeEngine = 'guardian';
 var engineCache = {};
-var histEvents = []; // historical layer — shown alongside live events when layerVis.history is true
+var histEvents = [];
+var histDate = null; // set when history mode is active — planets render at this date
 var irlCanvas = null, irlMaskCanvas = null, irlDayCanvas = null;
 var irlImgDay = null, irlImgNight = null, irlImgsLoaded = false;
 var irlBlobUrl = null;
@@ -1005,7 +1006,7 @@ function tickPlanets() {
   if (typeof globe === 'undefined') { planetRAF = requestAnimationFrame(tickPlanets); return; }
   var camDist = globe.camera().position.length();
   var opacity = Math.min(1, Math.max(0, (camDist - 160) / 120));
-  var d = daysSinceJ2000(new Date());
+  var d = daysSinceJ2000(histDate || new Date());
   PLANET_DEFS.forEach(function(p) {
     var el = document.getElementById('porb-' + p.name.toLowerCase());
     if (!el) return;
@@ -1618,7 +1619,7 @@ function toggleHistBar() {
   var open = bar.classList.toggle('open');
   btn.classList.toggle('active', open);
   document.body.classList.toggle('hist-open', open);
-  if (!open) { histEvents = []; layerVis.history = false; }
+  if (!open) { histEvents = []; layerVis.history = false; histDate = null; }
   var hint = document.getElementById('hb-connect-hint');
   if (hint) hint.style.display = open && connectMode ? 'inline' : 'none';
   refreshGlobe();
@@ -1636,7 +1637,8 @@ async function loadHistory() {
     var evs = await fetchHistoricalEvents(month, year);
     histEvents = evs;
     layerVis.history = true;
-    setHistStatus(label + ' — ' + evs.length + ' events on globe');
+    histDate = new Date(year, month - 1, 15); // midpoint of selected month
+    setHistStatus(label + ' — ' + evs.length + ' events · planets at ' + label);
     renderList(); refreshGlobe();
   } catch(e) {
     setHistStatus('Failed to load — try another date');
