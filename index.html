@@ -765,8 +765,12 @@ async function fetchAstronomyNews() {
       articles.push.apply(articles, res);
     }
   });
-  articles = dedupeByTitle(articles.map(function(a){ return {webTitle: a.webTitle, _raw: a}; }))
-    .map(function(x){ return x._raw || x; });
+  var seenTitles = new Set();
+  articles = articles.filter(function(a){
+    var key = a.webTitle.toLowerCase().replace(/[^a-z0-9]/g,'').slice(0,50);
+    if (seenTitles.has(key)) return false;
+    seenTitles.add(key); return true;
+  });
 
   var d = daysSinceJ2000(new Date());
   var gmst = norm360(280.46061837 + 360.98564736629 * d);
@@ -1501,7 +1505,18 @@ function applyThemeMode() {
 function setTheme(val) { themeMode = parseInt(val); applyThemeMode(); }
 function cycleTheme() { themeMode = (themeMode + 1) % 3; applyThemeMode(); }
 function toggleDay() { cycleTheme(); }
-function setTab(el){document.querySelectorAll('.tab').forEach(function(t){t.classList.remove('on');});el.classList.add('on');currentTab=el.dataset.tab;renderList();refreshGlobe();}
+function setTab(el){
+  document.querySelectorAll('.tab').forEach(function(t){t.classList.remove('on');});
+  el.classList.add('on');
+  currentTab = el.dataset.tab;
+  if (currentTab === 'astrology' || currentTab === 'astronomy') {
+    globe.controls().autoRotate = false;
+    globe.pointOfView({altitude: 2.8}, 1200);
+    setTimeout(function(){globe.controls().autoRotate = true;}, 6000);
+  }
+  renderList();
+  refreshGlobe();
+}
 function onSearch(){searchQ=document.getElementById('sinput').value.trim();if(searchQ)document.querySelectorAll('.wl-tag').forEach(function(t){t.classList.remove('on');});renderList();refreshGlobe();}
 function toggleLayer(el){
   var l=el.dataset.layer;
