@@ -721,13 +721,14 @@ function initGlobe() {
     .showAtmosphere(true).atmosphereColor('#1e3a8a').atmosphereAltitude(0.18)
     .htmlElementsData([]).htmlElement(function(d){return buildMarker(d);})
     .htmlLat(function(d){return d.lat;}).htmlLng(function(d){return d.lng;}).htmlAltitude(0.01)
-    .arcsData([]).arcStartLat(function(d){return d.sLat;}).arcStartLng(function(d){return d.sLng;})
-    .arcEndLat(function(d){return d.eLat;}).arcEndLng(function(d){return d.eLng;})
-    .arcColor(function(d){return d.color;}).arcDashLength(0.4).arcDashGap(0.15)
-    .arcDashAnimateTime(1800).arcStroke(function(d){return d.w;}).arcAltitude(0.18)
     .pointsData([]).pointLat(function(d){return d.lat;}).pointLng(function(d){return d.lng;})
     .pointColor(function(){return '#10b981';}).pointAltitude(0.004).pointRadius(0.22)
     (document.getElementById('globe-wrap'));
+  globe.arcsData([])
+    .arcStartLat(function(d){return d.sLat;}).arcStartLng(function(d){return d.sLng;})
+    .arcEndLat(function(d){return d.eLat;}).arcEndLng(function(d){return d.eLng;})
+    .arcColor(function(d){return d.color;}).arcDashLength(0.4).arcDashGap(0.15)
+    .arcDashAnimateTime(1800).arcStroke(function(d){return d.w;}).arcAltitude(0.18);
   globe.width(window.innerWidth).height(window.innerHeight);
   window.addEventListener('resize', function(){globe.width(window.innerWidth).height(window.innerHeight);});
   globe.controls().autoRotate = true;
