@@ -878,7 +878,87 @@ async function fetchAuroraKp() {
   return Math.max.apply(null, predicted.slice(0,4).map(function(r){return parseFloat(r[1])||0;}));
 }
 
-// Sky data — planets computed client-side + Aurora from NOAA
+// Zodiac sign → ruling planet for article-to-pin mapping
+var ZODIAC_RULERS = {
+  aries:'Mars',taurus:'Venus',gemini:'Mercury',cancer:'Moon',
+  leo:'Sun',virgo:'Mercury',libra:'Venus',scorpio:'Mars',
+  sagittarius:'Jupiter',capricorn:'Saturn',aquarius:'Saturn',pisces:'Jupiter'
+};
+
+async function fetchAstrologyNews() {
+  var queries = [
+    'astrology OR horoscope OR "Mercury retrograde" OR "planetary alignment"',
+    'zodiac OR "birth chart" OR "Venus in" OR "Mars in" OR "Jupiter in"',
+    'eclipse OR "full moon" OR "new moon" OR retrograde'
+  ];
+  var raw = await Promise.allSettled(queries.map(function(q){
+    return apiFetch(guardianUrl('lifeandstyle', q, 8), 10000);
+  }));
+  var articles = [];
+  raw.forEach(function(r){
+    if (r.status === 'fulfilled') articles.push.apply(articles, (r.value.response && r.value.response.results)||[]);
+  });
+  var seen = new Set();
+  articles = articles.filter(function(a){
+    var k = a.webTitle.toLowerCase().replace(/[^a-z0-9]/g,'').slice(0,50);
+    if (seen.has(k)) return false; seen.add(k); return true;
+  });
+
+  var d = daysSinceJ2000(new Date());
+  var gmst = norm360(280.46061837 + 360.98564736629 * d);
+
+  return articles.map(function(a, i){
+    var fields = a.fields || {};
+    var low = a.webTitle.toLowerCase();
+
+    var matchedPlanet = null;
+    PLANET_DEFS.forEach(function(p){ if (!matchedPlanet && low.indexOf(p.name.toLowerCase())!==-1) matchedPlanet = p; });
+
+    if (!matchedPlanet) {
+      Object.keys(ZODIAC_RULERS).forEach(function(sign){
+        if (!matchedPlanet && low.indexOf(sign)!==-1)
+          matchedPlanet = PLANET_DEFS.find(function(p){return p.name===ZODIAC_RULERS[sign];}) || null;
+      });
+    }
+
+    var isMoon = !matchedPlanet && (low.indexOf('moon')!==-1 || low.indexOf('lunar')!==-1);
+    var isSun  = !matchedPlanet && !isMoon && (low.indexOf('sun')!==-1 || low.indexOf('solar')!==-1);
+
+    var lat, lng, bodyName, bodyColor;
+    if (matchedPlanet) {
+      var pos = planetGeogLatLng(matchedPlanet, d);
+      lat = pos.lat; lng = pos.lng;
+      bodyName = matchedPlanet.name; bodyColor = matchedPlanet.color;
+    } else if (isMoon) {
+      var mLng = norm360(218.316 + 13.176396 * d - gmst); if (mLng > 180) mLng -= 360;
+      lat = 5.13 * Math.sin((93.272 + 13.064993 * d) * DEG); lng = mLng;
+      bodyName = 'Moon'; bodyColor = '#e2e8f0';
+    } else if (isSun) {
+      lat = 23.45 * Math.sin((280.46 + 0.9856 * d) * DEG);
+      var sLng = norm360(356.047 + 0.9856 * d + 282.94 - gmst); if (sLng > 180) sLng -= 360;
+      lng = sLng;
+      bodyName = 'Sun'; bodyColor = '#fbbf24';
+    } else {
+      var hubs = [[40.7,-74.0],[51.5,-0.1],[48.8,2.3],[-33.9,18.4],[35.7,139.7]];
+      var h = hubs[i % hubs.length]; lat = h[0]; lng = h[1];
+      bodyName = 'Cosmos'; bodyColor = '#c084fc';
+    }
+
+    return {
+      id:'astro_art_'+i, type:'astrology',
+      title:a.webTitle, location:bodyName,
+      lat:lat, lng:lng, severity:2,
+      age: a.webPublicationDate ? timeAgo(a.webPublicationDate) : 'Recent',
+      brief:(fields.trailText||a.webTitle).replace(/<[^>]*>/g,'').trim(),
+      url:a.webUrl,
+      sources:[{n:'The Guardian',a:a.webPublicationDate?timeAgo(a.webPublicationDate):'Recent',url:a.webUrl}],
+      tags:['Astrology',bodyName], _live:true,
+      _planet:{name:bodyName, color:bodyColor, emoji:'✨'}
+    };
+  });
+}
+
+// Sky data — planets computed client-side + astrology news + Aurora from NOAA
 async function fetchSkyData() {
   var events = computeSkyEvents();
   try {
@@ -887,18 +967,22 @@ async function fetchSkyData() {
       var auroLat = 66.5 - kp * 2.5;
       events.push({
         id:'sky_aurora', type:'astrology',
-        title:'Aurora Forecast \u2014 Kp ' + kp.toFixed(1),
-        location:'~' + auroLat.toFixed(0) + '\u00b0 latitude',
+        title:'Aurora Forecast — Kp ' + kp.toFixed(1),
+        location:'~' + auroLat.toFixed(0) + '° latitude',
         lat:auroLat, lng:0,
         severity: kp>=7?5:kp>=5?4:kp>=3?3:2,
         age:'NOAA Forecast',
-        brief:'NOAA Kp index: ' + kp.toFixed(1) + '.\nAurora visible above ~' + auroLat.toFixed(0) + '\u00b0 latitude.\n\nKp 0 = quiet \u00b7 Kp 5+ = geomagnetic storm \u00b7 Kp 9 = extreme.',
-        stats:[{label:'Kp Index',val:kp.toFixed(1)},{label:'Visible above',val:auroLat.toFixed(0)+'\u00b0'}],
+        brief:'NOAA Kp index: ' + kp.toFixed(1) + '.\nAurora visible above ~' + auroLat.toFixed(0) + '° latitude.\n\nKp 0 = quiet · Kp 5+ = geomagnetic storm · Kp 9 = extreme.',
+        stats:[{label:'Kp Index',val:kp.toFixed(1)},{label:'Visible above',val:auroLat.toFixed(0)+'°'}],
         sources:[{n:'NOAA SWPC',a:'Forecast',url:'https://www.swpc.noaa.gov'}],
         tags:['Aurora','NOAA','Space Weather'],
         _live:true, _planet:{emoji:'🌌',name:'Aurora'}
       });
     }
+  } catch(_){}
+  try {
+    var astroArticles = await fetchAstrologyNews();
+    events.push.apply(events, astroArticles);
   } catch(_){}
   return events;
 }
