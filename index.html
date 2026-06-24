@@ -15,7 +15,9 @@
   --col-storm:#60a5fa;--col-humanitarian:#ec4899;--col-flight:#10b981;
   --col-launch:#a78bfa;--col-tech:#06b6d4;--col-fashion:#f472b6;--col-astrology:#c084fc;
   --col-connection:#f59e0b;
+  --col-history:#a3e635;
 }
+
 html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);font-family:'Inter',sans-serif;color:var(--text)}
 #globe-wrap{position:fixed;inset:0;z-index:0}
 #splash{position:fixed;inset:0;z-index:9999;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;transition:opacity .6s ease}
@@ -50,6 +52,10 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);font-famil
 #hb-status{font-size:10px;color:var(--muted);flex:1}
 .hb-exit{font-size:9px;color:#f87171;letter-spacing:1px;cursor:pointer;text-transform:uppercase;font-weight:700}
 .hb-exit:hover{color:#fca5a5}
+#irl-btn.active{background:rgba(56,189,248,.13);border-color:rgba(56,189,248,.5);color:#38bdf8}
+#sun-orb{position:fixed;width:120px;height:120px;border-radius:50%;pointer-events:none;z-index:1;display:none;
+  background:radial-gradient(circle,rgba(255,230,100,1) 0%,rgba(255,180,30,.7) 25%,rgba(255,120,0,.25) 55%,transparent 75%);
+  filter:blur(4px);mix-blend-mode:screen}
 #ptoggle{position:fixed;top:60px;left:300px;z-index:202;width:20px;height:34px;background:var(--glass);border:1px solid var(--border);border-left:none;border-radius:0 6px 6px 0;cursor:pointer;color:var(--muted);display:flex;align-items:center;justify-content:center;font-size:10px;backdrop-filter:blur(20px);transition:left .35s cubic-bezier(.4,0,.2,1);outline:none;user-select:none}
 #ptoggle:hover{color:var(--text)}
 #ptoggle.closed{left:0}
@@ -196,6 +202,8 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);font-famil
   <div class="t-sep"></div>
   <div class="t-summary" id="t-summary">Loading intelligence feed…</div>
   <div class="t-spacer"></div>
+  <button class="t-btn" id="irl-btn" onclick="toggleIRL()">🌍 IRL</button>
+  <div class="t-sep"></div>
   <button class="t-btn" id="hist-btn" onclick="toggleHistBar()">⏱ HISTORY</button>
   <div class="t-sep"></div>
   <button class="t-btn" id="day-btn" onclick="toggleDay()">🌙 NIGHT</button>
@@ -256,6 +264,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);font-famil
   <div class="lc-row" data-layer="launch"       onclick="toggleLayer(this)"><div class="lc-dot" style="background:var(--col-launch)"></div><span>Launches</span><div class="lc-live" id="ls-launch"></div><span class="lc-n" id="lc-launch">–</span></div>
   <div class="lc-row" data-layer="connection"   onclick="toggleLayer(this)"><div class="lc-dot" style="background:var(--col-connection)"></div><span>Connections</span><div class="lc-live on" id="ls-connection"></div><span class="lc-n" id="lc-connection">–</span></div>
 </div>
+<div id="sun-orb"></div>
 <div id="ap"></div>
 <div id="detail">
   <button id="d-close" onclick="closeDetail()">&#x2715;</button>
@@ -394,6 +403,11 @@ var connectMode = false;
 var connectedIds = [];
 var histMode = false;
 var histEvents = [];
+var irlMode = false;
+var irlCanvas = null, irlMaskCanvas = null, irlDayCanvas = null;
+var irlImgDay = null, irlImgNight = null, irlImgsLoaded = false;
+var irlBlobUrl = null;
+var sunOrbRAF = null;
 var tickerData = [
   {sym:'BTC',px:'–',chg:'',up:true},{sym:'ETH',px:'–',chg:'',up:true},
   {sym:'SOL',px:'–',chg:'',up:true},{sym:'EUR/USD',px:'–',chg:'',up:true},
@@ -531,7 +545,9 @@ function getNightPolygon(date) {
 }
 
 function updateTerminator() {
-  if (typeof globe !== 'undefined') globe.polygonsData(getNightPolygon());
+  if (typeof globe === 'undefined') return;
+  if (irlMode) { globe.polygonsData([]); updateIRLTexture(); }
+  else globe.polygonsData(getNightPolygon());
 }
 
 function moonPhaseName(date) {
@@ -1161,6 +1177,146 @@ function renderAP() {
 
 function closeAP(){document.getElementById('ap').classList.remove('open');}
 function clearConnect(){connectedIds=[];syncConnectUI();closeAP();}
+
+// =============================================================================
+// IRL MODE — real-time day/night composite texture
+// =============================================================================
+function loadIRLImages() {
+  if (irlImgsLoaded) return Promise.resolve();
+  return new Promise(function(res, rej) {
+    var done = 0;
+    function onLoad() { if (++done === 2) { irlImgsLoaded = true; res(); } }
+    irlImgDay   = new Image(); irlImgNight = new Image();
+    irlImgDay.crossOrigin = irlImgNight.crossOrigin = 'anonymous';
+    irlImgDay.onload = irlImgNight.onload = onLoad;
+    irlImgDay.onerror = irlImgNight.onerror = rej;
+    irlImgDay.src   = 'https://unpkg.com/three-globe/example/img/earth-day.jpg';
+    irlImgNight.src = 'https://unpkg.com/three-globe/example/img/earth-night.jpg';
+  });
+}
+
+function buildIRLCanvas() {
+  var W = 2048, H = 1024;
+  if (!irlCanvas)     { irlCanvas     = document.createElement('canvas'); irlCanvas.width=W; irlCanvas.height=H; }
+  if (!irlMaskCanvas) { irlMaskCanvas = document.createElement('canvas'); irlMaskCanvas.width=W; irlMaskCanvas.height=H; }
+  if (!irlDayCanvas)  { irlDayCanvas  = document.createElement('canvas'); irlDayCanvas.width=W; irlDayCanvas.height=H; }
+
+  var sun = sunSubpoint(new Date());
+  var sunLat = sun.lat, sunLng = sun.lng;
+
+  // --- Build soft mask: white = day, black = night, blurred edge ---
+  var mc = irlMaskCanvas.getContext('2d');
+  mc.fillStyle = '#000'; mc.fillRect(0,0,W,H);
+  mc.save();
+  mc.filter = 'blur(32px)';
+  mc.fillStyle = '#fff';
+  mc.beginPath();
+  var first = true;
+  for (var i = 0; i <= 360; i++) {
+    var lng = i - 180;
+    var dlng = (lng - sunLng) * DEG;
+    var lat_rad = Math.abs(sunLat) < 0.5
+      ? (Math.cos(dlng) >= 0 ? Math.PI/2*0.999 : -Math.PI/2*0.999)
+      : Math.atan(-Math.cos(dlng) / Math.tan(sunLat * DEG));
+    var x = (lng + 180) / 360 * W;
+    var y = (90 - lat_rad * RAD) / 180 * H;
+    if (first) { mc.moveTo(x, y); first = false; } else mc.lineTo(x, y);
+  }
+  if (sunLat > 0) { mc.lineTo(W,0); mc.lineTo(0,0); }
+  else            { mc.lineTo(W,H); mc.lineTo(0,H); }
+  mc.closePath(); mc.fill();
+  mc.restore();
+
+  // --- Day canvas clipped to mask ---
+  var dc = irlDayCanvas.getContext('2d');
+  dc.clearRect(0,0,W,H);
+  dc.drawImage(irlImgDay, 0,0,W,H);
+  dc.globalCompositeOperation = 'destination-in';
+  dc.drawImage(irlMaskCanvas, 0,0,W,H);
+  dc.globalCompositeOperation = 'source-over';
+
+  // --- Composite: night base + day on top ---
+  var ctx = irlCanvas.getContext('2d');
+  ctx.drawImage(irlImgNight, 0,0,W,H);
+  ctx.drawImage(irlDayCanvas, 0,0,W,H);
+}
+
+function updateIRLTexture() {
+  if (!irlMode || !irlImgsLoaded) return;
+  buildIRLCanvas();
+  irlCanvas.toBlob(function(blob) {
+    var url = URL.createObjectURL(blob);
+    globe.globeImageUrl(url);
+    if (irlBlobUrl) URL.revokeObjectURL(irlBlobUrl);
+    irlBlobUrl = url;
+  }, 'image/jpeg', 0.88);
+}
+
+// Project a world-space point to screen coords using the globe's camera matrices
+function projectToScreen(wx, wy, wz) {
+  var cam = globe.camera();
+  var m = cam.matrixWorldInverse.elements;
+  var p = cam.projectionMatrix.elements;
+  var vx = m[0]*wx+m[4]*wy+m[8]*wz+m[12];
+  var vy = m[1]*wx+m[5]*wy+m[9]*wz+m[13];
+  var vz = m[2]*wx+m[6]*wy+m[10]*wz+m[14];
+  var vw = m[3]*wx+m[7]*wy+m[11]*wz+m[15];
+  var cx = p[0]*vx+p[4]*vy+p[8]*vz+p[12]*vw;
+  var cy = p[1]*vx+p[5]*vy+p[9]*vz+p[13]*vw;
+  var cw = p[3]*vx+p[7]*vy+p[11]*vz+p[15]*vw;
+  if (cw <= 0.01) return null;
+  var nx = cx/cw, ny = cy/cw;
+  if (Math.abs(nx) > 1.6 || Math.abs(ny) > 1.6) return null;
+  return { x:(nx+1)/2*window.innerWidth, y:(-ny+1)/2*window.innerHeight };
+}
+
+function tickSunOrb() {
+  sunOrbRAF = null;
+  var el = document.getElementById('sun-orb');
+  if (!el) return;
+  if (!irlMode) { el.style.display = 'none'; return; }
+  var sun = sunSubpoint(new Date());
+  var lat = sun.lat*DEG, lng = sun.lng*DEG;
+  var dist = 550; // globe units — far beyond the surface
+  var sp = projectToScreen(
+    dist*Math.cos(lat)*Math.sin(lng),
+    dist*Math.sin(lat),
+    dist*Math.cos(lat)*Math.cos(lng)
+  );
+  if (!sp) { el.style.display = 'none'; }
+  else {
+    el.style.display = 'block';
+    el.style.left = (sp.x - 60) + 'px';
+    el.style.top  = (sp.y - 60) + 'px';
+  }
+  sunOrbRAF = requestAnimationFrame(tickSunOrb);
+}
+
+async function toggleIRL() {
+  irlMode = !irlMode;
+  var btn = document.getElementById('irl-btn');
+  btn.classList.toggle('active', irlMode);
+  if (irlMode) {
+    btn.textContent = '⏳ loading…';
+    try {
+      await loadIRLImages();
+      globe.atmosphereColor('#5bb8ff').atmosphereAltitude(0.22);
+      updateIRLTexture();
+      tickSunOrb();
+    } catch(e) {
+      irlMode = false; btn.classList.remove('active');
+      btn.textContent = '🌍 IRL';
+    }
+    btn.textContent = '🌍 IRL';
+  } else {
+    if (sunOrbRAF) { cancelAnimationFrame(sunOrbRAF); sunOrbRAF = null; }
+    document.getElementById('sun-orb').style.display = 'none';
+    if (irlBlobUrl) { URL.revokeObjectURL(irlBlobUrl); irlBlobUrl = null; }
+    globe.globeImageUrl(dayMode ? DAY_IMG : NIGHT_IMG)
+         .atmosphereColor(dayMode ? '#93c5fd' : '#1e3a8a').atmosphereAltitude(0.14);
+    globe.polygonsData(getNightPolygon());
+  }
+}
 
 // =============================================================================
 // HISTORY MODE
