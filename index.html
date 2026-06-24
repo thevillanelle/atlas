@@ -57,6 +57,13 @@ select#theme-btn option{background:#070b18;color:var(--text);font-size:12px;lett
 #sun-orb{position:fixed;width:120px;height:120px;border-radius:50%;pointer-events:none;z-index:150;display:none;
   background:radial-gradient(circle,rgba(255,230,100,1) 0%,rgba(255,180,30,.7) 25%,rgba(255,120,0,.25) 55%,transparent 75%);
   filter:blur(4px);mix-blend-mode:screen}
+#planet-orbs{position:fixed;top:0;left:0;pointer-events:none;z-index:140;width:0;height:0}
+.porb{position:absolute;display:none;transform:translate(-50%,-50%)}
+.porb-dot{display:block;border-radius:50%;background:var(--pc);width:calc(var(--pr) * 2);height:calc(var(--pr) * 2);
+  box-shadow:0 0 calc(var(--pr) * 2) var(--pc),0 0 calc(var(--pr) * 5) var(--pc)}
+.porb-label{position:absolute;top:calc(var(--pr) * 2 + 4px);left:50%;transform:translateX(-50%);
+  font-family:'Space Mono',monospace;font-size:7px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;
+  color:var(--pc);white-space:nowrap;text-shadow:0 0 6px var(--pc)}
 #ptoggle{position:fixed;top:60px;left:300px;z-index:202;width:20px;height:34px;background:var(--glass);border:1px solid var(--border);border-left:none;border-radius:0 6px 6px 0;cursor:pointer;color:var(--muted);display:flex;align-items:center;justify-content:center;font-size:10px;backdrop-filter:blur(20px);transition:left .35s cubic-bezier(.4,0,.2,1);outline:none;user-select:none}
 #ptoggle:hover{color:var(--text)}
 #ptoggle.closed{left:0}
@@ -268,6 +275,7 @@ select#theme-btn option{background:#070b18;color:var(--text);font-size:12px;lett
   <div class="lc-row off" data-layer="history" onclick="toggleLayer(this)"><div class="lc-dot" style="background:var(--col-history)"></div><span>Historical</span><div class="lc-live" id="ls-history"></div><span class="lc-n" id="lc-history">–</span></div>
 </div>
 <div id="sun-orb"></div>
+<div id="planet-orbs"></div>
 <div id="ap"></div>
 <div id="detail">
   <button id="d-close" onclick="closeDetail()">&#x2715;</button>
@@ -901,6 +909,99 @@ function refreshGlobe() {
   flightPoints = layerVis.flight ? getFlightPoints() : [];
   globe.pointsData(flightPoints);
   updateTerminator();
+}
+
+// =============================================================================
+// PLANETARY POSITIONS — Keplerian elements (Paul Schlyter, J2000)
+// =============================================================================
+var EARTH_ELEMS = {N0:0,dN:0,i0:0,di:0,w0:282.9404,dw:4.70935e-5,a0:1,da:0,e0:0.016709,de:-1.151e-9,M0:356.0470,dM:0.9856002585};
+var PLANET_DEFS = [
+  {name:'Mercury',color:'#c8c8c8',r:4, N0:48.3313, dN:3.24587e-5, i0:7.0047, di:5e-8,   w0:29.1241,  dw:1.01444e-5, a0:0.387098,da:0,        e0:0.205635,de:5.59e-10,  M0:168.6562,dM:4.0923344368},
+  {name:'Venus',  color:'#ffe580',r:7, N0:76.6799, dN:2.46590e-5, i0:3.3946, di:2.75e-8, w0:54.8910,  dw:1.38374e-5, a0:0.723330, da:0,        e0:0.006773,de:-1.302e-9, M0:48.0052, dM:1.6021302244},
+  {name:'Mars',   color:'#ff6b3d',r:6, N0:49.5574, dN:2.11081e-5, i0:1.8497, di:-1.78e-8,w0:286.5016, dw:2.92961e-5, a0:1.523688, da:0,        e0:0.093405,de:2.516e-9,  M0:18.6021, dM:0.5240207766},
+  {name:'Jupiter',color:'#ffcc88',r:9, N0:100.4542,dN:2.76854e-5, i0:1.3030, di:-1.557e-7,w0:273.8777,dw:1.64505e-5, a0:5.20256,  da:0,        e0:0.048498,de:4.469e-9,  M0:19.8950, dM:0.0830853001},
+  {name:'Saturn', color:'#e8d580',r:8, N0:113.6634,dN:2.38980e-5, i0:2.4886, di:-1.081e-7,w0:339.3939,dw:2.97661e-5, a0:9.55475,  da:0,        e0:0.055546,de:-9.499e-9, M0:316.9670,dM:0.0334442282},
+  {name:'Uranus', color:'#7de8e8',r:5, N0:74.0005, dN:1.3978e-5,  i0:0.7733, di:1.9e-8,  w0:96.6612,  dw:3.0565e-5,  a0:19.18171, da:-1.55e-8, e0:0.047318,de:7.45e-9,   M0:142.5905,dM:0.011725806},
+  {name:'Neptune',color:'#6688ff',r:5, N0:131.7806,dN:3.0173e-5,  i0:1.7700, di:-2.55e-7, w0:272.8461,dw:-6.027e-6,  a0:30.05826, da:3.313e-8, e0:0.008606,de:2.15e-9,   M0:260.2471,dM:0.005995147},
+];
+
+function daysSinceJ2000(date) { return date.getTime()/86400000 - 10957.5; }
+
+function solveKepler(M, e) {
+  var E = M + e * Math.sin(M) * (1 + e * Math.cos(M));
+  for (var i = 0; i < 6; i++) E = E - (E - e*Math.sin(E) - M) / (1 - e*Math.cos(E));
+  return E;
+}
+
+function keplerXYZ(el, d) {
+  var N = norm360(el.N0 + el.dN*d) * DEG;
+  var inc = (el.i0 + el.di*d) * DEG;
+  var w = norm360(el.w0 + el.dw*d) * DEG;
+  var a = el.a0 + el.da*d;
+  var e = el.e0 + el.de*d;
+  var M = norm360(el.M0 + el.dM*d) * DEG;
+  var E = solveKepler(M, e);
+  var xv = a*(Math.cos(E) - e);
+  var yv = a*(Math.sqrt(1 - e*e) * Math.sin(E));
+  var v = Math.atan2(yv, xv);
+  var r = Math.sqrt(xv*xv + yv*yv);
+  return {
+    x: r*(Math.cos(N)*Math.cos(v+w) - Math.sin(N)*Math.sin(v+w)*Math.cos(inc)),
+    y: r*(Math.sin(N)*Math.cos(v+w) + Math.cos(N)*Math.sin(v+w)*Math.cos(inc)),
+    z: r*Math.sin(v+w)*Math.sin(inc)
+  };
+}
+
+function planetGeogLatLng(pEl, d) {
+  var ph = keplerXYZ(pEl, d);
+  var eh = keplerXYZ(EARTH_ELEMS, d);
+  var gx = ph.x - eh.x, gy = ph.y - eh.y, gz = ph.z - eh.z;
+  var eps = (23.4393 - 3.563e-7*d) * DEG;
+  var xe = gx;
+  var ye = gy*Math.cos(eps) - gz*Math.sin(eps);
+  var ze = gy*Math.sin(eps) + gz*Math.cos(eps);
+  var RA  = Math.atan2(ye, xe) * RAD;
+  var Dec = Math.atan2(ze, Math.sqrt(xe*xe + ye*ye)) * RAD;
+  var GMST = norm360(280.46061837 + 360.98564736629*d);
+  var lng = norm180(RA - GMST);
+  return {lat: Dec, lng: lng};
+}
+
+function initPlanetOrbs() {
+  var c = document.getElementById('planet-orbs');
+  c.innerHTML = '';
+  PLANET_DEFS.forEach(function(p) {
+    var el = document.createElement('div');
+    el.className = 'porb';
+    el.id = 'porb-' + p.name.toLowerCase();
+    el.style.setProperty('--pc', p.color);
+    el.style.setProperty('--pr', p.r + 'px');
+    el.innerHTML = '<span class="porb-dot"></span><span class="porb-label">' + p.name + '</span>';
+    c.appendChild(el);
+  });
+}
+
+var planetRAF = null;
+function tickPlanets() {
+  planetRAF = null;
+  if (typeof globe === 'undefined') { planetRAF = requestAnimationFrame(tickPlanets); return; }
+  var camDist = globe.camera().position.length();
+  var opacity = Math.min(1, Math.max(0, (camDist - 280) / 150));
+  var d = daysSinceJ2000(new Date());
+  PLANET_DEFS.forEach(function(p) {
+    var el = document.getElementById('porb-' + p.name.toLowerCase());
+    if (!el) return;
+    if (opacity <= 0) { el.style.display = 'none'; return; }
+    var pos = planetGeogLatLng(p, d);
+    var lat = pos.lat * DEG, lng = pos.lng * DEG, dist = 620;
+    var sp = projectToScreen(dist*Math.cos(lat)*Math.sin(lng), dist*Math.sin(lat), dist*Math.cos(lat)*Math.cos(lng));
+    if (!sp) { el.style.display = 'none'; return; }
+    el.style.display = 'block';
+    el.style.opacity = opacity;
+    el.style.left = sp.x + 'px';
+    el.style.top  = sp.y + 'px';
+  });
+  planetRAF = requestAnimationFrame(tickPlanets);
 }
 
 // =============================================================================
@@ -1572,6 +1673,8 @@ async function init() {
     document.getElementById('splash').classList.add('out');
     setTimeout(function(){var s=document.getElementById('splash');if(s)s.remove();},700);
   },500);
+  initPlanetOrbs();
+  tickPlanets();
   tickClock();
   setInterval(tickClock, 1000);
   setInterval(fetchMarkets, 60000);
