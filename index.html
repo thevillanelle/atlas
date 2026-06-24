@@ -886,7 +886,9 @@ function buildMarker(d) {
 }
 
 function refreshGlobe() {
-  var visEvs = getFiltered().filter(function(e){return layerVis[e.type];});
+  var live = allEvents.filter(function(e){return layerVis[e.type];});
+  var hist = (histEvents.length && layerVis.history) ? histEvents : [];
+  var visEvs = live.concat(hist);
   globe.htmlElementsData(visEvs);
   flightPoints = layerVis.flight ? getFlightPoints() : [];
   globe.pointsData(flightPoints);
@@ -897,9 +899,9 @@ function refreshGlobe() {
 // FILTER / LIST
 // =============================================================================
 function getFiltered() {
-  var evs = histEvents.length && layerVis.history
-    ? allEvents.concat(histEvents)
-    : allEvents;
+  // Sidebar: when history layer is loaded + visible, show only historical events
+  if (histEvents.length && layerVis.history) return histEvents;
+  var evs = allEvents;
   if (currentTab !== 'all') evs = evs.filter(function(e){return e.type===currentTab;});
   if (searchQ) {
     var q = searchQ.toLowerCase();
@@ -959,7 +961,8 @@ function renderList() {
 function selectEvent(id) {
   if (connectMode) { toggleConnected(id); return; }
   selectedId = id;
-  var ev = allEvents.find(function(e){return e.id===id;});
+  var ev = allEvents.find(function(e){return e.id===id;}) ||
+           histEvents.find(function(e){return e.id===id;});
   if (!ev) return;
   globe.controls().autoRotate = false;
   globe.pointOfView({lat:ev.lat,lng:ev.lng,altitude:1.6}, 1200);
