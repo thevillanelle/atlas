@@ -236,6 +236,7 @@ body.hist-open #panel{top:92px}body.hist-open #detail{top:92px}body.hist-open #l
   <input id="hb-year" type="number" min="1900" max="2025" placeholder="Year" value="1962">
   <button id="hb-go" onclick="loadHistory()">GO ›</button>
   <span id="hb-status"></span>
+  <span id="hb-connect-hint" style="display:none;font-size:9px;color:#2dd4bf;letter-spacing:1px;font-weight:700;margin-left:8px">⟷ CONNECT MODE ACTIVE — select historical + live dots to connect across time</span>
 </div>
 <button id="ptoggle" onclick="togglePanel()">&#8249;</button>
 <div id="panel">
@@ -987,7 +988,7 @@ function tickPlanets() {
   planetRAF = null;
   if (typeof globe === 'undefined') { planetRAF = requestAnimationFrame(tickPlanets); return; }
   var camDist = globe.camera().position.length();
-  var opacity = Math.min(1, Math.max(0, (camDist - 280) / 150));
+  var opacity = Math.min(1, Math.max(0, (camDist - 160) / 120));
   var d = daysSinceJ2000(new Date());
   PLANET_DEFS.forEach(function(p) {
     var el = document.getElementById('porb-' + p.name.toLowerCase());
@@ -1074,8 +1075,7 @@ function renderList() {
 function selectEvent(id) {
   if (connectMode) { toggleConnected(id); return; }
   selectedId = id;
-  var ev = allEvents.find(function(e){return e.id===id;}) ||
-           histEvents.find(function(e){return e.id===id;});
+  var ev = findEventById(id);
   if (!ev) return;
   globe.controls().autoRotate = false;
   globe.pointOfView({lat:ev.lat,lng:ev.lng,altitude:1.6}, 1200);
@@ -1209,6 +1209,8 @@ function toggleConnect() {
   btn.classList.toggle('active', connectMode);
   btn.textContent = connectMode ? '⟷ ON' : '⟷ CONNECT';
   if (!connectMode) { connectedIds = []; syncConnectUI(); closeAP(); }
+  var hint = document.getElementById('hb-connect-hint');
+  if (hint) hint.style.display = connectMode && document.getElementById('hist-bar').classList.contains('open') ? 'inline' : 'none';
 }
 
 function toggleConnected(id) {
@@ -1230,17 +1232,25 @@ function syncConnectUI() {
   drawArcs();
 }
 
+function findEventById(id) {
+  return allEvents.find(function(e){return e.id===id;}) || histEvents.find(function(e){return e.id===id;});
+}
+
 function drawArcs() {
   if (connectedIds.length < 2) { globe.arcsData([]); return; }
-  var evs = connectedIds.map(function(id){return allEvents.find(function(e){return e.id===id;});}).filter(Boolean);
+  var evs = connectedIds.map(findEventById).filter(Boolean);
   var arcs = [];
   for (var i=0;i<evs.length;i++) {
     for (var j=i+1;j<evs.length;j++) {
+      var temporal = evs[i].type==='history' || evs[j].type==='history';
       var shared = (evs[i].tags||[]).filter(function(t){return (evs[j].tags||[]).indexOf(t)!==-1;}).length;
+      // temporal arcs = teal; same-era arcs = purple
+      var strong = temporal ? '#2dd4bf' : '#a855f7';
+      var weak   = temporal ? 'rgba(45,212,191,0.3)' : 'rgba(168,85,247,0.3)';
       arcs.push({
         sLat:evs[i].lat, sLng:evs[i].lng, eLat:evs[j].lat, eLng:evs[j].lng,
-        color: shared > 0 ? ['#a855f7','#a855f7'] : ['rgba(168,85,247,0.3)','rgba(168,85,247,0.3)'],
-        w: shared > 0 ? 0.9 : 0.35
+        color: shared > 0 || temporal ? [strong,strong] : [weak,weak],
+        w: temporal ? 1.1 : (shared > 0 ? 0.9 : 0.35)
       });
     }
   }
@@ -1293,7 +1303,16 @@ function analyzeConnections(evs) {
   if (types[dominant]===evs.length && evs.length>1)
     threads.push('All ' + evs.length + ' selected events are ' + dominant + '. Compare them: which is most severe? Which has the least coverage? The gap between severity and attention is where the real story lives.');
 
-  if (!threads.length && sharedTags.length)
+  // Temporal connections — historical events mixed with live ones
+  var histEvsList = evs.filter(function(e){return e.type==='history';});
+  var liveEvsList = evs.filter(function(e){return e.type!=='history';});
+  if (histEvsList.length && liveEvsList.length) {
+    var hlocs = histEvsList.map(function(e){return e.location;}).join(', ');
+    var llocs = liveEvsList.map(function(e){return e.title;}).join(', ');
+    threads.unshift('ACROSS TIME: ' + hlocs + ' (historical) is connected to ' + llocs + ' (now). What patterns repeat? What has changed? History doesn\'t repeat — but it rhymes. Trace what the historical event set in motion and whether it has fully resolved or only shifted form.');
+    if (sharedTags.length)
+      threads.push('Shared signal across time: ' + sharedTags.slice(0,4).join(', ') + '. The same forces may be operating across different eras — look for the actor, the resource, or the ideology that links them.');
+  } else if (!threads.length && sharedTags.length)
     threads.push('Shared signals across ' + evs.length + ' events: ' + sharedTags.slice(0,5).join(', ') + '. These threads suggest a coordinated narrative or linked causal chain worth tracing.');
   if (!threads.length)
     threads.push('No direct signal overlap detected between these ' + evs.length + ' events. The connection may be economic, temporal, or structural — consider what a single actor (state, market, institution) might have to gain from all of these happening simultaneously.');
@@ -1303,7 +1322,7 @@ function analyzeConnections(evs) {
 
 function renderAP() {
   var panel = document.getElementById('ap');
-  var evs = connectedIds.map(function(id){return allEvents.find(function(e){return e.id===id;});}).filter(Boolean);
+  var evs = connectedIds.map(findEventById).filter(Boolean);
 
   var badges = evs.map(function(ev){
     var c = COLORS[ev.type]||'#fff';
@@ -1469,7 +1488,10 @@ function toggleHistBar() {
   var open = bar.classList.toggle('open');
   btn.classList.toggle('active', open);
   document.body.classList.toggle('hist-open', open);
-  if (!open) { histEvents = []; layerVis.history = false; refreshGlobe(); }
+  if (!open) { histEvents = []; layerVis.history = false; }
+  var hint = document.getElementById('hb-connect-hint');
+  if (hint) hint.style.display = open && connectMode ? 'inline' : 'none';
+  refreshGlobe();
   renderList();
 }
 
