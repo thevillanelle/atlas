@@ -41,8 +41,9 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);font-famil
 .t-btn{background:var(--glass);border:1px solid var(--border);border-radius:14px;color:var(--muted);font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;cursor:pointer;backdrop-filter:blur(20px);transition:all .2s;font-family:'Space Mono',monospace;outline:none;padding:4px 11px;flex-shrink:0}
 .t-btn:hover{color:var(--text);border-color:var(--border2)}
 .t-btn.active{background:rgba(163,230,53,.12);border-color:rgba(163,230,53,.45);color:#a3e635}
-#theme-btn.day{background:rgba(251,191,36,.12);border-color:rgba(251,191,36,.45);color:#fbbf24}
-#theme-btn.irl{background:rgba(56,189,248,.13);border-color:rgba(56,189,248,.5);color:#38bdf8}
+select#theme-btn{appearance:none;-webkit-appearance:none;background:var(--glass);border:1px solid var(--border);border-radius:14px;color:var(--muted);font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;cursor:pointer;font-family:'Space Mono',monospace;outline:none;padding:4px 22px 4px 11px;flex-shrink:0;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='5'%3E%3Cpath d='M0 0l4 5 4-5z' fill='%234e5a72'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 8px center}
+select#theme-btn:hover{color:var(--text);border-color:var(--border2)}
+select#theme-btn option{background:#070b18;color:var(--text);font-size:12px;letter-spacing:0;font-weight:400}
 #connect-btn.active{background:rgba(168,85,247,.15);border-color:rgba(168,85,247,.5);color:#a855f7}
 #hist-bar{position:fixed;top:48px;left:0;right:0;z-index:290;background:rgba(10,12,18,.96);border-bottom:1px solid rgba(163,230,53,.25);padding:8px 18px;display:none;align-items:center;gap:10px;font-family:'Space Mono',monospace;font-size:10px}
 #hist-bar.open{display:flex}
@@ -204,7 +205,11 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);font-famil
   <div class="t-spacer"></div>
   <button class="t-btn" id="hist-btn" onclick="toggleHistBar()">⏱ HISTORY</button>
   <div class="t-sep"></div>
-  <button class="t-btn" id="theme-btn" onclick="cycleTheme()">🌙 NIGHT</button>
+  <select id="theme-btn" onchange="setTheme(this.value)" class="t-btn">
+    <option value="0">🌙 NIGHT</option>
+    <option value="1">☀️ DAY</option>
+    <option value="2">🌍 IRL</option>
+  </select>
   <div class="t-sep"></div>
   <button class="t-btn" id="connect-btn" onclick="toggleConnect()">⟷ CONNECT</button>
   <div class="t-sep"></div>
@@ -1017,43 +1022,39 @@ function closeDetail() {
 // =============================================================================
 // UI CONTROLS
 // =============================================================================
-function cycleTheme() {
-  themeMode = (themeMode + 1) % 3;
-  dayMode  = (themeMode === 1);
-  irlMode  = (themeMode === 2);
-  var btn = document.getElementById('theme-btn');
-  btn.classList.remove('day','irl');
+function applyThemeMode() {
+  dayMode = (themeMode === 1);
+  irlMode = (themeMode === 2);
+  document.getElementById('theme-btn').value = themeMode;
   if (themeMode === 0) {
-    btn.textContent = '🌙 NIGHT';
     if (sunOrbRAF) { cancelAnimationFrame(sunOrbRAF); sunOrbRAF = null; }
     document.getElementById('sun-orb').style.display = 'none';
     if (irlBlobUrl) { URL.revokeObjectURL(irlBlobUrl); irlBlobUrl = null; }
     globe.globeImageUrl(NIGHT_IMG).atmosphereColor('#1e3a8a').atmosphereAltitude(0.14);
     globe.polygonsData(getNightPolygon());
   } else if (themeMode === 1) {
-    btn.textContent = '☀️ DAY'; btn.classList.add('day');
     if (sunOrbRAF) { cancelAnimationFrame(sunOrbRAF); sunOrbRAF = null; }
     document.getElementById('sun-orb').style.display = 'none';
     if (irlBlobUrl) { URL.revokeObjectURL(irlBlobUrl); irlBlobUrl = null; }
     globe.globeImageUrl(DAY_IMG).atmosphereColor('#93c5fd').atmosphereAltitude(0.14);
     globe.polygonsData([]);
   } else {
-    btn.textContent = '⏳ loading…'; btn.classList.add('irl');
     globe.atmosphereColor('#5bb8ff').atmosphereAltitude(0.22);
     globe.polygonsData([]);
     loadIRLImages().then(function() {
-      btn.textContent = '🌍 IRL';
       updateIRLTexture();
       tickSunOrb();
     }).catch(function() {
       themeMode = 0; dayMode = false; irlMode = false;
-      btn.textContent = '🌙 NIGHT'; btn.classList.remove('irl');
+      document.getElementById('theme-btn').value = 0;
       globe.globeImageUrl(NIGHT_IMG).atmosphereColor('#1e3a8a').atmosphereAltitude(0.14);
       globe.polygonsData(getNightPolygon());
     });
   }
 }
-function toggleDay(){ cycleTheme(); } // legacy alias
+function setTheme(val) { themeMode = parseInt(val); applyThemeMode(); }
+function cycleTheme() { themeMode = (themeMode + 1) % 3; applyThemeMode(); }
+function toggleDay() { cycleTheme(); }
 function setTab(el){document.querySelectorAll('.tab').forEach(function(t){t.classList.remove('on');});el.classList.add('on');currentTab=el.dataset.tab;renderList();refreshGlobe();}
 function onSearch(){searchQ=document.getElementById('sinput').value.trim();if(searchQ)document.querySelectorAll('.wl-tag').forEach(function(t){t.classList.remove('on');});renderList();refreshGlobe();}
 function toggleLayer(el){var l=el.dataset.layer;layerVis[l]=!layerVis[l];el.classList.toggle('off',!layerVis[l]);refreshGlobe();}
