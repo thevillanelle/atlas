@@ -36,6 +36,20 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);font-famil
 .t-summary{font-size:11px;color:var(--muted);font-family:'Space Mono',monospace;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .t-spacer{flex:1}
 #t-clock{font-size:11px;color:var(--muted);font-family:'Space Mono',monospace;flex-shrink:0}
+.t-btn{background:var(--glass);border:1px solid var(--border);border-radius:14px;color:var(--muted);font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;cursor:pointer;backdrop-filter:blur(20px);transition:all .2s;font-family:'Space Mono',monospace;outline:none;padding:4px 11px;flex-shrink:0}
+.t-btn:hover{color:var(--text);border-color:var(--border2)}
+.t-btn.active{background:rgba(163,230,53,.12);border-color:rgba(163,230,53,.45);color:#a3e635}
+#day-btn.day{background:rgba(251,191,36,.12);border-color:rgba(251,191,36,.45);color:#fbbf24}
+#connect-btn.active{background:rgba(168,85,247,.15);border-color:rgba(168,85,247,.5);color:#a855f7}
+#hist-bar{position:fixed;top:48px;left:0;right:0;z-index:290;background:rgba(10,12,18,.96);border-bottom:1px solid rgba(163,230,53,.25);padding:8px 18px;display:none;align-items:center;gap:10px;font-family:'Space Mono',monospace;font-size:10px}
+#hist-bar.open{display:flex}
+.hb-lbl{color:#a3e635;font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase}
+#hb-month,#hb-year{background:rgba(255,255,255,.06);border:1px solid rgba(163,230,53,.3);border-radius:6px;color:var(--text);font-family:'Space Mono',monospace;font-size:11px;padding:4px 8px;outline:none}
+#hb-go{background:rgba(163,230,53,.15);border:1px solid rgba(163,230,53,.45);border-radius:6px;color:#a3e635;font-family:'Space Mono',monospace;font-size:10px;font-weight:700;letter-spacing:1px;padding:4px 14px;cursor:pointer;transition:all .2s}
+#hb-go:hover{background:rgba(163,230,53,.28)}
+#hb-status{font-size:10px;color:var(--muted);flex:1}
+.hb-exit{font-size:9px;color:#f87171;letter-spacing:1px;cursor:pointer;text-transform:uppercase;font-weight:700}
+.hb-exit:hover{color:#fca5a5}
 #ptoggle{position:fixed;top:60px;left:300px;z-index:202;width:20px;height:34px;background:var(--glass);border:1px solid var(--border);border-left:none;border-radius:0 6px 6px 0;cursor:pointer;color:var(--muted);display:flex;align-items:center;justify-content:center;font-size:10px;backdrop-filter:blur(20px);transition:left .35s cubic-bezier(.4,0,.2,1);outline:none;user-select:none}
 #ptoggle:hover{color:var(--text)}
 #ptoggle.closed{left:0}
@@ -123,12 +137,6 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);font-famil
 .ds-badge{display:inline-flex;align-items:center;gap:3px;font-size:8px;font-weight:700;letter-spacing:1px;padding:2px 5px;border-radius:3px;text-transform:uppercase;vertical-align:middle;margin-left:4px}
 .ds-live{background:rgba(16,185,129,.15);color:#10b981;border:1px solid rgba(16,185,129,.25)}
 .ds-fallback{background:rgba(245,158,11,.12);color:#f59e0b;border:1px solid rgba(245,158,11,.2)}
-#day-btn{position:fixed;top:12px;right:270px;z-index:310;padding:5px 13px;background:var(--glass);border:1px solid var(--border);border-radius:16px;color:var(--muted);font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;cursor:pointer;backdrop-filter:blur(20px);transition:all .2s;font-family:'Space Mono',monospace;outline:none}
-#day-btn:hover{color:var(--text);border-color:var(--border2)}
-#day-btn.day{background:rgba(251,191,36,.12);border-color:rgba(251,191,36,.45);color:#fbbf24}
-#connect-btn{position:fixed;top:12px;right:160px;z-index:310;padding:5px 13px;background:var(--glass);border:1px solid var(--border);border-radius:16px;color:var(--muted);font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;cursor:pointer;backdrop-filter:blur(20px);transition:all .2s;font-family:'Space Mono',monospace;outline:none}
-#connect-btn:hover{color:var(--text);border-color:var(--border2)}
-#connect-btn.active{background:rgba(168,85,247,.15);border-color:rgba(168,85,247,.5);color:#a855f7}
 .ev.csel{background:rgba(168,85,247,.1);border-color:rgba(168,85,247,.35)!important;border:1px solid}
 .marker.csel .m-dot{box-shadow:0 0 0 3px rgba(168,85,247,.7),0 0 14px var(--mc)}
 .marker.csel .m-ring{border-color:#a855f7!important;opacity:.9}
@@ -188,7 +196,28 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);font-famil
   <div class="t-sep"></div>
   <div class="t-summary" id="t-summary">Loading intelligence feed…</div>
   <div class="t-spacer"></div>
+  <button class="t-btn" id="hist-btn" onclick="toggleHistBar()">⏱ HISTORY</button>
+  <div class="t-sep"></div>
+  <button class="t-btn" id="day-btn" onclick="toggleDay()">🌙 NIGHT</button>
+  <div class="t-sep"></div>
+  <button class="t-btn" id="connect-btn" onclick="toggleConnect()">⟷ CONNECT</button>
+  <div class="t-sep"></div>
   <div id="t-clock"></div>
+</div>
+<div id="hist-bar">
+  <span class="hb-lbl">⏱ HISTORY</span>
+  <select id="hb-month">
+    <option value="1">January</option><option value="2">February</option>
+    <option value="3">March</option><option value="4">April</option>
+    <option value="5">May</option><option value="6">June</option>
+    <option value="7">July</option><option value="8">August</option>
+    <option value="9">September</option><option value="10">October</option>
+    <option value="11">November</option><option value="12">December</option>
+  </select>
+  <input id="hb-year" type="number" min="1900" max="2025" placeholder="Year" value="1962">
+  <button id="hb-go" onclick="loadHistory()">GO ›</button>
+  <span id="hb-status"></span>
+  <span class="hb-exit" onclick="exitHistMode()" style="display:none" id="hb-exit">✕ Exit History</span>
 </div>
 <button id="ptoggle" onclick="togglePanel()">&#8249;</button>
 <div id="panel">
@@ -227,8 +256,6 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);font-famil
   <div class="lc-row" data-layer="launch"       onclick="toggleLayer(this)"><div class="lc-dot" style="background:var(--col-launch)"></div><span>Launches</span><div class="lc-live" id="ls-launch"></div><span class="lc-n" id="lc-launch">–</span></div>
   <div class="lc-row" data-layer="connection"   onclick="toggleLayer(this)"><div class="lc-dot" style="background:var(--col-connection)"></div><span>Connections</span><div class="lc-live on" id="ls-connection"></div><span class="lc-n" id="lc-connection">–</span></div>
 </div>
-<button id="day-btn" onclick="toggleDay()">🌙 NIGHT</button>
-<button id="connect-btn" onclick="toggleConnect()">⟷ CONNECT</button>
 <div id="ap"></div>
 <div id="detail">
   <button id="d-close" onclick="closeDetail()">&#x2715;</button>
@@ -246,11 +273,11 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);font-famil
 var COLORS = {
   news:'#ef4444',conflict:'#f97316',disaster:'#eab308',storm:'#60a5fa',
   humanitarian:'#ec4899',flight:'#10b981',launch:'#a78bfa',
-  tech:'#06b6d4',fashion:'#f472b6',astrology:'#c084fc',connection:'#f59e0b'
+  tech:'#06b6d4',fashion:'#f472b6',astrology:'#c084fc',connection:'#f59e0b',history:'#a3e635'
 };
 var ICONS = {
   news:'📰',conflict:'⚔️',disaster:'🌊',storm:'🌀',humanitarian:'🏥',
-  flight:'✈️',launch:'🚀',tech:'💻',fashion:'👗',astrology:'✨',connection:'🔗'
+  flight:'✈️',launch:'🚀',tech:'💻',fashion:'👗',astrology:'✨',connection:'🔗',history:'🕰️'
 };
 var DAY_IMG   = '//unpkg.com/three-globe/example/img/earth-day.jpg';
 var NIGHT_IMG = '//unpkg.com/three-globe/example/img/earth-night.jpg';
@@ -360,11 +387,13 @@ var searchQ = '';
 var selectedId = null;
 var panelOpen = true;
 var watchTags = ['Gaza','Ukraine','AI','Markets','Fashion','Climate'];
-var layerVis = {news:true,conflict:true,disaster:true,storm:true,humanitarian:true,flight:true,launch:true,tech:true,fashion:true,astrology:true,connection:true};
+var layerVis = {news:true,conflict:true,disaster:true,storm:true,humanitarian:true,flight:true,launch:true,tech:true,fashion:true,astrology:true,connection:true,history:true};
 var globe;
 var dayMode = false;
 var connectMode = false;
 var connectedIds = [];
+var histMode = false;
+var histEvents = [];
 var tickerData = [
   {sym:'BTC',px:'–',chg:'',up:true},{sym:'ETH',px:'–',chg:'',up:true},
   {sym:'SOL',px:'–',chg:'',up:true},{sym:'EUR/USD',px:'–',chg:'',up:true},
@@ -849,6 +878,7 @@ function refreshGlobe() {
 // FILTER / LIST
 // =============================================================================
 function getFiltered() {
+  if (histMode) return histEvents;
   var evs = allEvents;
   if (currentTab !== 'all') evs = evs.filter(function(e){return e.type===currentTab;});
   if (searchQ) {
@@ -1131,6 +1161,103 @@ function renderAP() {
 
 function closeAP(){document.getElementById('ap').classList.remove('open');}
 function clearConnect(){connectedIds=[];syncConnectUI();closeAP();}
+
+// =============================================================================
+// HISTORY MODE
+// =============================================================================
+var MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+
+function toggleHistBar() {
+  var bar = document.getElementById('hist-bar');
+  var btn = document.getElementById('hist-btn');
+  var open = bar.classList.toggle('open');
+  btn.classList.toggle('active', open);
+}
+
+async function loadHistory() {
+  var month = parseInt(document.getElementById('hb-month').value);
+  var year  = parseInt(document.getElementById('hb-year').value);
+  if (!year || year < 1900 || year > 2025) { setHistStatus('Enter a valid year (1900–2025)'); return; }
+  var label = MONTHS[month-1] + ' ' + year;
+  setHistStatus('Loading ' + label + '…');
+  document.getElementById('hb-go').disabled = true;
+  try {
+    var evs = await fetchHistoricalEvents(month, year);
+    if (!evs.length) { setHistStatus('No geolocatable events found — try another date'); document.getElementById('hb-go').disabled=false; return; }
+    histEvents = evs;
+    histMode = true;
+    document.getElementById('hb-status').textContent = label + ' — ' + evs.length + ' events';
+    document.getElementById('hb-exit').style.display = '';
+    var sun = sunSubpoint(new Date(year, month-1, 15));
+    globe.pointOfView({lat:sun.lat, lng:sun.lng, altitude:2.0}, 1200);
+    renderList(); refreshGlobe();
+  } catch(e) {
+    setHistStatus('Failed to load — try another date');
+  }
+  document.getElementById('hb-go').disabled = false;
+}
+
+function exitHistMode() {
+  histMode = false; histEvents = [];
+  document.getElementById('hb-status').textContent = '';
+  document.getElementById('hb-exit').style.display = 'none';
+  document.getElementById('hist-bar').classList.remove('open');
+  document.getElementById('hist-btn').classList.remove('active');
+  renderList(); refreshGlobe();
+}
+
+function setHistStatus(msg) { document.getElementById('hb-status').textContent = msg; }
+
+async function fetchHistoricalEvents(month, year) {
+  var monthName = MONTHS[month-1];
+  var title = monthName + '_' + year;
+  var url = 'https://en.wikipedia.org/w/api.php?action=query&prop=extracts&titles='+encodeURIComponent(title)+'&format=json&origin=*&explaintext=1&exsectionformat=plain';
+  var data = await apiFetch(url, 12000);
+  var pages = data.query && data.query.pages;
+  if (!pages) throw new Error('no pages');
+  var page = Object.values(pages)[0];
+  if (!page || page.missing !== undefined) return fetchHistSearch(monthName, year);
+  var evs = parseWikiExtract(page.extract || '', monthName, year);
+  return evs.length ? evs : fetchHistSearch(monthName, year);
+}
+
+async function fetchHistSearch(monthName, year) {
+  var url = 'https://en.wikipedia.org/w/api.php?action=query&list=search&srsearch='+encodeURIComponent(monthName+' '+year)+'&srnamespace=0&srlimit=30&format=json&origin=*';
+  var data = await apiFetch(url, 10000);
+  var results = (data.query && data.query.search) || [];
+  return results.map(function(r,i) {
+    var text = r.title + ' ' + r.snippet.replace(/<[^>]*>/g,'');
+    var ll = findLatLng(text);
+    if (!ll) return null;
+    var loc = Object.keys(CC).sort(function(a,b){return b.length-a.length;}).find(function(c){return text.toLowerCase().indexOf(c.toLowerCase())!==-1;})||'Unknown';
+    var wikiUrl = 'https://en.wikipedia.org/wiki/'+encodeURIComponent(r.title.replace(/ /g,'_'));
+    return {id:'histf_'+i,type:'history',title:r.title,location:loc,lat:ll[0],lng:ll[1],severity:3,age:monthName+' '+year,
+      brief:r.snippet.replace(/<[^>]*>/g,'').trim(),url:wikiUrl,
+      sources:[{n:'Wikipedia',a:monthName+' '+year,url:wikiUrl}],tags:[String(year),monthName,'Historical',loc],_live:false};
+  }).filter(Boolean);
+}
+
+function parseWikiExtract(text, monthName, year) {
+  var events=[], lines=text.split('\n'), inEvents=false;
+  lines.forEach(function(line,i) {
+    line=line.replace(/\[\d+\]/g,'').trim();
+    if (/^Events?\s*$/i.test(line)){inEvents=true;return;}
+    if (/^(Births?|Deaths?|Holidays?|Notes?)\s*$/i.test(line)){inEvents=false;return;}
+    if (!inEvents||line.length<15) return;
+    var m=line.match(/^(?:[A-Za-z]+ )?(\d{1,2})\s*[–—\-]\s*(.{20,})/);
+    if (!m) return;
+    var desc=m[2].trim(), ll=findLatLng(desc);
+    if (!ll) return;
+    var loc=Object.keys(CC).sort(function(a,b){return b.length-a.length;}).find(function(c){return desc.toLowerCase().indexOf(c.toLowerCase())!==-1;})||monthName+' '+year;
+    var dateStr=monthName+' '+m[1]+', '+year;
+    var wikiTitle=desc.split(/[,\.]/)[0].trim().slice(0,60);
+    var wikiUrl='https://en.wikipedia.org/wiki/Special:Search?search='+encodeURIComponent(wikiTitle+' '+year);
+    events.push({id:'hist_'+i,type:'history',title:desc.slice(0,90)+(desc.length>90?'…':''),location:loc,lat:ll[0],lng:ll[1],
+      severity:3,age:dateStr,brief:desc,url:wikiUrl,sources:[{n:'Wikipedia',a:dateStr,url:wikiUrl}],
+      tags:[String(year),monthName,'Historical',loc],_live:false});
+  });
+  return events;
+}
 
 // =============================================================================
 // INIT
