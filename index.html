@@ -113,6 +113,7 @@ select#theme-btn option{background:#070b18;color:var(--text);font-size:12px;lett
 .astro-sign{font-size:11px;font-weight:700;color:var(--text);margin-bottom:2px}
 .astro-site{font-size:8px;color:var(--muted)}
 .astro-snip{font-size:9px;color:rgba(192,132,252,.7);margin-top:4px;line-height:1.4;text-align:left;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+body.hist-open #panel{top:92px}body.hist-open #detail{top:92px}body.hist-open #lctrl{top:104px}
 #lctrl{position:fixed;top:60px;right:12px;z-index:200;background:var(--glass);border:1px solid var(--border);border-radius:11px;padding:9px;backdrop-filter:blur(24px);display:flex;flex-direction:column;gap:3px;min-width:158px}
 .lc-hdr{font-size:8px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--muted);padding:1px 5px 4px}
 .lc-row{display:flex;align-items:center;gap:7px;padding:4px 6px;border-radius:6px;cursor:pointer;transition:background .12s;font-size:10.5px;font-weight:500;user-select:none}
@@ -1467,18 +1468,9 @@ function toggleHistBar() {
   var btn = document.getElementById('hist-btn');
   var open = bar.classList.toggle('open');
   btn.classList.toggle('active', open);
+  document.body.classList.toggle('hist-open', open);
   if (!open) { histEvents = []; layerVis.history = false; refreshGlobe(); }
-  updatePanelOffsets();
   renderList();
-}
-
-function updatePanelOffsets() {
-  var bar = document.getElementById('hist-bar');
-  var extra = bar.classList.contains('open') ? bar.offsetHeight : 0;
-  var topPx = (48 + extra) + 'px';
-  document.getElementById('panel').style.top = topPx;
-  document.getElementById('detail').style.top = topPx;
-  document.getElementById('lctrl').style.top = (60 + extra) + 'px';
 }
 
 async function loadHistory() {
