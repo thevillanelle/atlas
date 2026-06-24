@@ -54,7 +54,7 @@ select#theme-btn option{background:#070b18;color:var(--text);font-size:12px;lett
 #hb-status{font-size:10px;color:var(--muted);flex:1}
 .hb-exit{font-size:9px;color:#f87171;letter-spacing:1px;cursor:pointer;text-transform:uppercase;font-weight:700}
 .hb-exit:hover{color:#fca5a5}
-#sun-orb{position:fixed;width:120px;height:120px;border-radius:50%;pointer-events:none;z-index:1;display:none;
+#sun-orb{position:fixed;width:120px;height:120px;border-radius:50%;pointer-events:none;z-index:150;display:none;
   background:radial-gradient(circle,rgba(255,230,100,1) 0%,rgba(255,180,30,.7) 25%,rgba(255,120,0,.25) 55%,transparent 75%);
   filter:blur(4px);mix-blend-mode:screen}
 #ptoggle{position:fixed;top:60px;left:300px;z-index:202;width:20px;height:34px;background:var(--glass);border:1px solid var(--border);border-left:none;border-radius:0 6px 6px 0;cursor:pointer;color:var(--muted);display:flex;align-items:center;justify-content:center;font-size:10px;backdrop-filter:blur(20px);transition:left .35s cubic-bezier(.4,0,.2,1);outline:none;user-select:none}
@@ -549,8 +549,8 @@ function getNightPolygon(date) {
 
 function updateTerminator() {
   if (typeof globe === 'undefined') return;
-  if (themeMode === 2) { globe.polygonsData([]); updateIRLTexture(); }
-  else globe.polygonsData(themeMode === 0 ? getNightPolygon() : []);
+  if (themeMode === 2) { updateIRLTexture(); }
+  globe.polygonsData([]);
 }
 
 function moonPhaseName(date) {
@@ -886,6 +886,14 @@ function buildMarker(d) {
 }
 
 function refreshGlobe() {
+  var histBarOpen = document.getElementById('hist-bar').classList.contains('open');
+  if (histBarOpen) {
+    // Globe clears to only historical dots (empty until GO is clicked)
+    globe.htmlElementsData(histEvents);
+    globe.pointsData([]);
+    updateTerminator();
+    return;
+  }
   var live = allEvents.filter(function(e){return layerVis[e.type];});
   var hist = (histEvents.length && layerVis.history) ? histEvents : [];
   var visEvs = live.concat(hist);
@@ -1037,7 +1045,7 @@ function applyThemeMode() {
     document.getElementById('sun-orb').style.display = 'none';
     if (irlBlobUrl) { URL.revokeObjectURL(irlBlobUrl); irlBlobUrl = null; }
     globe.globeImageUrl(NIGHT_IMG).atmosphereColor('#1e3a8a').atmosphereAltitude(0.14);
-    globe.polygonsData(getNightPolygon());
+    globe.polygonsData([]);
   } else if (themeMode === 1) {
     if (sunOrbRAF) { cancelAnimationFrame(sunOrbRAF); sunOrbRAF = null; }
     document.getElementById('sun-orb').style.display = 'none';
@@ -1054,7 +1062,7 @@ function applyThemeMode() {
       themeMode = 0; dayMode = false; irlMode = false;
       document.getElementById('theme-btn').value = 0;
       globe.globeImageUrl(NIGHT_IMG).atmosphereColor('#1e3a8a').atmosphereAltitude(0.14);
-      globe.polygonsData(getNightPolygon());
+      globe.polygonsData([]);
     });
   }
 }
