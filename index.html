@@ -122,6 +122,33 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);font-famil
 .ds-badge{display:inline-flex;align-items:center;gap:3px;font-size:8px;font-weight:700;letter-spacing:1px;padding:2px 5px;border-radius:3px;text-transform:uppercase;vertical-align:middle;margin-left:4px}
 .ds-live{background:rgba(16,185,129,.15);color:#10b981;border:1px solid rgba(16,185,129,.25)}
 .ds-fallback{background:rgba(245,158,11,.12);color:#f59e0b;border:1px solid rgba(245,158,11,.2)}
+#connect-btn{position:fixed;top:12px;right:160px;z-index:310;padding:5px 13px;background:var(--glass);border:1px solid var(--border);border-radius:16px;color:var(--muted);font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;cursor:pointer;backdrop-filter:blur(20px);transition:all .2s;font-family:'Space Mono',monospace;outline:none}
+#connect-btn:hover{color:var(--text);border-color:var(--border2)}
+#connect-btn.active{background:rgba(168,85,247,.15);border-color:rgba(168,85,247,.5);color:#a855f7}
+.ev.csel{background:rgba(168,85,247,.1);border-color:rgba(168,85,247,.35)!important;border:1px solid}
+.marker.csel .m-dot{box-shadow:0 0 0 3px rgba(168,85,247,.7),0 0 14px var(--mc)}
+.marker.csel .m-ring{border-color:#a855f7!important;opacity:.9}
+#ap{position:fixed;bottom:36px;left:0;right:0;z-index:260;background:var(--glass2);border-top:1px solid rgba(168,85,247,.35);backdrop-filter:blur(28px) saturate(180%);transform:translateY(100%);transition:transform .35s cubic-bezier(.4,0,.2,1);max-height:55vh;overflow-y:auto}
+#ap.open{transform:translateY(0)}
+.ap-hdr{display:flex;align-items:center;padding:9px 14px;gap:10px;border-bottom:1px solid var(--border);position:sticky;top:0;background:var(--glass2);z-index:1}
+.ap-title{font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#a855f7}
+.ap-close{margin-left:auto;font-size:9px;color:var(--muted);cursor:pointer;padding:2px 8px;border:1px solid var(--border);border-radius:4px;transition:color .15s}
+.ap-close:hover{color:var(--text)}
+.ap-sel{display:flex;flex-wrap:wrap;gap:5px;padding:8px 14px;border-bottom:1px solid var(--border)}
+.ap-badge{display:inline-flex;align-items:center;gap:5px;font-size:9px;padding:3px 8px;border-radius:5px;cursor:pointer;transition:opacity .15s}
+.ap-badge:hover{opacity:.75}
+.ap-bx{opacity:.45;font-size:8px}
+.ap-body{padding:12px 14px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+@media(max-width:700px){.ap-body{grid-template-columns:1fr}}
+.ap-card{background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:8px;padding:10px 12px}
+.ap-card-ttl{font-size:8px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin-bottom:8px}
+.ap-thread{font-size:11px;line-height:1.6;color:rgba(216,221,232,.85);margin-bottom:8px;padding-bottom:8px;border-bottom:1px solid var(--border)}
+.ap-thread:last-child{border-bottom:none;margin-bottom:0;padding-bottom:0}
+.ap-tag{font-size:9px;padding:2px 6px;border-radius:3px;background:rgba(168,85,247,.12);border:1px solid rgba(168,85,247,.25);color:#c084fc;display:inline-block;margin:2px}
+.ap-row{display:flex;justify-content:space-between;align-items:center;font-size:10px;padding:4px 0;border-bottom:1px solid rgba(255,255,255,.04)}
+.ap-row:last-child{border-bottom:none}
+.ap-rv{color:var(--text);font-family:'Space Mono',monospace;font-size:9px}
+.ap-prompt{padding:20px 16px;text-align:center;color:var(--muted);font-size:11px;font-family:'Space Mono',monospace}
 .marker{position:relative;cursor:pointer;width:22px;height:22px}
 .m-dot{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:8px;height:8px;border-radius:50%;background:var(--mc);box-shadow:0 0 8px var(--mc);z-index:2}
 .m-ring{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:22px;height:22px;border-radius:50%;border:1.5px solid var(--mc);animation:mring 2.8s ease-out infinite;z-index:1}
@@ -194,6 +221,8 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);font-famil
   <div class="lc-row" data-layer="flight"       onclick="toggleLayer(this)"><div class="lc-dot" style="background:var(--col-flight)"></div><span>Live Flights</span><div class="lc-live" id="ls-flight"></div><span class="lc-n" id="lc-flight">–</span></div>
   <div class="lc-row" data-layer="launch"       onclick="toggleLayer(this)"><div class="lc-dot" style="background:var(--col-launch)"></div><span>Launches</span><div class="lc-live" id="ls-launch"></div><span class="lc-n" id="lc-launch">–</span></div>
 </div>
+<button id="connect-btn" onclick="toggleConnect()">⟷ CONNECT</button>
+<div id="ap"></div>
 <div id="detail">
   <button id="d-close" onclick="closeDetail()">&#x2715;</button>
   <div id="d-body"></div>
@@ -303,6 +332,8 @@ var panelOpen = true;
 var watchTags = ['Gaza','Ukraine','AI','Markets','Fashion','Climate'];
 var layerVis = {news:true,conflict:true,disaster:true,storm:true,humanitarian:true,flight:true,launch:true,tech:true,fashion:true,astrology:true};
 var globe;
+var connectMode = false;
+var connectedIds = [];
 var tickerData = [
   {sym:'BTC',px:'–',chg:'',up:true},{sym:'ETH',px:'–',chg:'',up:true},
   {sym:'SOL',px:'–',chg:'',up:true},{sym:'EUR/USD',px:'–',chg:'',up:true},
@@ -690,6 +721,10 @@ function initGlobe() {
     .showAtmosphere(true).atmosphereColor('#1e3a8a').atmosphereAltitude(0.18)
     .htmlElementsData([]).htmlElement(function(d){return buildMarker(d);})
     .htmlLat(function(d){return d.lat;}).htmlLng(function(d){return d.lng;}).htmlAltitude(0.01)
+    .arcsData([]).arcStartLat(function(d){return d.sLat;}).arcStartLng(function(d){return d.sLng;})
+    .arcEndLat(function(d){return d.eLat;}).arcEndLng(function(d){return d.eLng;})
+    .arcColor(function(d){return d.color;}).arcDashLength(0.4).arcDashGap(0.15)
+    .arcDashAnimateTime(1800).arcStroke(function(d){return d.w;}).arcAltitude(0.18)
     .pointsData([]).pointLat(function(d){return d.lat;}).pointLng(function(d){return d.lng;})
     .pointColor(function(){return '#10b981';}).pointAltitude(0.004).pointRadius(0.22)
     (document.getElementById('globe-wrap'));
@@ -703,8 +738,9 @@ function initGlobe() {
 
 function buildMarker(d) {
   var el = document.createElement('div');
-  el.className = 'marker' + (d.severity >= 4 ? ' sev5' : '');
+  el.className = 'marker' + (d.severity >= 4 ? ' sev5' : '') + (connectedIds.indexOf(d.id)!==-1?' csel':'');
   el.style.cssText = '--mc:' + (COLORS[d.type]||'#fff') + ';width:22px;height:22px;cursor:pointer';
+  el.setAttribute('data-id', d.id);
   el.title = d.title;
   var delay = (Math.random()*2).toFixed(2);
   el.innerHTML = '<div class="m-ring" style="animation-delay:'+delay+'s"></div><div class="m-ring m-ring2" style="animation-delay:'+(+delay+.9).toFixed(2)+'s"></div><div class="m-dot"></div>';
@@ -787,6 +823,7 @@ function renderList() {
 // DETAIL DRAWER
 // =============================================================================
 function selectEvent(id) {
+  if (connectMode) { toggleConnected(id); return; }
   selectedId = id;
   var ev = allEvents.find(function(e){return e.id===id;});
   if (!ev) return;
@@ -859,6 +896,149 @@ function watchFilter(tag){var inp=document.getElementById('sinput');var active=i
 function addWatchTag(){var t=prompt('Add topic to watchlist:');if(t&&t.trim()){watchTags.push(t.trim());renderWatchlist();}}
 function renderTicker(){var items=tickerData.concat(tickerData);document.getElementById('tk-inner').innerHTML=items.map(function(d){return '<div class="tk-item"><span class="tk-sym">'+d.sym+'</span><span class="tk-px">'+d.px+'</span>'+(d.chg?'<span class="'+(d.up?'tk-up':'tk-dn')+'">'+d.chg+'</span>':'')+'</div><span class="tk-div">|</span>';}).join('');}
 function tickClock(){document.getElementById('t-clock').textContent=new Date().toISOString().replace('T',' ').substring(0,19)+' UTC';}
+
+// =============================================================================
+// CONNECT MODE
+// =============================================================================
+function toggleConnect() {
+  connectMode = !connectMode;
+  var btn = document.getElementById('connect-btn');
+  btn.classList.toggle('active', connectMode);
+  btn.textContent = connectMode ? '⟷ ON' : '⟷ CONNECT';
+  if (!connectMode) { connectedIds = []; syncConnectUI(); closeAP(); }
+}
+
+function toggleConnected(id) {
+  var idx = connectedIds.indexOf(id);
+  if (idx === -1) connectedIds.push(id);
+  else connectedIds.splice(idx, 1);
+  syncConnectUI();
+  renderAP();
+}
+
+function syncConnectUI() {
+  document.querySelectorAll('.marker').forEach(function(el){
+    el.classList.toggle('csel', connectedIds.indexOf(el.getAttribute('data-id'))!==-1);
+  });
+  document.querySelectorAll('.ev').forEach(function(el){
+    var id = el.id.replace('ev-','');
+    el.classList.toggle('csel', connectedIds.indexOf(id)!==-1);
+  });
+  drawArcs();
+}
+
+function drawArcs() {
+  if (connectedIds.length < 2) { globe.arcsData([]); return; }
+  var evs = connectedIds.map(function(id){return allEvents.find(function(e){return e.id===id;});}).filter(Boolean);
+  var arcs = [];
+  for (var i=0;i<evs.length;i++) {
+    for (var j=i+1;j<evs.length;j++) {
+      var shared = (evs[i].tags||[]).filter(function(t){return (evs[j].tags||[]).indexOf(t)!==-1;}).length;
+      arcs.push({
+        sLat:evs[i].lat, sLng:evs[i].lng, eLat:evs[j].lat, eLng:evs[j].lng,
+        color: shared > 0 ? ['#a855f7','#a855f7'] : ['rgba(168,85,247,0.3)','rgba(168,85,247,0.3)'],
+        w: shared > 0 ? 0.9 : 0.35
+      });
+    }
+  }
+  globe.arcsData(arcs);
+}
+
+function analyzeConnections(evs) {
+  var tagCounts = {};
+  evs.forEach(function(ev){(ev.tags||[]).forEach(function(t){tagCounts[t]=(tagCounts[t]||0)+1;});});
+  var sharedTags = Object.keys(tagCounts).filter(function(t){return tagCounts[t]>1;}).sort(function(a,b){return tagCounts[b]-tagCounts[a];});
+
+  var lats = evs.map(function(e){return e.lat;}), lngs = evs.map(function(e){return e.lng;});
+  var latSpan = Math.max.apply(null,lats)-Math.min.apply(null,lats);
+  var lngSpan = Math.max.apply(null,lngs)-Math.min.apply(null,lngs);
+  var geo = latSpan<12&&lngSpan<12 ? 'Localized cluster' : latSpan<40&&lngSpan<60 ? 'Regional spread' : 'Global — multi-theater';
+
+  var types = {};
+  evs.forEach(function(ev){types[ev.type]=(types[ev.type]||0)+1;});
+
+  var threads = [];
+  var conflicts = evs.filter(function(e){return e.type==='conflict';});
+  var humanitarian = evs.filter(function(e){return e.type==='humanitarian';});
+  var disasters = evs.filter(function(e){return e.type==='disaster';});
+  var news = evs.filter(function(e){return e.type==='news';});
+  var tech = evs.filter(function(e){return e.type==='tech';});
+  var fashion = evs.filter(function(e){return e.type==='fashion';});
+
+  if (conflicts.length && humanitarian.length)
+    threads.push('Conflict zones and humanitarian crises overlap — ' + conflicts.map(function(e){return e.location;}).join(', ') + ' may be the source of the displacement and aid blockages in ' + humanitarian.map(function(e){return e.location;}).join(', ') + '.');
+  if (conflicts.length && disasters.length)
+    threads.push('Compounding crisis: active conflict in ' + conflicts.map(function(e){return e.location;}).join(', ') + ' intersects with natural disaster response — aid corridors and infrastructure may be simultaneously overwhelmed.');
+  if (disasters.length && news.length)
+    threads.push('Natural disasters are generating news coverage — check whether media framing matches the severity data, or whether coverage is concentrated on one event while others go underreported.');
+  if (tech.length && conflicts.length)
+    threads.push('Tech developments alongside active conflicts — watch for surveillance technology, cyber operations, or infrastructure disruption narratives that connect these events.');
+  if (fashion.length && conflicts.length)
+    threads.push('Fashion events alongside conflict zones — supply chain disruption, labor exploitation, or raw material sourcing from conflict regions may be the connecting thread.');
+
+  var regionCounts = {};
+  evs.forEach(function(ev){
+    (ev.tags||[]).concat(ev.location.split(/[,\s]+/)).forEach(function(t){
+      if(t&&CC[t])regionCounts[t]=(regionCounts[t]||0)+1;
+    });
+  });
+  var sharedRegions = Object.keys(regionCounts).filter(function(r){return regionCounts[r]>1;});
+  if (sharedRegions.length && !threads.length)
+    threads.push('Geographic convergence in ' + sharedRegions.slice(0,3).join(', ') + ' — multiple event types compressing into the same territory signals systemic instability, not isolated incidents.');
+
+  var dominant = Object.keys(types).sort(function(a,b){return types[b]-types[a];})[0];
+  if (types[dominant]===evs.length && evs.length>1)
+    threads.push('All ' + evs.length + ' selected events are ' + dominant + '. Compare them: which is most severe? Which has the least coverage? The gap between severity and attention is where the real story lives.');
+
+  if (!threads.length && sharedTags.length)
+    threads.push('Shared signals across ' + evs.length + ' events: ' + sharedTags.slice(0,5).join(', ') + '. These threads suggest a coordinated narrative or linked causal chain worth tracing.');
+  if (!threads.length)
+    threads.push('No direct signal overlap detected between these ' + evs.length + ' events. The connection may be economic, temporal, or structural — consider what a single actor (state, market, institution) might have to gain from all of these happening simultaneously.');
+
+  return {sharedTags:sharedTags, geo:geo, types:types, threads:threads};
+}
+
+function renderAP() {
+  var panel = document.getElementById('ap');
+  var evs = connectedIds.map(function(id){return allEvents.find(function(e){return e.id===id;});}).filter(Boolean);
+
+  var badges = evs.map(function(ev){
+    var c = COLORS[ev.type]||'#fff';
+    return '<div class="ap-badge" style="background:'+c+'1a;border:1px solid '+c+'40;color:'+c+'" onclick="toggleConnected(\''+ev.id+'\')">' +
+      ev.title.slice(0,30)+(ev.title.length>30?'…':'')+'<span class="ap-bx">✕</span></div>';
+  }).join('');
+
+  var header = '<div class="ap-hdr"><span class="ap-title">⟷ CONNECT — '+evs.length+' selected</span>' +
+    '<span class="ap-close" onclick="clearConnect()">Clear all</span></div>' +
+    '<div class="ap-sel">'+badges+'</div>';
+
+  if (evs.length < 2) {
+    panel.innerHTML = header + '<div class="ap-prompt">Select ' + (2-evs.length) + ' more event'+(2-evs.length!==1?'s':'')+' to begin analysis</div>';
+    panel.classList.add('open'); return;
+  }
+
+  var a = analyzeConnections(evs);
+
+  var threadsHtml = a.threads.map(function(t){return '<div class="ap-thread">'+t+'</div>';}).join('');
+  var tagsHtml = a.sharedTags.length
+    ? a.sharedTags.slice(0,10).map(function(t){return '<span class="ap-tag">'+t+'</span>';}).join('')
+    : '<span style="color:var(--muted);font-size:10px">No overlapping signals</span>';
+  var typeRows = Object.keys(a.types).map(function(t){
+    return '<div class="ap-row"><span style="color:'+(COLORS[t]||'#aaa')+'">'+t.toUpperCase()+'</span><span class="ap-rv">'+a.types[t]+'</span></div>';
+  }).join('');
+
+  panel.innerHTML = header +
+    '<div class="ap-body">' +
+      '<div class="ap-card"><div class="ap-card-ttl">Narrative Threads</div>'+threadsHtml+'</div>' +
+      '<div class="ap-card"><div class="ap-card-ttl">Shared Signals</div>'+tagsHtml+
+        '<div style="margin-top:12px"><div class="ap-card-ttl">Geographic Scope</div><div style="font-size:10.5px;color:var(--text)">'+a.geo+'</div></div></div>' +
+      '<div class="ap-card"><div class="ap-card-ttl">Event Types</div>'+typeRows+'</div>' +
+    '</div>';
+  panel.classList.add('open');
+}
+
+function closeAP(){document.getElementById('ap').classList.remove('open');}
+function clearConnect(){connectedIds=[];syncConnectUI();closeAP();}
 
 // =============================================================================
 // INIT
