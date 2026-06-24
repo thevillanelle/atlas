@@ -1340,21 +1340,6 @@ function renderList() {
     return;
   }
 
-  if (currentTab === 'astronomy') {
-    list.innerHTML = evs.map(function(ev){
-      var body = ev._planet ? ev._planet.name : ev._star ? ev._star[0] : 'Space';
-      var color = ev._planet ? ev._planet.color : '#38bdf8';
-      var snip = ev.brief ? ev.brief.replace(/\n/g,' ').slice(0,90)+'…' : '';
-      return '<div class="ev'+(ev.id===selectedId?' sel':'')+'" id="ev-'+ev.id+'" onclick="selectEvent(\''+ev.id+'\')">' +
-        '<div class="ev-row"><div class="ev-ico" style="color:'+color+'">🔭</div><div class="ev-body">' +
-        '<div class="ev-name">'+(ev.url?'<a href="'+ev.url+'" target="_blank" onclick="event.stopPropagation()">'+ev.title+'</a>':ev.title)+'</div>' +
-        '<div class="ev-meta"><span style="color:'+color+';font-weight:700">'+body+'</span> · <span style="color:var(--muted)">'+ev.age+'</span></div>' +
-        '<div class="ev-loc" style="color:var(--muted);font-size:10px;margin-top:2px">'+snip+'</div>' +
-        '</div></div></div>';
-    }).join('');
-    return;
-  }
-
   list.innerHTML = evs.map(function(ev){
     var c = COLORS[ev.type]||'#fff', ico = ICONS[ev.type]||'\u25cf';
     var titleHtml = ev.url
@@ -1378,7 +1363,8 @@ function selectEvent(id) {
   var ev = findEventById(id);
   if (!ev) return;
   globe.controls().autoRotate = false;
-  globe.pointOfView({lat:ev.lat,lng:ev.lng,altitude:1.6}, 1200);
+  var alt = (ev.type === 'astronomy' || ev.type === 'astrology') ? 2.8 : 1.6;
+  globe.pointOfView({lat:ev.lat,lng:ev.lng,altitude:alt}, 1200);
   setTimeout(function(){globe.controls().autoRotate=true;}, 6000);
   document.querySelectorAll('.ev,.astro-card').forEach(function(el){el.classList.remove('sel');});
   var listEl = document.getElementById('ev-'+id);
