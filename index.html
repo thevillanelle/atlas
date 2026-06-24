@@ -1354,29 +1354,45 @@ async function engineGuardian(evs) {
 // Engine 2: WIKI — find shared Wikipedia categories between events
 async function engineWiki(evs) {
   var results = await Promise.all(evs.map(async function(ev) {
-    var title = ev.type === 'history' ? ev.title : ev.location.split(',')[0].trim();
-    var url = 'https://en.wikipedia.org/w/api.php?action=query&titles=' + encodeURIComponent(title) +
+    // Build candidate search terms: title first, then location fallbacks
+    var locParts = ev.location.split(',').map(function(s){ return s.trim(); }).filter(function(s){ return s.length > 3; });
+    // Strip directional prefixes like "11 km N of Redwood Valley" → "Redwood Valley"
+    var cleanLoc = locParts.map(function(s){ return s.replace(/^\d+\s*km\s+\w+\s+of\s+/i,'').trim(); });
+    var candidates = ev.type === 'history'
+      ? [ev.title]
+      : [ev.title.slice(0,60)].concat(cleanLoc.reverse()).filter(Boolean);
+    var pageTitle = null;
+    for (var ci = 0; ci < candidates.length; ci++) {
+      var searchUrl = 'https://en.wikipedia.org/w/api.php?action=query&list=search&srsearch=' +
+        encodeURIComponent(candidates[ci]) + '&srlimit=1&format=json&origin=*';
+      var searchData = await apiFetch(searchUrl, 6000);
+      var hits = searchData && searchData.query && searchData.query.search;
+      if (hits && hits.length) { pageTitle = hits[0].title; break; }
+    }
+    var searchTerm = candidates[0];
+    if (!pageTitle) return {label: searchTerm, cats: [], missing: true};
+    var pageTitle = hits[0].title;
+    var catUrl = 'https://en.wikipedia.org/w/api.php?action=query&titles=' + encodeURIComponent(pageTitle) +
       '&prop=categories&cllimit=50&clshow=!hidden&format=json&origin=*';
-    var data = await apiFetch(url, 6000);
-    var pages = data && data.query && data.query.pages;
+    var catData = await apiFetch(catUrl, 6000);
+    var pages = catData && catData.query && catData.query.pages;
     var page = pages && Object.values(pages)[0];
     var cats = (page && page.categories || []).map(function(c){ return c.title.replace('Category:',''); });
-    return {title: title, cats: cats, missing: !page || page.missing !== undefined};
+    return {label: pageTitle, cats: cats, missing: false};
   }));
   var found = results.filter(function(r){ return !r.missing && r.cats.length; });
-  if (found.length < 2) return {threads:['Wikipedia articles not found for one or more of these events. Try history mode events or events with well-known location names.'], signals:[]};
+  if (found.length < 2) return {threads:['Wikipedia could not find matching articles for one or more of these events.'], signals:[]};
   var shared = found[0].cats.filter(function(c){
     return found.slice(1).every(function(r){ return r.cats.indexOf(c) !== -1; });
   });
   var threads = [];
   if (shared.length) {
-    threads.push('Wikipedia places ' + found.map(function(r){return r.title;}).join(' and ') + ' in ' + shared.length + ' shared categor' + (shared.length===1?'y':'ies') + '.');
-    threads.push('Shared classification signals structural similarity in how human knowledge organizes these events — they belong to the same encyclopedic territory.');
-    if (shared.length > 3) threads.push('High category overlap (' + shared.length + ') suggests these events are deeply entangled at the definitional level — same conflict, same region, same systemic cause.');
+    threads.push('Wikipedia places "' + found[0].label + '" and "' + found[1].label + '" in ' + shared.length + ' shared categor' + (shared.length===1?'y':'ies') + '.');
+    threads.push('Shared classification signals structural similarity — these events belong to the same encyclopedic territory.');
+    if (shared.length > 3) threads.push('High overlap (' + shared.length + ' categories) suggests deep entanglement — same conflict, region, or systemic cause.');
   } else {
-    var allCats = found.map(function(r){return r.cats.length;});
-    threads.push('No direct Wikipedia category overlap found between ' + found.map(function(r){return r.title;}).join(' and ') + '.');
-    threads.push('The connection is likely indirect — economic, causal, or temporal rather than taxonomic. Consider the GDELT or BACKLINKS engine for co-occurrence patterns.');
+    threads.push('No shared Wikipedia categories between "' + found[0].label + '" and "' + found[1].label + '".');
+    threads.push('The connection is likely indirect — economic, causal, or temporal. Try BACKLINKS for co-citation patterns.');
   }
   return {threads:threads, signals:shared.slice(0,12)};
 }
@@ -1401,8 +1417,11 @@ async function engineWikidata(evs) {
   var props = bindings.map(function(b){
     var p = b.propLabel && b.propLabel.value;
     var v = b.valueLabel && b.valueLabel.value;
-    return (p && v && !p.startsWith('P') && !v.startsWith('Q')) ? p + ': ' + v : null;
-  }).filter(Boolean);
+    if (!v || v.startsWith('Q')) return null;
+    // propLabel may be a full URI when no label exists — strip to short name or omit
+    var pClean = (p && !p.startsWith('http') && !p.startsWith('P')) ? p : null;
+    return pClean ? pClean + ': ' + v : v;
+  }).filter(Boolean).filter(function(s,i,a){ return a.indexOf(s)===i; });
   var threads = [];
   if (props.length) {
     threads.push('Wikidata links ' + found[0].label + ' (' + ids[0] + ') and ' + found[1].label + ' (' + ids[1] + ') through ' + props.length + ' shared propert' + (props.length===1?'y':'ies') + '.');
