@@ -777,11 +777,14 @@ function buildMarker(d) {
   el.title = d.title;
   var delay = (Math.random()*2).toFixed(2);
   el.innerHTML = '<div class="m-ring" style="animation-delay:'+delay+'s"></div><div class="m-ring m-ring2" style="animation-delay:'+(+delay+.9).toFixed(2)+'s"></div><div class="m-dot"></div>';
-  var _mdTime, _mdX, _mdY;
-  el.addEventListener('mousedown', function(e){_mdTime=Date.now();_mdX=e.clientX;_mdY=e.clientY;});
-  el.addEventListener('mouseup', function(e){
-    if(Date.now()-_mdTime<300&&Math.abs(e.clientX-_mdX)<6&&Math.abs(e.clientY-_mdY)<6){
-      e.stopPropagation();selectEvent(d.id);
+  var _pdTime, _pdX, _pdY;
+  el.addEventListener('pointerdown', function(e){
+    e.stopPropagation(); // prevent OrbitControls from calling setPointerCapture
+    _pdTime=Date.now();_pdX=e.clientX;_pdY=e.clientY;
+  });
+  el.addEventListener('pointerup', function(e){
+    if(Date.now()-_pdTime<400&&Math.abs(e.clientX-_pdX)<8&&Math.abs(e.clientY-_pdY)<8){
+      selectEvent(d.id);
     }
   });
   return el;
