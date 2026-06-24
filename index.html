@@ -22,6 +22,24 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);font-famil
 #globe-wrap{position:fixed;inset:0;z-index:0}
 #splash{position:fixed;inset:0;z-index:9999;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;transition:opacity .6s ease}
 #splash.out{opacity:0;pointer-events:none}
+#mode-select{position:fixed;inset:0;z-index:9998;background:rgba(5,8,16,0.97);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0;opacity:0;pointer-events:none;transition:opacity .5s ease;backdrop-filter:blur(12px)}
+#mode-select.open{opacity:1;pointer-events:all}
+#mode-select.out{opacity:0;pointer-events:none}
+.ms-eyebrow{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:4px;text-transform:uppercase;color:var(--muted);margin-bottom:10px}
+.ms-title{font-family:'Space Mono',monospace;font-size:22px;font-weight:700;letter-spacing:6px;color:#fff;margin-bottom:6px}
+.ms-title em{color:var(--accent);font-style:normal}
+.ms-sub{font-size:11px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;margin-bottom:40px}
+.ms-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;max-width:780px;width:100%;padding:0 24px;margin-bottom:32px}
+.ms-card{background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:14px;padding:22px 18px 18px;cursor:pointer;transition:all .2s ease;text-align:left;position:relative;overflow:hidden}
+.ms-card::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,var(--mc) 0%,transparent 60%);opacity:0;transition:opacity .2s}
+.ms-card:hover{border-color:var(--mc);transform:translateY(-2px);box-shadow:0 8px 32px var(--mc)22}
+.ms-card:hover::before{opacity:.08}
+.ms-card-ico{font-size:26px;margin-bottom:10px;display:block}
+.ms-card-name{font-size:13px;font-weight:700;color:#fff;letter-spacing:.5px;margin-bottom:4px}
+.ms-card-desc{font-size:10px;color:var(--muted);line-height:1.5}
+.ms-footer{display:flex;align-items:center;gap:20px;font-size:10px;color:var(--muted)}
+.ms-skip{cursor:pointer;text-transform:uppercase;letter-spacing:1.5px;padding:6px 14px;border:1px solid var(--border);border-radius:6px;transition:all .15s}.ms-skip:hover{color:#fff;border-color:rgba(255,255,255,.3)}
+.ms-hint{letter-spacing:1px;text-transform:uppercase}
 .sp-logo{font-family:'Space Mono',monospace;font-size:30px;font-weight:700;letter-spacing:8px;color:#fff}
 .sp-logo em{color:var(--accent);font-style:normal}
 .sp-sub{font-size:10px;color:var(--muted);letter-spacing:4px;text-transform:uppercase;font-family:'Space Mono',monospace}
@@ -217,6 +235,47 @@ body.hist-open #panel{top:92px}body.hist-open #detail{top:92px}body.hist-open #l
 </style>
 </head>
 <body>
+<div id="mode-select">
+  <div class="ms-eyebrow">Global Intelligence Feed</div>
+  <div class="ms-title">ATL<em>A</em>S</div>
+  <div class="ms-sub">What are you here for today?</div>
+  <div class="ms-grid">
+    <div class="ms-card" style="--mc:#ef4444" onclick="selectMode('news')">
+      <span class="ms-card-ico">📰</span>
+      <div class="ms-card-name">Breaking News</div>
+      <div class="ms-card-desc">Live world events, conflicts, disasters, and developing stories across the globe.</div>
+    </div>
+    <div class="ms-card" style="--mc:#f472b6" onclick="selectMode('fashion')">
+      <span class="ms-card-ico">👗</span>
+      <div class="ms-card-name">Fashion</div>
+      <div class="ms-card-desc">Runway, luxury, designers, and the global culture of style.</div>
+    </div>
+    <div class="ms-card" style="--mc:#c084fc" onclick="selectMode('astrology')">
+      <span class="ms-card-ico">✨</span>
+      <div class="ms-card-name">Astrology</div>
+      <div class="ms-card-desc">Live planetary placements, horoscopes, and celestial events.</div>
+    </div>
+    <div class="ms-card" style="--mc:#38bdf8" onclick="selectMode('astronomy')">
+      <span class="ms-card-ico">🔭</span>
+      <div class="ms-card-name">Astronomy</div>
+      <div class="ms-card-desc">Space news pinned to the planets and stars they're about.</div>
+    </div>
+    <div class="ms-card" style="--mc:#a3e635" onclick="selectMode('history')">
+      <span class="ms-card-ico">🕰️</span>
+      <div class="ms-card-name">History</div>
+      <div class="ms-card-desc">Explore what was happening anywhere in the world, at any point in time.</div>
+    </div>
+    <div class="ms-card" style="--mc:#f59e0b" onclick="selectMode('connection')">
+      <span class="ms-card-ico">🔗</span>
+      <div class="ms-card-name">Connections</div>
+      <div class="ms-card-desc">Chokepoints, economic stress, political flashpoints — the threads that bind events.</div>
+    </div>
+  </div>
+  <div class="ms-footer">
+    <span class="ms-skip" onclick="selectMode('all')">Enter all feeds →</span>
+    <span class="ms-hint">or select a mode above</span>
+  </div>
+</div>
 <div id="splash">
   <div class="sp-logo">ATL<em>A</em>S</div>
   <div class="sp-sub">Global Intelligence Feed</div>
@@ -2348,6 +2407,31 @@ async function loadLiveData() {
   setLayerStatus('flight',      'fb');
 }
 
+function selectMode(mode) {
+  var ms = document.getElementById('mode-select');
+  ms.classList.remove('open');
+  ms.classList.add('out');
+  setTimeout(function(){ ms.remove(); }, 500);
+
+  if (mode === 'history') {
+    // Open history bar
+    setTimeout(function(){ toggleHistBar(); }, 400);
+    return;
+  }
+
+  if (mode !== 'all') {
+    currentTab = mode;
+    document.querySelectorAll('.tab').forEach(function(t){
+      t.classList.toggle('on', t.dataset.tab === mode);
+    });
+    if (mode === 'astrology' || mode === 'astronomy') {
+      globe.pointOfView({altitude: 2.8}, 800);
+    }
+  }
+  renderList();
+  refreshGlobe();
+}
+
 async function init() {
   splash(5, 'Initializing 3D globe…');
   initGlobe();
@@ -2357,8 +2441,11 @@ async function init() {
   splash(100, 'Systems nominal');
   setTimeout(function(){
     document.getElementById('splash').classList.add('out');
-    setTimeout(function(){var s=document.getElementById('splash');if(s)s.remove();},700);
-  },500);
+    setTimeout(function(){
+      var s = document.getElementById('splash'); if (s) s.remove();
+      document.getElementById('mode-select').classList.add('open');
+    }, 700);
+  }, 500);
   initPlanetOrbs();
   initStars();
   computeOrbitPaths();
