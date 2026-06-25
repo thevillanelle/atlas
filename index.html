@@ -147,7 +147,12 @@ select#theme-btn option{background:#070b18;color:var(--text);font-size:12px;lett
 .astro-snip{font-size:9px;color:rgba(192,132,252,.7);margin-top:4px;line-height:1.4;text-align:left;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 body.hist-open #panel{top:92px}body.hist-open #detail{top:92px}body.hist-open #lctrl{top:104px}
 #lctrl{position:fixed;top:60px;right:12px;z-index:200;background:var(--glass);border:1px solid var(--border);border-radius:11px;padding:9px;backdrop-filter:blur(24px);display:flex;flex-direction:column;gap:3px;min-width:158px}
-.lc-hdr{font-size:8px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--muted);padding:1px 5px 4px}
+.lc-hdr{font-size:8px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--muted);padding:1px 5px 4px;display:flex;align-items:center;cursor:pointer;user-select:none;gap:5px}
+.lc-hdr:hover{color:var(--text)}
+.lc-chevron{margin-left:auto;font-size:9px;transition:transform .2s ease;display:inline-block}
+.lc-chevron.closed{transform:rotate(-90deg)}
+#lctrl-rows{overflow:hidden;transition:max-height .25s ease,opacity .2s ease;max-height:600px;opacity:1}
+#lctrl-rows.hidden{max-height:0;opacity:0}
 .lc-row{display:flex;align-items:center;gap:7px;padding:4px 6px;border-radius:6px;cursor:pointer;transition:background .12s;font-size:10.5px;font-weight:500;user-select:none}
 .lc-row:hover{background:rgba(255,255,255,.05)}
 .lc-row.off{opacity:.28}
@@ -361,24 +366,26 @@ body.hist-open #panel{top:92px}body.hist-open #detail{top:92px}body.hist-open #l
   </div>
 </div>
 <div id="lctrl">
-  <div class="lc-hdr">Layers</div>
-  <div class="lc-row" data-layer="news"         onclick="toggleLayer(this)"><div class="lc-dot" style="background:var(--col-news)"></div><span>Breaking News</span><div class="lc-live" id="ls-news"></div><span class="lc-n" id="lc-news">–</span></div>
-  <div class="lc-row" data-layer="conflict"     onclick="toggleLayer(this)"><div class="lc-dot" style="background:var(--col-conflict)"></div><span>Conflicts</span><div class="lc-live" id="ls-conflict"></div><span class="lc-n" id="lc-conflict">–</span></div>
-  <div class="lc-row" data-layer="disaster"     onclick="toggleLayer(this)"><div class="lc-dot" style="background:var(--col-disaster)"></div><span>Disasters</span><div class="lc-live" id="ls-disaster"></div><span class="lc-n" id="lc-disaster">–</span></div>
-  <div class="lc-row" data-layer="storm"        onclick="toggleLayer(this)"><div class="lc-dot" style="background:var(--col-storm)"></div><span>Storms</span><div class="lc-live" id="ls-storm"></div><span class="lc-n" id="lc-storm">–</span></div>
-  <div class="lc-row" data-layer="humanitarian" onclick="toggleLayer(this)"><div class="lc-dot" style="background:var(--col-humanitarian)"></div><span>Humanitarian</span><div class="lc-live" id="ls-humanitarian"></div><span class="lc-n" id="lc-humanitarian">–</span></div>
-  <div class="lc-row" data-layer="tech"         onclick="toggleLayer(this)"><div class="lc-dot" style="background:var(--col-tech)"></div><span>Tech</span><div class="lc-live" id="ls-tech"></div><span class="lc-n" id="lc-tech">–</span></div>
-  <div class="lc-row" data-layer="fashion"      onclick="toggleLayer(this)"><div class="lc-dot" style="background:var(--col-fashion)"></div><span>Fashion</span><div class="lc-live" id="ls-fashion"></div><span class="lc-n" id="lc-fashion">–</span></div>
-  <div class="lc-row" data-layer="astrology"    onclick="toggleLayer(this)"><div class="lc-dot" style="background:var(--col-astrology)"></div><span>Astrology</span><div class="lc-live" id="ls-astrology"></div><span class="lc-n" id="lc-astrology">–</span></div>
-  <div class="lc-row" data-layer="astronomy"    onclick="toggleLayer(this)"><div class="lc-dot" style="background:var(--col-astronomy)"></div><span>Astronomy</span><div class="lc-live" id="ls-astronomy"></div><span class="lc-n" id="lc-astronomy">–</span></div>
-  <div class="lc-row" data-layer="flight"       onclick="toggleLayer(this)"><div class="lc-dot" style="background:var(--col-flight)"></div><span>Live Flights</span><div class="lc-live" id="ls-flight"></div><span class="lc-n" id="lc-flight">–</span></div>
-  <div class="lc-row" data-layer="launch"       onclick="toggleLayer(this)"><div class="lc-dot" style="background:var(--col-launch)"></div><span>Launches</span><div class="lc-live" id="ls-launch"></div><span class="lc-n" id="lc-launch">–</span></div>
-  <div class="lc-row" data-layer="connection"   onclick="toggleLayer(this)"><div class="lc-dot" style="background:var(--col-connection)"></div><span>Connections</span><div class="lc-live on" id="ls-connection"></div><span class="lc-n" id="lc-connection">–</span></div>
-  <div class="lc-row off" data-layer="history" onclick="toggleLayer(this)"><div class="lc-dot" style="background:var(--col-history)"></div><span>Historical</span><div class="lc-live" id="ls-history"></div><span class="lc-n" id="lc-history">–</span></div>
-  <div class="lc-row" data-layer="money"   onclick="toggleLayer(this)"><div class="lc-dot" style="background:var(--col-money)"></div><span>Money</span><div class="lc-live" id="ls-money"></div><span class="lc-n" id="lc-money">–</span></div>
-  <div class="lc-row" data-layer="world"   onclick="toggleLayer(this)"><div class="lc-dot" style="background:var(--col-world)"></div><span>World</span><div class="lc-live" id="ls-world"></div><span class="lc-n" id="lc-world">–</span></div>
-  <div class="lc-row" data-layer="nyc"     onclick="toggleLayer(this)"><div class="lc-dot" style="background:var(--col-nyc)"></div><span>NYC</span><div class="lc-live" id="ls-nyc"></div><span class="lc-n" id="lc-nyc">–</span></div>
-  <div class="lc-row" data-layer="usnews"  onclick="toggleLayer(this)"><div class="lc-dot" style="background:var(--col-usnews)"></div><span>US News</span><div class="lc-live" id="ls-usnews"></div><span class="lc-n" id="lc-usnews">–</span></div>
+  <div class="lc-hdr" onclick="toggleLayers()">Layers<span class="lc-chevron" id="lc-chevron">▾</span></div>
+  <div id="lctrl-rows">
+    <div class="lc-row" data-layer="news"         onclick="toggleLayer(this)"><div class="lc-dot" style="background:var(--col-news)"></div><span>Breaking News</span><div class="lc-live" id="ls-news"></div><span class="lc-n" id="lc-news">–</span></div>
+    <div class="lc-row" data-layer="world"        onclick="toggleLayer(this)"><div class="lc-dot" style="background:var(--col-world)"></div><span>World</span><div class="lc-live" id="ls-world"></div><span class="lc-n" id="lc-world">–</span></div>
+    <div class="lc-row" data-layer="usnews"       onclick="toggleLayer(this)"><div class="lc-dot" style="background:var(--col-usnews)"></div><span>US News</span><div class="lc-live" id="ls-usnews"></div><span class="lc-n" id="lc-usnews">–</span></div>
+    <div class="lc-row" data-layer="nyc"          onclick="toggleLayer(this)"><div class="lc-dot" style="background:var(--col-nyc)"></div><span>NYC</span><div class="lc-live" id="ls-nyc"></div><span class="lc-n" id="lc-nyc">–</span></div>
+    <div class="lc-row" data-layer="money"        onclick="toggleLayer(this)"><div class="lc-dot" style="background:var(--col-money)"></div><span>Money</span><div class="lc-live" id="ls-money"></div><span class="lc-n" id="lc-money">–</span></div>
+    <div class="lc-row" data-layer="conflict"     onclick="toggleLayer(this)"><div class="lc-dot" style="background:var(--col-conflict)"></div><span>Conflicts</span><div class="lc-live" id="ls-conflict"></div><span class="lc-n" id="lc-conflict">–</span></div>
+    <div class="lc-row" data-layer="disaster"     onclick="toggleLayer(this)"><div class="lc-dot" style="background:var(--col-disaster)"></div><span>Disasters</span><div class="lc-live" id="ls-disaster"></div><span class="lc-n" id="lc-disaster">–</span></div>
+    <div class="lc-row" data-layer="storm"        onclick="toggleLayer(this)"><div class="lc-dot" style="background:var(--col-storm)"></div><span>Storms</span><div class="lc-live" id="ls-storm"></div><span class="lc-n" id="lc-storm">–</span></div>
+    <div class="lc-row" data-layer="humanitarian" onclick="toggleLayer(this)"><div class="lc-dot" style="background:var(--col-humanitarian)"></div><span>Humanitarian</span><div class="lc-live" id="ls-humanitarian"></div><span class="lc-n" id="lc-humanitarian">–</span></div>
+    <div class="lc-row" data-layer="tech"         onclick="toggleLayer(this)"><div class="lc-dot" style="background:var(--col-tech)"></div><span>Tech</span><div class="lc-live" id="ls-tech"></div><span class="lc-n" id="lc-tech">–</span></div>
+    <div class="lc-row" data-layer="fashion"      onclick="toggleLayer(this)"><div class="lc-dot" style="background:var(--col-fashion)"></div><span>Fashion</span><div class="lc-live" id="ls-fashion"></div><span class="lc-n" id="lc-fashion">–</span></div>
+    <div class="lc-row" data-layer="astrology"    onclick="toggleLayer(this)"><div class="lc-dot" style="background:var(--col-astrology)"></div><span>Astrology</span><div class="lc-live" id="ls-astrology"></div><span class="lc-n" id="lc-astrology">–</span></div>
+    <div class="lc-row" data-layer="astronomy"    onclick="toggleLayer(this)"><div class="lc-dot" style="background:var(--col-astronomy)"></div><span>Astronomy</span><div class="lc-live" id="ls-astronomy"></div><span class="lc-n" id="lc-astronomy">–</span></div>
+    <div class="lc-row" data-layer="flight"       onclick="toggleLayer(this)"><div class="lc-dot" style="background:var(--col-flight)"></div><span>Live Flights</span><div class="lc-live" id="ls-flight"></div><span class="lc-n" id="lc-flight">–</span></div>
+    <div class="lc-row" data-layer="launch"       onclick="toggleLayer(this)"><div class="lc-dot" style="background:var(--col-launch)"></div><span>Launches</span><div class="lc-live" id="ls-launch"></div><span class="lc-n" id="lc-launch">–</span></div>
+    <div class="lc-row" data-layer="connection"   onclick="toggleLayer(this)"><div class="lc-dot" style="background:var(--col-connection)"></div><span>Connections</span><div class="lc-live on" id="ls-connection"></div><span class="lc-n" id="lc-connection">–</span></div>
+    <div class="lc-row off" data-layer="history"  onclick="toggleLayer(this)"><div class="lc-dot" style="background:var(--col-history)"></div><span>Historical</span><div class="lc-live" id="ls-history"></div><span class="lc-n" id="lc-history">–</span></div>
+  </div>
 </div>
 <div id="sun-orb"></div>
 <div id="planet-orbs"></div>
@@ -1262,13 +1269,13 @@ function refreshGlobe() {
 // =============================================================================
 var EARTH_ELEMS = {N0:0,dN:0,i0:0,di:0,w0:282.9404,dw:4.70935e-5,a0:1,da:0,e0:0.016709,de:-1.151e-9,M0:356.0470,dM:0.9856002585};
 var PLANET_DATA = {
-  Mercury:{dist:'0.39 AU',period:'88 days',moons:0,radius:'2,439 km',type:'Terrestrial',note:'The smallest planet and closest to the Sun. A day on Mercury lasts longer than its year — it rotates so slowly the Sun rises, nearly stops, reverses, and sets again before the planet completes one orbit.'},
-  Venus:  {dist:'0.72 AU',period:'225 days',moons:0,radius:'6,051 km',type:'Terrestrial',note:'The hottest planet despite not being closest to the Sun. Its thick CO₂ atmosphere creates a runaway greenhouse effect — surface temperatures hit 465°C. It rotates backwards; the Sun rises in the west.'},
-  Mars:   {dist:'1.52 AU',period:'687 days',moons:2,radius:'3,389 km',type:'Terrestrial',note:'Home to Olympus Mons, the solar system\'s largest volcano — three times the height of Everest. Ancient river valleys suggest liquid water once flowed here. Currently home to several active rovers.'},
-  Jupiter:{dist:'5.20 AU',period:'11.9 yrs',moons:95,radius:'69,911 km',type:'Gas Giant',note:'More than twice the mass of all other planets combined. Its Great Red Spot is a storm raging for at least 350 years. Acts as the solar system\'s shield, deflecting comets and asteroids with its immense gravity.'},
-  Saturn: {dist:'9.58 AU',period:'29.5 yrs',moons:146,radius:'58,232 km',type:'Gas Giant',note:'The least dense planet — it would float in water. Its rings span 282,000 km but are only ~10 meters thick. Titan, its largest moon, has liquid methane lakes and a thick nitrogen atmosphere — the only moon with one.'},
-  Uranus: {dist:'19.2 AU',period:'84 yrs',moons:28,radius:'25,362 km',type:'Ice Giant',note:'Rotates on its side — axial tilt of 98°, likely the result of a massive ancient collision. Its north pole points almost directly at the Sun for 42 years at a time. Coldest planetary atmosphere at -224°C.'},
-  Neptune:{dist:'30.1 AU',period:'165 yrs',moons:16,radius:'24,622 km',type:'Ice Giant',note:'The windiest planet — supersonic winds reach 2,100 km/h. Its moon Triton orbits backwards and is almost certainly a captured Kuiper Belt object. Neptune was predicted mathematically before it was ever observed.'},
+  Mercury:{dist:'0.39 AU',period:'88 days',moons:0,radius:'2,439 km',type:'Terrestrial',wiki:'https://en.wikipedia.org/wiki/Mercury_(planet)',note:'The smallest planet and closest to the Sun. A day on Mercury lasts longer than its year — it rotates so slowly the Sun rises, nearly stops, reverses, and sets again before the planet completes one orbit.'},
+  Venus:  {dist:'0.72 AU',period:'225 days',moons:0,radius:'6,051 km',type:'Terrestrial',wiki:'https://en.wikipedia.org/wiki/Venus',note:'The hottest planet despite not being closest to the Sun. Its thick CO₂ atmosphere creates a runaway greenhouse effect — surface temperatures hit 465°C. It rotates backwards; the Sun rises in the west.'},
+  Mars:   {dist:'1.52 AU',period:'687 days',moons:2,radius:'3,389 km',type:'Terrestrial',wiki:'https://en.wikipedia.org/wiki/Mars',note:'Home to Olympus Mons, the solar system\'s largest volcano — three times the height of Everest. Ancient river valleys suggest liquid water once flowed here. Currently home to several active rovers.'},
+  Jupiter:{dist:'5.20 AU',period:'11.9 yrs',moons:95,radius:'69,911 km',type:'Gas Giant',wiki:'https://en.wikipedia.org/wiki/Jupiter',note:'More than twice the mass of all other planets combined. Its Great Red Spot is a storm raging for at least 350 years. Acts as the solar system\'s shield, deflecting comets and asteroids with its immense gravity.'},
+  Saturn: {dist:'9.58 AU',period:'29.5 yrs',moons:146,radius:'58,232 km',type:'Gas Giant',wiki:'https://en.wikipedia.org/wiki/Saturn',note:'The least dense planet — it would float in water. Its rings span 282,000 km but are only ~10 meters thick. Titan, its largest moon, has liquid methane lakes and a thick nitrogen atmosphere — the only moon with one.'},
+  Uranus: {dist:'19.2 AU',period:'84 yrs',moons:28,radius:'25,362 km',type:'Ice Giant',wiki:'https://en.wikipedia.org/wiki/Uranus',note:'Rotates on its side — axial tilt of 98°, likely the result of a massive ancient collision. Its north pole points almost directly at the Sun for 42 years at a time. Coldest planetary atmosphere at -224°C.'},
+  Neptune:{dist:'30.1 AU',period:'165 yrs',moons:16,radius:'24,622 km',type:'Ice Giant',wiki:'https://en.wikipedia.org/wiki/Neptune',note:'The windiest planet — supersonic winds reach 2,100 km/h. Its moon Triton orbits backwards and is almost certainly a captured Kuiper Belt object. Neptune was predicted mathematically before it was ever observed.'},
 };
 var PLANET_DEFS = [
   {name:'Mercury',color:'#c8c8c8',r:4, N0:48.3313, dN:3.24587e-5, i0:7.0047, di:5e-8,   w0:29.1241,  dw:1.01444e-5, a0:0.387098,da:0,        e0:0.205635,de:5.59e-10,  M0:168.6562,dM:4.0923344368},
@@ -1342,26 +1349,79 @@ function showPlanetDetail(p) {
   var data = PLANET_DATA[p.name] || {};
   var d = daysSinceJ2000(histDate || new Date());
   var pos = planetGeogLatLng(p, d);
+
+  // Fly to antipodal point so planet orb centres on screen
   globe.controls().autoRotate = false;
-  globe.pointOfView({lat: pos.lat, lng: pos.lng, altitude: 2.8}, 1200);
+  globe.pointOfView({lat: -pos.lat, lng: pos.lng + 180, altitude: 3.5}, 1200);
   setTimeout(function(){globe.controls().autoRotate = true;}, 6000);
+
+  // Related news: astronomy/astrology/tech/news articles mentioning the planet
+  var pname = p.name.toLowerCase();
+  var related = allEvents.filter(function(e) {
+    var inTitle = e.title.toLowerCase().indexOf(pname) !== -1;
+    var inTags  = (e.tags || []).some(function(t){ return t.toLowerCase() === pname; });
+    return (inTitle || inTags) && (e.type === 'astronomy' || e.type === 'astrology' || e.type === 'tech' || e.type === 'news');
+  }).slice(0, 5);
+
+  var relatedHtml = '';
+  if (related.length) {
+    relatedHtml = '<div class="d-sep"></div><div class="d-lbl">In the news</div>' +
+      related.map(function(e) {
+        var c = COLORS[e.type] || '#fff';
+        var titleHtml = e.url
+          ? '<a href="' + e.url + '" target="_blank" style="color:var(--text);text-decoration:none;border-bottom:1px solid rgba(255,255,255,.12)">' + e.title + '</a>'
+          : e.title;
+        return '<div style="padding:8px 10px;background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:7px;margin-bottom:5px">' +
+          '<div style="font-size:9px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:' + c + ';margin-bottom:4px">' + e.type + '</div>' +
+          '<div style="font-size:11px;line-height:1.4;margin-bottom:4px">' + titleHtml + '</div>' +
+          '<div style="font-size:9px;color:var(--muted);font-family:\'Space Mono\',monospace">' + e.age + (e.sources[0] ? ' · ' + e.sources[0].n : '') + '</div>' +
+          '</div>';
+      }).join('');
+  }
+
+  var wikiBtn = data.wiki
+    ? '<a href="' + data.wiki + '" target="_blank" style="display:flex;align-items:center;justify-content:center;gap:6px;padding:9px 14px;background:rgba(255,255,255,.05);border:1px solid var(--border);border-radius:7px;color:var(--muted);font-size:10px;font-weight:700;letter-spacing:1px;text-decoration:none;text-transform:uppercase;transition:background .15s;margin-bottom:12px" onmouseover="this.style.background=\'rgba(255,255,255,.1)\'" onmouseout="this.style.background=\'rgba(255,255,255,.05)\'">&#x2197; Wikipedia</a>'
+    : '';
+
   var det = document.getElementById('detail');
-  det.innerHTML = '<button id="d-close" onclick="document.getElementById(\'detail\').style.display=\'none\'">✕</button>' +
-    '<div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">' +
-      '<div style="width:18px;height:18px;border-radius:50%;background:'+p.color+';box-shadow:0 0 12px 4px '+p.color+'66;flex-shrink:0"></div>' +
-      '<div><div style="font-size:16px;font-weight:700;color:var(--text)">'+p.name+'</div>' +
-      '<div style="font-size:10px;color:var(--muted);letter-spacing:1px;text-transform:uppercase">'+(data.type||'Planet')+' · Solar System</div></div>' +
+  det.innerHTML =
+    '<button id="d-close" onclick="closeDetail()">&#x2715;</button>' +
+    '<div id="d-body">' +
+    '<div style="display:flex;align-items:center;gap:12px;margin-bottom:16px">' +
+      '<div style="width:24px;height:24px;border-radius:50%;flex-shrink:0;' +
+        'background:radial-gradient(circle at 35% 35%,' + p.color + 'ee,' + p.color + ',' + p.color + '88);' +
+        'box-shadow:0 0 18px 6px ' + p.color + '55"></div>' +
+      '<div>' +
+        '<div style="font-size:18px;font-weight:700;color:var(--text)">' + p.name + '</div>' +
+        '<div style="font-size:10px;color:var(--muted);letter-spacing:1px;text-transform:uppercase">' + (data.type || 'Planet') + ' · Solar System</div>' +
+      '</div>' +
     '</div>' +
-    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">' +
-      '<div style="background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:6px;padding:8px 10px"><div style="font-size:8px;letter-spacing:1px;color:var(--muted);text-transform:uppercase;margin-bottom:2px">Distance</div><div style="font-size:14px;font-weight:700;color:'+p.color+'">'+(data.dist||'—')+'</div></div>' +
-      '<div style="background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:6px;padding:8px 10px"><div style="font-size:8px;letter-spacing:1px;color:var(--muted);text-transform:uppercase;margin-bottom:2px">Orbital Period</div><div style="font-size:14px;font-weight:700;color:var(--text)">'+(data.period||'—')+'</div></div>' +
+    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:10px">' +
+      '<div style="background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:6px;padding:8px 10px">' +
+        '<div style="font-size:8px;letter-spacing:1px;color:var(--muted);text-transform:uppercase;margin-bottom:2px">Distance</div>' +
+        '<div style="font-size:14px;font-weight:700;color:' + p.color + '">' + (data.dist || '—') + '</div>' +
+      '</div>' +
+      '<div style="background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:6px;padding:8px 10px">' +
+        '<div style="font-size:8px;letter-spacing:1px;color:var(--muted);text-transform:uppercase;margin-bottom:2px">Orbital Period</div>' +
+        '<div style="font-size:14px;font-weight:700;color:var(--text)">' + (data.period || '—') + '</div>' +
+      '</div>' +
+      '<div style="background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:6px;padding:8px 10px">' +
+        '<div style="font-size:8px;letter-spacing:1px;color:var(--muted);text-transform:uppercase;margin-bottom:2px">Radius</div>' +
+        '<div style="font-size:14px;font-weight:700;color:var(--text)">' + (data.radius || '—') + '</div>' +
+      '</div>' +
+      '<div style="background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:6px;padding:8px 10px">' +
+        '<div style="font-size:8px;letter-spacing:1px;color:var(--muted);text-transform:uppercase;margin-bottom:2px">Moons</div>' +
+        '<div style="font-size:14px;font-weight:700;color:var(--text)">' + (data.moons !== undefined ? data.moons : '—') + '</div>' +
+      '</div>' +
     '</div>' +
-    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px">' +
-      '<div style="background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:6px;padding:8px 10px"><div style="font-size:8px;letter-spacing:1px;color:var(--muted);text-transform:uppercase;margin-bottom:2px">Radius</div><div style="font-size:14px;font-weight:700;color:var(--text)">'+(data.radius||'—')+'</div></div>' +
-      '<div style="background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:6px;padding:8px 10px"><div style="font-size:8px;letter-spacing:1px;color:var(--muted);text-transform:uppercase;margin-bottom:2px">Moons</div><div style="font-size:14px;font-weight:700;color:var(--text)">'+(data.moons!==undefined?data.moons:'—')+'</div></div>' +
-    '</div>' +
-    '<div style="font-size:11px;line-height:1.65;color:rgba(216,221,232,.85);margin-bottom:14px">'+(data.note||'')+'</div>';
-  det.style.display = '';
+    '<div class="d-sep"></div>' +
+    '<div class="d-lbl">About</div>' +
+    '<div style="font-size:11px;line-height:1.7;color:rgba(216,221,232,.85);margin-bottom:12px">' + (data.note || '') + '</div>' +
+    wikiBtn +
+    relatedHtml +
+    '</div>';
+
+  det.classList.add('open');
 }
 
 var planetRAF = null;
@@ -1545,65 +1605,73 @@ function initStars() {
 
 function showStarDetail(s) {
   var color = starColor(s[4]);
-  var d = document.getElementById('detail');
-  d.innerHTML = '<button id="d-close" onclick="document.getElementById(\'detail\').style.display=\'none\'">✕</button>' +
-    '<div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">' +
-      '<div style="width:18px;height:18px;border-radius:50%;background:' + color + ';box-shadow:0 0 12px 4px ' + color + '66;flex-shrink:0"></div>' +
-      '<div><div style="font-size:16px;font-weight:700;color:var(--text)">' + s[0] + '</div>' +
-      '<div style="font-size:10px;color:var(--muted);letter-spacing:1px;text-transform:uppercase">' + s[6] + ' · ' + s[4] + '</div></div>' +
+  var starName = s[0].toLowerCase();
+
+  // Find astronomy/astrology articles that mention this star by name
+  var related = allEvents.filter(function(e) {
+    return (e.type === 'astronomy' || e.type === 'astrology') &&
+      e.title.toLowerCase().indexOf(starName) !== -1;
+  }).slice(0, 4);
+
+  var relatedHtml = '';
+  if (related.length) {
+    relatedHtml = '<div class="d-sep"></div>' +
+      '<div class="d-lbl">In the news</div>' +
+      related.map(function(e) {
+        var titleHtml = e.url
+          ? '<a href="' + e.url + '" target="_blank" style="color:var(--text);text-decoration:none;border-bottom:1px solid rgba(255,255,255,.12)">' + e.title + '</a>'
+          : e.title;
+        return '<div style="padding:8px 10px;background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:7px;margin-bottom:5px">' +
+          '<div style="font-size:11px;line-height:1.4;margin-bottom:4px">' + titleHtml + '</div>' +
+          '<div style="font-size:9px;color:var(--muted);font-family:\'Space Mono\',monospace">' + e.age + ' · ' + (e.sources[0] ? e.sources[0].n : '') + '</div>' +
+          '</div>';
+      }).join('');
+  }
+
+  var det = document.getElementById('detail');
+  det.innerHTML =
+    '<button id="d-close" onclick="closeDetail()">&#x2715;</button>' +
+    '<div id="d-body">' +
+    '<div style="display:flex;align-items:center;gap:12px;margin-bottom:16px">' +
+      '<div style="width:22px;height:22px;border-radius:50%;flex-shrink:0;' +
+        'background:radial-gradient(circle at 35% 35%,' + color + 'cc,'+color+','+color+'88);' +
+        'box-shadow:0 0 16px 5px ' + color + '55"></div>' +
+      '<div>' +
+        '<div style="font-size:18px;font-weight:700;color:var(--text)">' + s[0] + '</div>' +
+        '<div style="font-size:10px;color:var(--muted);letter-spacing:1px;text-transform:uppercase">' + s[6] + ' · ' + s[4] + '</div>' +
+      '</div>' +
     '</div>' +
-    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px">' +
+    '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-bottom:12px">' +
       '<div style="background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:6px;padding:8px 10px">' +
         '<div style="font-size:8px;letter-spacing:1px;color:var(--muted);text-transform:uppercase;margin-bottom:2px">Distance</div>' +
-        '<div style="font-size:15px;font-weight:700;color:' + color + '">' + (s[5] < 10 ? s[5].toFixed(2) : Math.round(s[5])) + ' <span style="font-size:10px;font-weight:400;color:var(--muted)">light-years</span></div>' +
+        '<div style="font-size:13px;font-weight:700;color:' + color + '">' + (s[5] < 10 ? s[5].toFixed(2) : Math.round(s[5])) + '</div>' +
+        '<div style="font-size:8px;color:var(--muted)">light-years</div>' +
       '</div>' +
       '<div style="background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:6px;padding:8px 10px">' +
         '<div style="font-size:8px;letter-spacing:1px;color:var(--muted);text-transform:uppercase;margin-bottom:2px">Magnitude</div>' +
-        '<div style="font-size:15px;font-weight:700;color:var(--text)">' + s[3] + ' <span style="font-size:10px;font-weight:400;color:var(--muted)">visual</span></div>' +
+        '<div style="font-size:13px;font-weight:700;color:var(--text)">' + s[3] + '</div>' +
+        '<div style="font-size:8px;color:var(--muted)">visual</div>' +
+      '</div>' +
+      '<div style="background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:6px;padding:8px 10px">' +
+        '<div style="font-size:8px;letter-spacing:1px;color:var(--muted);text-transform:uppercase;margin-bottom:2px">Spectral</div>' +
+        '<div style="font-size:13px;font-weight:700;color:' + color + '">' + s[4].split('')[0] + '</div>' +
+        '<div style="font-size:8px;color:var(--muted)">' + s[4] + '</div>' +
       '</div>' +
     '</div>' +
-    '<div style="background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:6px;padding:10px 12px;margin-bottom:14px">' +
-      '<div style="font-size:8px;letter-spacing:1px;color:var(--muted);text-transform:uppercase;margin-bottom:6px">Coordinates (J2000)</div>' +
-      '<div style="font-size:10px;color:var(--text);font-family:\'Space Mono\',monospace">RA ' + s[1].toFixed(2) + '° · Dec ' + (s[2] >= 0 ? '+' : '') + s[2].toFixed(2) + '°</div>' +
+    '<div style="background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:6px;padding:9px 11px;margin-bottom:12px;font-family:\'Space Mono\',monospace">' +
+      '<div style="font-size:8px;letter-spacing:1px;color:var(--muted);text-transform:uppercase;margin-bottom:5px">Coordinates (J2000)</div>' +
+      '<div style="font-size:10px;color:var(--text)">RA ' + s[1].toFixed(2) + '°&ensp;·&ensp;Dec ' + (s[2] >= 0 ? '+' : '') + s[2].toFixed(2) + '°</div>' +
     '</div>' +
-    '<div style="font-size:11px;line-height:1.65;color:rgba(216,221,232,.85)">' + s[7] + '</div>';
-  d.style.display = '';
+    '<div class="d-sep"></div>' +
+    '<div class="d-lbl">About</div>' +
+    '<div style="font-size:11px;line-height:1.7;color:rgba(216,221,232,.85);margin-bottom:4px">' + s[7] + '</div>' +
+    relatedHtml +
+    '</div>';
+
+  det.classList.add('open');
 }
 
 
-
-function showPlanetDetail(p) {
-  var data = PLANET_DATA[p.name] || {};
-  var d = document.getElementById('detail');
-  d.innerHTML = '<button id="d-close" onclick="document.getElementById(\'detail\').style.display=\'none\'">✕</button>' +
-    '<div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">' +
-      '<div style="width:18px;height:18px;border-radius:50%;background:' + p.color + ';box-shadow:0 0 12px 4px ' + p.color + '66;flex-shrink:0"></div>' +
-      '<div><div style="font-size:16px;font-weight:700;color:var(--text)">' + p.name + '</div>' +
-      '<div style="font-size:10px;color:var(--muted);letter-spacing:1px;text-transform:uppercase">' + (data.type || 'Planet') + ' · Solar System</div></div>' +
-    '</div>' +
-    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">' +
-      '<div style="background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:6px;padding:8px 10px">' +
-        '<div style="font-size:8px;letter-spacing:1px;color:var(--muted);text-transform:uppercase;margin-bottom:2px">Distance</div>' +
-        '<div style="font-size:14px;font-weight:700;color:' + p.color + '">' + (data.dist || '—') + '</div>' +
-      '</div>' +
-      '<div style="background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:6px;padding:8px 10px">' +
-        '<div style="font-size:8px;letter-spacing:1px;color:var(--muted);text-transform:uppercase;margin-bottom:2px">Orbital Period</div>' +
-        '<div style="font-size:14px;font-weight:700;color:var(--text)">' + (data.period || '—') + '</div>' +
-      '</div>' +
-    '</div>' +
-    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px">' +
-      '<div style="background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:6px;padding:8px 10px">' +
-        '<div style="font-size:8px;letter-spacing:1px;color:var(--muted);text-transform:uppercase;margin-bottom:2px">Radius</div>' +
-        '<div style="font-size:14px;font-weight:700;color:var(--text)">' + (data.radius || '—') + '</div>' +
-      '</div>' +
-      '<div style="background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:6px;padding:8px 10px">' +
-        '<div style="font-size:8px;letter-spacing:1px;color:var(--muted);text-transform:uppercase;margin-bottom:2px">Moons</div>' +
-        '<div style="font-size:14px;font-weight:700;color:var(--text)">' + (data.moons !== undefined ? data.moons : '—') + '</div>' +
-      '</div>' +
-    '</div>' +
-    '<div style="font-size:11px;line-height:1.65;color:rgba(216,221,232,.85)">' + (data.note || '') + '</div>';
-  d.style.display = '';
-}
 
 // =============================================================================
 // FILTER / LIST
@@ -1848,7 +1916,7 @@ function toggleLayer(el){
   // History and flight stay as simple toggles
   if(l==='history'||l==='flight'){layerVis[l]=!layerVis[l];el.classList.toggle('off',!layerVis[l]);refreshGlobe();return;}
   // All other layers: isolate on click, reset to all-on if already isolated
-  var contentLayers=['news','conflict','disaster','storm','humanitarian','tech','fashion','astrology','astronomy','launch','connection'];
+  var contentLayers=['news','world','usnews','nyc','money','conflict','disaster','storm','humanitarian','tech','fashion','astrology','astronomy','launch','connection'];
   var activeCount=contentLayers.filter(function(k){return layerVis[k];}).length;
   if(layerVis[l]&&activeCount===1){
     // Already isolated — reset all on
@@ -1862,6 +1930,12 @@ function toggleLayer(el){
     if(rl&&rl!=='history'&&rl!=='flight')row.classList.toggle('off',!layerVis[rl]);
   });
   refreshGlobe();
+}
+var _layersOpen = true;
+function toggleLayers() {
+  _layersOpen = !_layersOpen;
+  document.getElementById('lctrl-rows').classList.toggle('hidden', !_layersOpen);
+  document.getElementById('lc-chevron').classList.toggle('closed', !_layersOpen);
 }
 function togglePanel(){panelOpen=!panelOpen;document.getElementById('panel').classList.toggle('hidden',!panelOpen);var t=document.getElementById('ptoggle');t.innerHTML=panelOpen?'&#8249;':'&#8250;';t.classList.toggle('closed',!panelOpen);t.style.left=panelOpen?'300px':'0';}
 function renderWatchlist(){document.getElementById('wl-tags').innerHTML=watchTags.map(function(t){return '<div class="wl-tag" onclick="watchFilter(\''+t+'\')">'+t+'<span class="wl-tag-x" onclick="event.stopPropagation();removeWatchTag(\''+t+'\')">×</span></div>';}).join('');}
