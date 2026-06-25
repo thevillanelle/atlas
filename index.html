@@ -81,9 +81,15 @@ select#theme-btn option{background:#070b18;color:var(--text);font-size:12px;lett
 #auth-card{background:var(--panel);border:1px solid var(--border);border-radius:16px;padding:32px;width:320px;text-align:center;box-shadow:0 24px 64px rgba(0,0,0,.5)}
 .auth-logo{font-family:'Space Mono',monospace;font-size:22px;font-weight:700;letter-spacing:6px;color:#fff;margin-bottom:4px}.auth-logo em{color:var(--accent);font-style:normal}
 .auth-sub{font-size:10px;color:var(--muted);letter-spacing:3px;text-transform:uppercase;margin-bottom:28px}
-#google-btn{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;padding:12px;background:rgba(255,255,255,.06);border:1px solid var(--border);border-radius:10px;color:var(--text);font-size:12px;font-weight:600;cursor:pointer;transition:all .2s}
-#google-btn:hover{background:rgba(255,255,255,.1);border-color:var(--border2)}
-.auth-note{font-size:9px;color:var(--muted);margin-top:16px;letter-spacing:1px}
+.auth-input{width:100%;padding:10px 12px;background:rgba(255,255,255,.05);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:12px;font-family:'Space Mono',monospace;outline:none;box-sizing:border-box;transition:border-color .2s;margin-bottom:10px}
+.auth-input:focus{border-color:var(--accent)}
+.auth-input::placeholder{color:var(--muted)}
+#auth-submit{width:100%;padding:11px;background:var(--accent);border:none;border-radius:8px;color:#000;font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;cursor:pointer;font-family:'Space Mono',monospace;transition:opacity .2s;margin-top:4px}
+#auth-submit:hover{opacity:.85}
+#auth-submit:disabled{opacity:.4;cursor:not-allowed}
+.auth-toggle{font-size:10px;color:var(--muted);margin-top:14px;cursor:pointer;letter-spacing:1px}
+.auth-toggle span{color:var(--accent);text-decoration:underline}
+.auth-err{font-size:10px;color:#f87171;margin-top:8px;min-height:14px;text-align:left}
 #auth-user-panel{position:absolute;top:52px;right:16px;background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:16px;width:220px;z-index:400;display:none;box-shadow:0 16px 40px rgba(0,0,0,.5)}
 #auth-user-panel.open{display:block}
 .aup-name{font-size:12px;font-weight:700;color:var(--text);margin-bottom:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
@@ -347,12 +353,12 @@ body.hist-open #panel{top:92px}body.hist-open #detail{top:92px}body.hist-open #l
 <div id="auth-modal" onclick="if(event.target===this)this.classList.remove('open')">
   <div id="auth-card">
     <div class="auth-logo">ATL<em>A</em>S</div>
-    <div class="auth-sub">Global Intelligence Feed</div>
-    <button id="google-btn" onclick="signInWithGoogle()">
-      <svg width="18" height="18" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.31-8.16 2.31-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
-      Continue with Google
-    </button>
-    <div class="auth-note">Your preferences, watchlist, and saved events sync across devices.</div>
+    <div class="auth-sub" id="auth-mode-label">Sign in to your account</div>
+    <input class="auth-input" id="auth-email" type="email" placeholder="Email address" autocomplete="email">
+    <input class="auth-input" id="auth-password" type="password" placeholder="Password" autocomplete="current-password" onkeydown="if(event.key==='Enter')submitAuth()">
+    <div class="auth-err" id="auth-err"></div>
+    <button id="auth-submit" onclick="submitAuth()">Sign In</button>
+    <div class="auth-toggle" id="auth-toggle-link" onclick="toggleAuthMode()">No account? <span>Create one</span></div>
   </div>
 </div>
 <!-- Signed-in user panel -->
@@ -451,12 +457,41 @@ var SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYm
 var sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 var currentUser = null;
 
-function signInWithGoogle() {
+var authMode = 'signin'; // 'signin' | 'signup'
+
+function toggleAuthMode() {
+  authMode = authMode === 'signin' ? 'signup' : 'signin';
+  var isSignUp = authMode === 'signup';
+  document.getElementById('auth-submit').textContent = isSignUp ? 'CREATE ACCOUNT' : 'SIGN IN';
+  document.getElementById('auth-mode-label').textContent = isSignUp ? 'Create your account' : 'Sign in to your account';
+  document.getElementById('auth-toggle-link').innerHTML = isSignUp
+    ? 'Already have an account? <span>Sign in</span>'
+    : 'No account? <span>Create one</span>';
+  document.getElementById('auth-password').autocomplete = isSignUp ? 'new-password' : 'current-password';
+  document.getElementById('auth-err').textContent = '';
+}
+
+async function submitAuth() {
+  var email = document.getElementById('auth-email').value.trim();
+  var password = document.getElementById('auth-password').value;
+  var errEl = document.getElementById('auth-err');
+  var btn = document.getElementById('auth-submit');
+  if (!email || !password) { errEl.textContent = 'Email and password are required.'; return; }
+  btn.disabled = true;
+  errEl.textContent = '';
+  var result = authMode === 'signup'
+    ? await sb.auth.signUp({ email, password })
+    : await sb.auth.signInWithPassword({ email, password });
+  btn.disabled = false;
+  if (result.error) { errEl.textContent = result.error.message; return; }
+  if (authMode === 'signup' && result.data.user && !result.data.session) {
+    errEl.style.color = '#34d399';
+    errEl.textContent = 'Check your email to confirm your account.';
+    return;
+  }
   document.getElementById('auth-modal').classList.remove('open');
-  sb.auth.signInWithOAuth({
-    provider: 'google',
-    options: { redirectTo: window.location.origin + window.location.pathname }
-  });
+  document.getElementById('auth-email').value = '';
+  document.getElementById('auth-password').value = '';
 }
 
 function signOut() {
