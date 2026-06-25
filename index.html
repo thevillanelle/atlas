@@ -1363,7 +1363,8 @@ function initGlobe() {
   globe.controls().autoRotateSpeed = 0.22;
   globe.controls().enableDamping = true;
   var sun = sunSubpoint(new Date());
-  globe.pointOfView({lat:sun.lat, lng:sun.lng, altitude:2.2}, 0);
+  // Start on night side so the sun orb is visible from the first frame
+  globe.pointOfView({lat:-sun.lat, lng:sun.lng+180, altitude:2.2}, 0);
   updateTerminator();
 }
 
@@ -2811,6 +2812,7 @@ function selectMode(mode) {
 async function init() {
   splash(5, 'Initializing 3D globe…');
   initGlobe();
+  tickSunOrb();
   checkAPIs();
   await loadLiveData();
   splash(96, 'Rendering feed…');
