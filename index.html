@@ -16,6 +16,7 @@
   --col-launch:#a78bfa;--col-tech:#06b6d4;--col-fashion:#f472b6;--col-astrology:#c084fc;--col-astronomy:#38bdf8;
   --col-connection:#f59e0b;
   --col-history:#a3e635;
+  --col-money:#34d399;--col-world:#818cf8;--col-nyc:#fb923c;--col-usnews:#94a3b8;
 }
 
 html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);font-family:'Inter',sans-serif;color:var(--text)}
@@ -26,28 +27,30 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);font-famil
 #mode-select.open{opacity:1;pointer-events:all}
 #mode-select.out{opacity:0;pointer-events:none}
 .ms-wrap{width:100%;max-width:860px;padding:0 28px}
-.ms-eyebrow{font-family:'Space Mono',monospace;font-size:8px;letter-spacing:5px;text-transform:uppercase;color:#475569;margin-bottom:8px}
-.ms-title{font-family:'Space Mono',monospace;font-size:20px;font-weight:700;letter-spacing:8px;color:#fff;margin-bottom:4px}
+.ms-eyebrow{font-family:'Space Mono',monospace;font-size:11px;letter-spacing:5px;text-transform:uppercase;color:#475569;margin-bottom:8px}
+.ms-title{font-family:'Space Mono',monospace;font-size:28px;font-weight:700;letter-spacing:8px;color:#fff;margin-bottom:4px}
 .ms-title em{color:var(--accent);font-style:normal}
 .ms-rule{width:32px;height:1px;background:#1e3a5f;margin:12px 0}
-.ms-sub{font-size:9px;letter-spacing:2px;text-transform:uppercase;color:#64748b;margin-bottom:22px;font-family:'Space Mono',monospace}
-.ms-section-label{font-size:7px;letter-spacing:3px;text-transform:uppercase;color:#1e3a5f;font-family:'Space Mono',monospace;margin-bottom:8px}
+.ms-sub{font-size:12px;letter-spacing:2px;text-transform:uppercase;color:#64748b;margin-bottom:22px;font-family:'Space Mono',monospace}
+.ms-section-label{font-size:10px;letter-spacing:3px;text-transform:uppercase;color:#1e3a5f;font-family:'Space Mono',monospace;margin-bottom:8px}
 .ms-fn-grid{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:rgba(255,255,255,.06);margin-bottom:18px}
 .ms-fn-cell{background:#050810;padding:16px 18px;cursor:pointer;transition:background .15s;display:flex;align-items:flex-start;gap:12px}
 .ms-fn-cell:hover{background:#0a1020}
 .ms-fn-cell:hover .ms-cell-name{color:#fff}
 .ms-fn-cell:hover .ms-dot{opacity:1}
-.ms-feed-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:1px;background:rgba(255,255,255,.06)}
+.ms-feed-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:1px;background:rgba(255,255,255,.06)}
 .ms-feed-cell{background:#050810;padding:14px 12px;cursor:pointer;transition:background .15s}
 .ms-feed-cell:hover{background:#0a1020}
 .ms-feed-cell:hover .ms-cell-name{color:#fff}
 .ms-feed-cell:hover .ms-dot{opacity:1}
-.ms-dot{width:5px;height:5px;border-radius:50%;opacity:.35;transition:opacity .15s;margin-bottom:9px;flex-shrink:0;margin-top:3px}
-.ms-cell-name{font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:#94a3b8;margin-bottom:4px;transition:color .15s;font-family:'Space Mono',monospace}
-.ms-cell-desc{font-size:8px;color:#334155;line-height:1.5;font-family:'Space Mono',monospace}
+.ms-dot{width:8px;height:8px;border-radius:50%;opacity:.25;transition:opacity .4s,box-shadow .4s;margin-bottom:9px;flex-shrink:0;margin-top:3px}
+.ms-dot.live{opacity:1;animation:dotpulse 2.4s ease infinite}
+@keyframes dotpulse{0%,100%{box-shadow:0 0 4px 1px var(--dc,currentColor)}50%{box-shadow:0 0 10px 3px var(--dc,currentColor)}}
+.ms-cell-name{font-size:12px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:#94a3b8;margin-bottom:4px;transition:color .15s;font-family:'Space Mono',monospace}
+.ms-cell-desc{font-size:10px;color:#334155;line-height:1.5;font-family:'Space Mono',monospace}
 .ms-footer{display:flex;align-items:center;justify-content:space-between;margin-top:12px;padding-top:12px;border-top:1px solid rgba(255,255,255,.05)}
-.ms-skip{font-size:8px;letter-spacing:2px;text-transform:uppercase;color:#334155;cursor:pointer;font-family:'Space Mono',monospace;transition:color .15s}.ms-skip:hover{color:#94a3b8}
-.ms-status{font-size:7px;letter-spacing:1px;text-transform:uppercase;color:#1e3a5f;font-family:'Space Mono',monospace}
+.ms-skip{font-size:11px;letter-spacing:2px;text-transform:uppercase;color:#334155;cursor:pointer;font-family:'Space Mono',monospace;transition:color .15s}.ms-skip:hover{color:#94a3b8}
+.ms-status{font-size:10px;letter-spacing:1px;text-transform:uppercase;color:#1e3a5f;font-family:'Space Mono',monospace}
 .sp-logo{font-family:'Space Mono',monospace;font-size:30px;font-weight:700;letter-spacing:8px;color:#fff}
 .sp-logo em{color:var(--accent);font-style:normal}
 .sp-sub{font-size:10px;color:var(--muted);letter-spacing:4px;text-transform:uppercase;font-family:'Space Mono',monospace}
@@ -84,12 +87,13 @@ select#theme-btn option{background:#070b18;color:var(--text);font-size:12px;lett
   background:radial-gradient(circle,rgba(255,230,100,1) 0%,rgba(255,180,30,.7) 25%,rgba(255,120,0,.25) 55%,transparent 75%);
   filter:blur(4px);mix-blend-mode:screen}
 #planet-orbs{position:fixed;top:0;left:0;pointer-events:none;z-index:140;width:0;height:0}
-.porb{position:absolute;display:none;transform:translate(-50%,-50%)}
-.porb-dot{display:block;border-radius:50%;background:var(--pc);width:calc(var(--pr) * 2);height:calc(var(--pr) * 2);
-  box-shadow:0 0 calc(var(--pr) * 2) var(--pc),0 0 calc(var(--pr) * 5) var(--pc)}
-.porb-label{position:absolute;top:calc(var(--pr) * 2 + 4px);left:50%;transform:translateX(-50%);
-  font-family:'Space Mono',monospace;font-size:7px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;
-  color:var(--pc);white-space:nowrap;text-shadow:0 0 6px var(--pc)}
+.porb{position:absolute;display:none;transform:translate(-50%,-50%);cursor:pointer}
+.porb-dot{display:block;border-radius:50%;width:calc(var(--pr) * 2);height:calc(var(--pr) * 2);
+  background:radial-gradient(circle at 35% 35%, color-mix(in srgb,var(--pc) 60%,#fff), var(--pc) 55%, color-mix(in srgb,var(--pc) 80%,#000));
+  box-shadow:0 0 calc(var(--pr) * 3) calc(var(--pr)) var(--pc),0 0 calc(var(--pr) * 8) calc(var(--pr) * 2) color-mix(in srgb,var(--pc) 40%,transparent)}
+.porb-label{position:absolute;top:calc(var(--pr) * 2 + 6px);left:50%;transform:translateX(-50%);
+  font-family:'Space Mono',monospace;font-size:8px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;
+  color:var(--pc);white-space:nowrap;text-shadow:0 0 8px var(--pc),0 0 16px var(--pc)}
 #ptoggle{position:fixed;top:60px;left:300px;z-index:202;width:20px;height:34px;background:var(--glass);border:1px solid var(--border);border-left:none;border-radius:0 6px 6px 0;cursor:pointer;color:var(--muted);display:flex;align-items:center;justify-content:center;font-size:10px;backdrop-filter:blur(20px);transition:left .35s cubic-bezier(.4,0,.2,1);outline:none;user-select:none}
 #ptoggle:hover{color:var(--text)}
 #ptoggle.closed{left:0}
@@ -253,32 +257,36 @@ body.hist-open #panel{top:92px}body.hist-open #detail{top:92px}body.hist-open #l
     <div class="ms-section-label">Explore</div>
     <div class="ms-fn-grid">
       <div class="ms-fn-cell" onclick="selectMode('history')">
-        <div class="ms-dot" style="background:#a3e635"></div>
+        <div class="ms-dot" id="msdot-history" style="background:#a3e635;--dc:#a3e635"></div>
         <div><div class="ms-cell-name">History</div><div class="ms-cell-desc">Step back to any point in time — see what was happening anywhere in the world</div></div>
       </div>
       <div class="ms-fn-cell" onclick="selectMode('connection')">
-        <div class="ms-dot" style="background:#f59e0b"></div>
+        <div class="ms-dot" id="msdot-connection" style="background:#f59e0b;--dc:#f59e0b"></div>
         <div><div class="ms-cell-name">Connections</div><div class="ms-cell-desc">Surface the threads linking events — chokepoints, fault lines, economic pressure</div></div>
       </div>
     </div>
 
     <div class="ms-section-label">Live feeds</div>
     <div class="ms-feed-grid">
-      <div class="ms-feed-cell" onclick="selectMode('news')"><div class="ms-dot" style="background:#ef4444"></div><div class="ms-cell-name">Breaking News</div><div class="ms-cell-desc">Live world events and developing stories</div></div>
-      <div class="ms-feed-cell" onclick="selectMode('conflict')"><div class="ms-dot" style="background:#f97316"></div><div class="ms-cell-name">Conflicts</div><div class="ms-cell-desc">Wars, attacks, military movements</div></div>
-      <div class="ms-feed-cell" onclick="selectMode('disaster')"><div class="ms-dot" style="background:#eab308"></div><div class="ms-cell-name">Disasters</div><div class="ms-cell-desc">Earthquakes, floods, natural events</div></div>
-      <div class="ms-feed-cell" onclick="selectMode('storm')"><div class="ms-dot" style="background:#60a5fa"></div><div class="ms-cell-name">Storms</div><div class="ms-cell-desc">Hurricanes, cyclones, severe weather</div></div>
-      <div class="ms-feed-cell" onclick="selectMode('humanitarian')"><div class="ms-dot" style="background:#ec4899"></div><div class="ms-cell-name">Humanitarian</div><div class="ms-cell-desc">Aid, crises, relief operations</div></div>
-      <div class="ms-feed-cell" onclick="selectMode('tech')"><div class="ms-dot" style="background:#06b6d4"></div><div class="ms-cell-name">Tech</div><div class="ms-cell-desc">Hacker News, AI, the internet</div></div>
-      <div class="ms-feed-cell" onclick="selectMode('fashion')"><div class="ms-dot" style="background:#f472b6"></div><div class="ms-cell-name">Fashion</div><div class="ms-cell-desc">Runway, luxury, global style</div></div>
-      <div class="ms-feed-cell" onclick="selectMode('launch')"><div class="ms-dot" style="background:#a78bfa"></div><div class="ms-cell-name">Launches</div><div class="ms-cell-desc">Upcoming rocket launches</div></div>
-      <div class="ms-feed-cell" onclick="selectMode('astrology')"><div class="ms-dot" style="background:#c084fc"></div><div class="ms-cell-name">Astrology</div><div class="ms-cell-desc">Planetary placements, celestial events</div></div>
-      <div class="ms-feed-cell" onclick="selectMode('astronomy')"><div class="ms-dot" style="background:#38bdf8"></div><div class="ms-cell-name">Astronomy</div><div class="ms-cell-desc">Space news pinned to planets</div></div>
+      <div class="ms-feed-cell" onclick="selectMode('news')"><div class="ms-dot" id="msdot-news" style="background:#ef4444;--dc:#ef4444"></div><div class="ms-cell-name">Breaking News</div><div class="ms-cell-desc">Live world events and developing stories</div></div>
+      <div class="ms-feed-cell" onclick="selectMode('world')"><div class="ms-dot" id="msdot-world" style="background:#818cf8;--dc:#818cf8"></div><div class="ms-cell-name">World</div><div class="ms-cell-desc">Foreign press — Africa, Asia, Europe, Americas</div></div>
+      <div class="ms-feed-cell" onclick="selectMode('usnews')"><div class="ms-dot" id="msdot-usnews" style="background:#94a3b8;--dc:#94a3b8"></div><div class="ms-cell-name">US News</div><div class="ms-cell-desc">Politics, society, and national stories</div></div>
+      <div class="ms-feed-cell" onclick="selectMode('nyc')"><div class="ms-dot" id="msdot-nyc" style="background:#fb923c;--dc:#fb923c"></div><div class="ms-cell-name">NYC</div><div class="ms-cell-desc">New York City — local, culture, transit</div></div>
+      <div class="ms-feed-cell" onclick="selectMode('money')"><div class="ms-dot" id="msdot-money" style="background:#34d399;--dc:#34d399"></div><div class="ms-cell-name">Money</div><div class="ms-cell-desc">Markets, economy, finance, luxury</div></div>
+      <div class="ms-feed-cell" onclick="selectMode('conflict')"><div class="ms-dot" id="msdot-conflict" style="background:#f97316;--dc:#f97316"></div><div class="ms-cell-name">Conflicts</div><div class="ms-cell-desc">Wars, attacks, military movements</div></div>
+      <div class="ms-feed-cell" onclick="selectMode('disaster')"><div class="ms-dot" id="msdot-disaster" style="background:#eab308;--dc:#eab308"></div><div class="ms-cell-name">Disasters</div><div class="ms-cell-desc">Earthquakes, floods, natural events</div></div>
+      <div class="ms-feed-cell" onclick="selectMode('storm')"><div class="ms-dot" id="msdot-storm" style="background:#60a5fa;--dc:#60a5fa"></div><div class="ms-cell-name">Storms</div><div class="ms-cell-desc">Hurricanes, cyclones, severe weather</div></div>
+      <div class="ms-feed-cell" onclick="selectMode('humanitarian')"><div class="ms-dot" id="msdot-humanitarian" style="background:#ec4899;--dc:#ec4899"></div><div class="ms-cell-name">Humanitarian</div><div class="ms-cell-desc">Aid, crises, relief operations</div></div>
+      <div class="ms-feed-cell" onclick="selectMode('tech')"><div class="ms-dot" id="msdot-tech" style="background:#06b6d4;--dc:#06b6d4"></div><div class="ms-cell-name">Tech</div><div class="ms-cell-desc">Hacker News, AI, the internet</div></div>
+      <div class="ms-feed-cell" onclick="selectMode('fashion')"><div class="ms-dot" id="msdot-fashion" style="background:#f472b6;--dc:#f472b6"></div><div class="ms-cell-name">Fashion</div><div class="ms-cell-desc">Runway, luxury, global style</div></div>
+      <div class="ms-feed-cell" onclick="selectMode('launch')"><div class="ms-dot" id="msdot-launch" style="background:#a78bfa;--dc:#a78bfa"></div><div class="ms-cell-name">Launches</div><div class="ms-cell-desc">Upcoming rocket launches</div></div>
+      <div class="ms-feed-cell" onclick="selectMode('astrology')"><div class="ms-dot" id="msdot-astrology" style="background:#c084fc;--dc:#c084fc"></div><div class="ms-cell-name">Astrology</div><div class="ms-cell-desc">Planetary placements, celestial events</div></div>
+      <div class="ms-feed-cell" onclick="selectMode('astronomy')"><div class="ms-dot" id="msdot-astronomy" style="background:#38bdf8;--dc:#38bdf8"></div><div class="ms-cell-name">Astronomy</div><div class="ms-cell-desc">Space news pinned to planets</div></div>
     </div>
 
     <div class="ms-footer">
       <span class="ms-skip" onclick="selectMode('all')">Skip — enter all feeds →</span>
-      <span class="ms-status">● Systems nominal</span>
+      <span class="ms-status" id="ms-status-txt">● Checking systems…</span>
     </div>
   </div>
 </div>
@@ -331,6 +339,10 @@ body.hist-open #panel{top:92px}body.hist-open #detail{top:92px}body.hist-open #l
     <div class="tab on" data-tab="all"         onclick="setTab(this)">All</div>
     <div class="tab"    data-tab="watchlist"    onclick="setTab(this)">Watchlist</div>
     <div class="tab"    data-tab="news"         onclick="setTab(this)">News</div>
+    <div class="tab"    data-tab="world"        onclick="setTab(this)">World</div>
+    <div class="tab"    data-tab="usnews"       onclick="setTab(this)">US</div>
+    <div class="tab"    data-tab="nyc"          onclick="setTab(this)">NYC</div>
+    <div class="tab"    data-tab="money"        onclick="setTab(this)">Money</div>
     <div class="tab"    data-tab="tech"         onclick="setTab(this)">Tech</div>
     <div class="tab"    data-tab="fashion"      onclick="setTab(this)">Fashion</div>
     <div class="tab"    data-tab="astrology"    onclick="setTab(this)">Astrology</div>
@@ -363,6 +375,10 @@ body.hist-open #panel{top:92px}body.hist-open #detail{top:92px}body.hist-open #l
   <div class="lc-row" data-layer="launch"       onclick="toggleLayer(this)"><div class="lc-dot" style="background:var(--col-launch)"></div><span>Launches</span><div class="lc-live" id="ls-launch"></div><span class="lc-n" id="lc-launch">–</span></div>
   <div class="lc-row" data-layer="connection"   onclick="toggleLayer(this)"><div class="lc-dot" style="background:var(--col-connection)"></div><span>Connections</span><div class="lc-live on" id="ls-connection"></div><span class="lc-n" id="lc-connection">–</span></div>
   <div class="lc-row off" data-layer="history" onclick="toggleLayer(this)"><div class="lc-dot" style="background:var(--col-history)"></div><span>Historical</span><div class="lc-live" id="ls-history"></div><span class="lc-n" id="lc-history">–</span></div>
+  <div class="lc-row" data-layer="money"   onclick="toggleLayer(this)"><div class="lc-dot" style="background:var(--col-money)"></div><span>Money</span><div class="lc-live" id="ls-money"></div><span class="lc-n" id="lc-money">–</span></div>
+  <div class="lc-row" data-layer="world"   onclick="toggleLayer(this)"><div class="lc-dot" style="background:var(--col-world)"></div><span>World</span><div class="lc-live" id="ls-world"></div><span class="lc-n" id="lc-world">–</span></div>
+  <div class="lc-row" data-layer="nyc"     onclick="toggleLayer(this)"><div class="lc-dot" style="background:var(--col-nyc)"></div><span>NYC</span><div class="lc-live" id="ls-nyc"></div><span class="lc-n" id="lc-nyc">–</span></div>
+  <div class="lc-row" data-layer="usnews"  onclick="toggleLayer(this)"><div class="lc-dot" style="background:var(--col-usnews)"></div><span>US News</span><div class="lc-live" id="ls-usnews"></div><span class="lc-n" id="lc-usnews">–</span></div>
 </div>
 <div id="sun-orb"></div>
 <div id="planet-orbs"></div>
@@ -385,11 +401,13 @@ body.hist-open #panel{top:92px}body.hist-open #detail{top:92px}body.hist-open #l
 var COLORS = {
   news:'#ef4444',conflict:'#f97316',disaster:'#eab308',storm:'#60a5fa',
   humanitarian:'#ec4899',flight:'#10b981',launch:'#a78bfa',
-  tech:'#06b6d4',fashion:'#f472b6',astrology:'#c084fc',astronomy:'#38bdf8',connection:'#f59e0b',history:'#a3e635'
+  tech:'#06b6d4',fashion:'#f472b6',astrology:'#c084fc',astronomy:'#38bdf8',connection:'#f59e0b',history:'#a3e635',
+  money:'#34d399',world:'#818cf8',nyc:'#fb923c',usnews:'#94a3b8'
 };
 var ICONS = {
   news:'📰',conflict:'⚔️',disaster:'🌊',storm:'🌀',humanitarian:'🏥',
-  flight:'✈️',launch:'🚀',tech:'💻',fashion:'👗',astrology:'✨',astronomy:'🔭',connection:'🔗',history:'🕰️'
+  flight:'✈️',launch:'🚀',tech:'💻',fashion:'👗',astrology:'✨',astronomy:'🔭',connection:'🔗',history:'🕰️',
+  money:'💰',world:'🌐',nyc:'🗽',usnews:'🇺🇸'
 };
 var DAY_IMG   = '//unpkg.com/three-globe/example/img/earth-day.jpg';
 var NIGHT_IMG = '//unpkg.com/three-globe/example/img/earth-night.jpg';
@@ -499,7 +517,7 @@ var searchQ = '';
 var selectedId = null;
 var panelOpen = true;
 var watchTags = ['Gaza','Ukraine','AI','Markets','Fashion','Climate'];
-var layerVis = {news:true,conflict:true,disaster:true,storm:true,humanitarian:true,flight:true,launch:true,tech:true,fashion:true,astrology:true,astronomy:true,connection:true,history:false};
+var layerVis = {news:true,conflict:true,disaster:true,storm:true,humanitarian:true,flight:true,launch:true,tech:true,fashion:true,astrology:true,astronomy:true,connection:true,history:false,money:true,world:true,nyc:true,usnews:true};
 var globe;
 var themeMode = 0; // 0=NIGHT 1=DAY 2=IRL
 var dayMode = false; // kept for compat — true when themeMode===1
@@ -1082,6 +1100,63 @@ async function fetchMarkets() {
   renderTicker();
 }
 
+// Money / financial news — Guardian business + money sections
+async function fetchMoneyNews() {
+  var results = await Promise.allSettled([
+    fetchGuardian('business', null, 'money', 12),
+    fetchGuardian('money', null, 'money', 12),
+    fetchGuardian('business', 'markets OR stocks OR economy OR inflation OR "interest rates" OR Fed OR "central bank" OR GDP OR recession', 'money', 10),
+    fetchGuardian('business', 'LVMH OR luxury OR "hedge fund" OR IPO OR merger OR acquisition OR "private equity"', 'money', 8)
+  ]);
+  var all = [];
+  results.forEach(function(r){if (r.status==='fulfilled') all.push.apply(all, r.value);});
+  return dedupeByTitle(all).slice(0, 35);
+}
+
+// World news — broad geographic coverage via regional Guardian queries
+async function fetchWorldNews() {
+  var queries = [
+    fetchGuardian('world', 'Africa OR Nigeria OR Kenya OR Ethiopia OR Egypt OR South Africa OR Ghana OR Congo', 'world', 8),
+    fetchGuardian('world', 'China OR Japan OR India OR Korea OR Indonesia OR Vietnam OR Thailand OR Philippines', 'world', 8),
+    fetchGuardian('world', '"Middle East" OR Iran OR Saudi Arabia OR Israel OR Lebanon OR Iraq OR Syria OR Yemen OR Jordan OR Qatar', 'world', 8),
+    fetchGuardian('world', 'Europe OR Germany OR France OR Poland OR Romania OR Italy OR Spain OR Netherlands OR Sweden', 'world', 8),
+    fetchGuardian('world', '"Latin America" OR Brazil OR Mexico OR Colombia OR Argentina OR Venezuela OR Chile OR Peru', 'world', 8),
+    fetchGuardian('world', 'Russia OR Ukraine OR Belarus OR NATO OR Balkans OR Turkey OR Caucasus OR Central Asia', 'world', 8),
+    fetchGuardian('world', 'Pacific OR Australia OR "New Zealand" OR Papua OR "Southeast Asia" OR ASEAN OR Oceania', 'world', 6)
+  ];
+  var results = await Promise.allSettled(queries);
+  var all = [];
+  results.forEach(function(r){if (r.status==='fulfilled') all.push.apply(all, r.value);});
+  return dedupeByTitle(all).slice(0, 50);
+}
+
+// NYC — New York City local news
+async function fetchNYCNews() {
+  var results = await Promise.allSettled([
+    fetchGuardian('us-news', '"New York City" OR NYC OR Manhattan OR Brooklyn OR Bronx OR Queens OR "Staten Island"', 'nyc', 12),
+    fetchGuardian(null, 'MTA OR NYPD OR "New York mayor" OR "New York governor" OR "New York housing" OR "New York transit"', 'nyc', 10),
+    fetchGuardian('culture', '"New York" OR Broadway OR "Metropolitan Museum" OR "Lincoln Center" OR "Central Park"', 'nyc', 8)
+  ]);
+  var all = [];
+  results.forEach(function(r){if (r.status==='fulfilled') all.push.apply(all, r.value);});
+  // Pin all NYC events to NYC coordinates
+  all.forEach(function(e){ e.lat = 40.71; e.lng = -74.01; });
+  return dedupeByTitle(all).slice(0, 25);
+}
+
+// US News — national American news across politics, society, crime, weather
+async function fetchUSNews() {
+  var results = await Promise.allSettled([
+    fetchGuardian('us-news', null, 'usnews', 15),
+    fetchGuardian('us-news', 'Congress OR Senate OR "House of Representatives" OR "White House" OR "Supreme Court" OR Trump OR Biden', 'usnews', 10),
+    fetchGuardian('us-news', 'immigration OR border OR "gun control" OR abortion OR "civil rights" OR election OR "voter ID"', 'usnews', 8),
+    fetchGuardian('us-news', 'California OR Texas OR Florida OR "New York State" OR Illinois OR Ohio OR Pennsylvania', 'usnews', 8)
+  ]);
+  var all = [];
+  results.forEach(function(r){if (r.status==='fulfilled') all.push.apply(all, r.value);});
+  return dedupeByTitle(all).slice(0, 35);
+}
+
 // Simulated flight positions (OpenSky blocks GitHub Pages CORS)
 function getFlightPoints() {
   var now = Date.now();
@@ -1302,7 +1377,7 @@ function tickPlanets() {
     if (opacity <= 0) { el.style.display = 'none'; return; }
     var pos = planetGeogLatLng(p, d);
     var lat = pos.lat * DEG, lng = pos.lng * DEG, dist = 620;
-    var sp = projectToScreen(dist*Math.cos(lat)*Math.sin(lng), dist*Math.sin(lat), dist*Math.cos(lat)*Math.cos(lng), true);
+    var sp = projectToScreen(dist*Math.cos(lat)*Math.sin(lng), dist*Math.sin(lat), dist*Math.cos(lat)*Math.cos(lng), false);
     if (!sp) { el.style.display = 'none'; return; }
     el.style.display = 'block';
     el.style.opacity = opacity;
@@ -1351,7 +1426,7 @@ function tickPlanets() {
     if (!el) return;
     if (starOp <= 0) { el.style.display = 'none'; return; }
     var slat = s[2] * DEG, slng = norm180(s[1] - GMST_s) * DEG, dist = 618;
-    var sp = projectToScreen(dist*Math.cos(slat)*Math.sin(slng), dist*Math.sin(slat), dist*Math.cos(slat)*Math.cos(slng), true);
+    var sp = projectToScreen(dist*Math.cos(slat)*Math.sin(slng), dist*Math.sin(slat), dist*Math.cos(slat)*Math.cos(slng), false);
     if (!sp) { el.style.display = 'none'; return; }
     el.style.display = 'block';
     el.style.opacity = starOp;
@@ -1570,7 +1645,7 @@ function getFiltered() {
 function renderList() {
   var evs = getFiltered();
   document.getElementById('ph-count').textContent = evs.length + ' events';
-  ['news','conflict','disaster','storm','humanitarian','tech','fashion','astrology','astronomy','launch','connection'].forEach(function(t){
+  ['news','conflict','disaster','storm','humanitarian','tech','fashion','astrology','astronomy','launch','connection','money','world','nyc','usnews'].forEach(function(t){
     var el = document.getElementById('lc-'+t);
     if (el) el.textContent = allEvents.filter(function(e){return e.type===t;}).length || '\u2013';
   });
@@ -1617,8 +1692,12 @@ function selectEvent(id) {
   var ev = findEventById(id);
   if (!ev) return;
   globe.controls().autoRotate = false;
-  var alt = (ev.type === 'astronomy' || ev.type === 'astrology') ? 2.8 : 1.6;
-  globe.pointOfView({lat:ev.lat,lng:ev.lng,altitude:alt}, 1200);
+  var isPlanetEvent = (ev.type === 'astronomy' || ev.type === 'astrology') && (ev._planet || ev._star);
+  var alt = isPlanetEvent ? 3.5 : (ev.type === 'astronomy' || ev.type === 'astrology') ? 2.8 : 1.6;
+  // For planet-linked events navigate to the antipodal point so the orb appears centre-screen
+  var navLat = isPlanetEvent ? -ev.lat : ev.lat;
+  var navLng = isPlanetEvent ? ev.lng + 180 : ev.lng;
+  globe.pointOfView({lat:navLat, lng:navLng, altitude:alt}, 1200);
   setTimeout(function(){globe.controls().autoRotate=true;}, 6000);
   document.querySelectorAll('.ev,.astro-card').forEach(function(el){el.classList.remove('sel');});
   var listEl = document.getElementById('ev-'+id);
@@ -1716,18 +1795,17 @@ function applyThemeMode() {
   dayMode = (themeMode === 1);
   irlMode = (themeMode === 2);
   document.getElementById('theme-btn').value = themeMode;
+  if (sunOrbRAF) { cancelAnimationFrame(sunOrbRAF); sunOrbRAF = null; }
   if (themeMode === 0) {
-    if (sunOrbRAF) { cancelAnimationFrame(sunOrbRAF); sunOrbRAF = null; }
-    document.getElementById('sun-orb').style.display = 'none';
     if (irlBlobUrl) { URL.revokeObjectURL(irlBlobUrl); irlBlobUrl = null; }
     globe.globeImageUrl(NIGHT_IMG).atmosphereColor('#1e3a8a').atmosphereAltitude(0.14);
     globe.polygonsData([]);
+    tickSunOrb();
   } else if (themeMode === 1) {
-    if (sunOrbRAF) { cancelAnimationFrame(sunOrbRAF); sunOrbRAF = null; }
-    document.getElementById('sun-orb').style.display = 'none';
     if (irlBlobUrl) { URL.revokeObjectURL(irlBlobUrl); irlBlobUrl = null; }
     globe.globeImageUrl(DAY_IMG).atmosphereColor('#93c5fd').atmosphereAltitude(0.14);
     globe.polygonsData([]);
+    tickSunOrb();
   } else {
     globe.atmosphereColor('#5bb8ff').atmosphereAltitude(0.22);
     globe.polygonsData([]);
@@ -1739,6 +1817,7 @@ function applyThemeMode() {
       document.getElementById('theme-btn').value = 0;
       globe.globeImageUrl(NIGHT_IMG).atmosphereColor('#1e3a8a').atmosphereAltitude(0.14);
       globe.polygonsData([]);
+      tickSunOrb();
     });
   }
 }
@@ -2190,11 +2269,9 @@ function projectToScreen(wx, wy, wz, occlude) {
 function tickSunOrb() {
   sunOrbRAF = null;
   var el = document.getElementById('sun-orb');
-  if (!el) return;
-  if (!irlMode) { el.style.display = 'none'; return; }
+  if (!el || typeof globe === 'undefined') return;
   var sun = sunSubpoint(new Date());
-  var lat = sun.lat*DEG, lng = sun.lng*DEG;
-  var dist = 550; // globe units — far beyond the surface
+  var lat = sun.lat*DEG, lng = sun.lng*DEG, dist = 550;
   var sp = projectToScreen(
     dist*Math.cos(lat)*Math.sin(lng),
     dist*Math.sin(lat),
@@ -2205,6 +2282,8 @@ function tickSunOrb() {
     el.style.display = 'block';
     el.style.left = (sp.x - 60) + 'px';
     el.style.top  = (sp.y - 60) + 'px';
+    // dim in night mode so it reads as "where daytime is" rather than blinding glow
+    el.style.opacity = themeMode === 0 ? '0.45' : '1';
   }
   sunOrbRAF = requestAnimationFrame(tickSunOrb);
 }
@@ -2369,7 +2448,7 @@ async function loadLiveData() {
   splash(12, 'USGS Earthquakes + Launches…');
   var phase1 = await Promise.allSettled([fetchUSGS(), fetchLaunches()]);
 
-  splash(35, 'Guardian News + HN Tech…');
+  splash(30, 'Guardian News + HN Tech…');
   var phase2 = await Promise.allSettled([
     fetchMultiSourceNews(),
     fetchGuardian('world', 'conflict OR war OR attack OR military', 'conflict', 10),
@@ -2378,13 +2457,17 @@ async function loadLiveData() {
     fetchFashionNews()
   ]);
 
-  splash(65, 'Sky data + Astronomy news + Markets…');
-  var phase3 = await Promise.allSettled([fetchSkyData(), fetchAstronomyNews()]);
+  splash(55, 'Money · World · NYC · US feeds…');
+  var phase3 = await Promise.allSettled([fetchMoneyNews(), fetchWorldNews(), fetchNYCNews(), fetchUSNews()]);
+
+  splash(72, 'Sky data + Astronomy + Markets…');
+  var phase4 = await Promise.allSettled([fetchSkyData(), fetchAstronomyNews()]);
   try { await fetchMarkets(); } catch(_) {}
 
   var usgs     = phase1[0], launches = phase1[1];
   var newsR    = phase2[0], conflR   = phase2[1], stormR = phase2[2], hnR = phase2[3], fashR = phase2[4];
-  var skyR     = phase3[0], astroNewsR = phase3[1];
+  var moneyR   = phase3[0], worldR   = phase3[1], nycR   = phase3[2], usR  = phase3[3];
+  var skyR     = phase4[0], astroNewsR = phase4[1];
 
   var disasters   = dedupeByTitle(usgs.status==='fulfilled' ? usgs.value : []).slice(0,30);
   var conflicts   = dedupeByTitle((conflR.status==='fulfilled'&&conflR.value.length ? conflR.value : []).concat(SEEDS.conflict)).slice(0,12);
@@ -2392,12 +2475,18 @@ async function loadLiveData() {
   var newsEvs     = newsR.status==='fulfilled' && newsR.value.length ? newsR.value : [];
   var techEvs     = hnR.status==='fulfilled' && hnR.value.length ? hnR.value : [];
   var fashionEvs  = fashR.status==='fulfilled' && fashR.value.length ? fashR.value : [];
+  var moneyEvs    = moneyR.status==='fulfilled' ? moneyR.value : [];
+  var worldEvs    = worldR.status==='fulfilled' ? worldR.value : [];
+  var nycEvs      = nycR.status==='fulfilled' ? nycR.value : [];
+  var usEvs       = usR.status==='fulfilled' ? usR.value : [];
   var astroEvs    = skyR.status==='fulfilled' ? skyR.value : computeSkyEvents();
   var astronomyEvs = astroNewsR.status==='fulfilled' ? astroNewsR.value : [];
   var launchEvs   = launches.status==='fulfilled' ? launches.value : FALLBACK_LAUNCHES;
 
   var connectionEvs = [].concat(CHOKEPOINTS, ECONOMIC_STRESS, POLITICAL_FLASH);
-  allEvents = [].concat(newsEvs, conflicts, disasters, storms, SEEDS.humanitarian, techEvs, fashionEvs, astroEvs, astronomyEvs, launchEvs, connectionEvs);
+  allEvents = [].concat(newsEvs, conflicts, disasters, storms, SEEDS.humanitarian,
+    techEvs, fashionEvs, moneyEvs, worldEvs, nycEvs, usEvs,
+    astroEvs, astronomyEvs, launchEvs, connectionEvs);
   setLayerStatus('connection','on');
 
   setLayerStatus('disaster',    usgs.status==='fulfilled'?'on':'fb');
@@ -2406,11 +2495,54 @@ async function loadLiveData() {
   setLayerStatus('news',        newsR.status==='fulfilled'&&newsR.value.length?'on':'fb');
   setLayerStatus('tech',        hnR.status==='fulfilled'&&hnR.value.length?'on':'fb');
   setLayerStatus('fashion',     fashR.status==='fulfilled'&&fashR.value.length?'on':'fb');
+  setLayerStatus('money',       moneyR.status==='fulfilled'&&moneyR.value.length?'on':'fb');
+  setLayerStatus('world',       worldR.status==='fulfilled'&&worldR.value.length?'on':'fb');
+  setLayerStatus('nyc',         nycR.status==='fulfilled'&&nycR.value.length?'on':'fb');
+  setLayerStatus('usnews',      usR.status==='fulfilled'&&usR.value.length?'on':'fb');
   setLayerStatus('astrology',   'on');
   setLayerStatus('astronomy',   astroNewsR.status==='fulfilled'&&astroNewsR.value.length?'on':'fb');
   setLayerStatus('launch',      launches.status==='fulfilled'?'on':'fb');
   setLayerStatus('humanitarian','fb');
   setLayerStatus('flight',      'fb');
+}
+
+function dotLive(id) {
+  var el = document.getElementById('msdot-' + id);
+  if (el) el.classList.add('live');
+}
+
+async function checkAPIs() {
+  var status = document.getElementById('ms-status-txt');
+  // Always-on: history (static) and connection (static) and humanitarian (seeds) and astrology (computed)
+  setTimeout(function(){ dotLive('history'); dotLive('connection'); dotLive('humanitarian'); dotLive('astrology'); }, 80);
+
+  var checks = [
+    { id: 'disaster',  url: 'https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&minmagnitude=5.0&limit=1&orderby=time' },
+    { id: 'tech',      url: 'https://hn.algolia.com/api/v1/search?tags=front_page&hitsPerPage=1' },
+    { id: 'launch',    url: 'https://ll.thespacedevs.com/2.2.0/launch/upcoming/?format=json&limit=1&mode=list' },
+    { id: 'astronomy', url: 'https://services.swpc.noaa.gov/products/noaa-planetary-k-index-forecast.json' },
+    // Guardian covers news / conflict / storm / fashion / money / world / nyc / usnews
+    { id: 'news',      url: 'https://content.guardianapis.com/search?api-key=test&page-size=1&format=json' },
+    { id: 'conflict',  url: 'https://content.guardianapis.com/search?api-key=test&page-size=1&q=conflict&format=json' },
+    { id: 'storm',     url: 'https://content.guardianapis.com/search?api-key=test&page-size=1&section=environment&format=json' },
+    { id: 'fashion',   url: 'https://content.guardianapis.com/search?api-key=test&page-size=1&section=fashion&format=json' },
+    { id: 'money',     url: 'https://content.guardianapis.com/search?api-key=test&page-size=1&section=business&format=json' },
+    { id: 'world',     url: 'https://content.guardianapis.com/search?api-key=test&page-size=1&section=world&format=json' },
+    { id: 'nyc',       url: 'https://content.guardianapis.com/search?api-key=test&page-size=1&q=New+York+City&format=json' },
+    { id: 'usnews',    url: 'https://content.guardianapis.com/search?api-key=test&page-size=1&section=us-news&format=json' },
+  ];
+
+  var passed = 0;
+  await Promise.allSettled(checks.map(function(c) {
+    return fetch(c.url, { signal: AbortSignal.timeout(6000) })
+      .then(function(r) { if (r.ok) { dotLive(c.id); passed++; } })
+      .catch(function(){});
+  }));
+
+  if (status) {
+    var total = passed + 4; // +4 always-on (history, connection, humanitarian, astrology)
+    status.textContent = '● ' + total + ' / ' + (checks.length + 4) + ' systems nominal';
+  }
 }
 
 function selectMode(mode) {
@@ -2441,6 +2573,7 @@ function selectMode(mode) {
 async function init() {
   splash(5, 'Initializing 3D globe…');
   initGlobe();
+  checkAPIs();
   await loadLiveData();
   splash(96, 'Rendering feed…');
   renderList(); renderTicker(); renderWatchlist(); refreshGlobe();
