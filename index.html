@@ -73,6 +73,23 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);font-famil
 select#theme-btn{appearance:none;-webkit-appearance:none;background:var(--glass);border:1px solid var(--border);border-radius:14px;color:var(--muted);font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;cursor:pointer;font-family:'Space Mono',monospace;outline:none;padding:4px 22px 4px 11px;flex-shrink:0;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='5'%3E%3Cpath d='M0 0l4 5 4-5z' fill='%234e5a72'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 8px center}
 select#theme-btn:hover{color:var(--text);border-color:var(--border2)}
 select#theme-btn option{background:#070b18;color:var(--text);font-size:12px;letter-spacing:0;font-weight:400}
+#auth-btn{display:flex;align-items:center;gap:7px;background:var(--glass);border:1px solid var(--border);border-radius:14px;color:var(--muted);font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;cursor:pointer;backdrop-filter:blur(20px);transition:all .2s;font-family:'Space Mono',monospace;outline:none;padding:4px 11px;flex-shrink:0}
+#auth-btn:hover{color:var(--text);border-color:var(--border2)}
+#auth-avatar{width:20px;height:20px;border-radius:50%;object-fit:cover;display:none}
+#auth-modal{position:fixed;inset:0;z-index:9000;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.6);backdrop-filter:blur(8px)}
+#auth-modal.open{display:flex}
+#auth-card{background:var(--panel);border:1px solid var(--border);border-radius:16px;padding:32px;width:320px;text-align:center;box-shadow:0 24px 64px rgba(0,0,0,.5)}
+.auth-logo{font-family:'Space Mono',monospace;font-size:22px;font-weight:700;letter-spacing:6px;color:#fff;margin-bottom:4px}.auth-logo em{color:var(--accent);font-style:normal}
+.auth-sub{font-size:10px;color:var(--muted);letter-spacing:3px;text-transform:uppercase;margin-bottom:28px}
+#google-btn{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;padding:12px;background:rgba(255,255,255,.06);border:1px solid var(--border);border-radius:10px;color:var(--text);font-size:12px;font-weight:600;cursor:pointer;transition:all .2s}
+#google-btn:hover{background:rgba(255,255,255,.1);border-color:var(--border2)}
+.auth-note{font-size:9px;color:var(--muted);margin-top:16px;letter-spacing:1px}
+#auth-user-panel{position:absolute;top:52px;right:16px;background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:16px;width:220px;z-index:400;display:none;box-shadow:0 16px 40px rgba(0,0,0,.5)}
+#auth-user-panel.open{display:block}
+.aup-name{font-size:12px;font-weight:700;color:var(--text);margin-bottom:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.aup-email{font-size:10px;color:var(--muted);margin-bottom:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.aup-signout{width:100%;padding:8px;background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:8px;color:var(--muted);font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;cursor:pointer;font-family:'Space Mono',monospace;transition:all .2s}
+.aup-signout:hover{color:var(--text);border-color:var(--border2)}
 #connect-btn.active{background:rgba(168,85,247,.15);border-color:rgba(168,85,247,.5);color:#a855f7}
 #hist-bar{position:fixed;top:48px;left:0;right:0;z-index:290;background:rgba(10,12,18,.96);border-bottom:1px solid rgba(163,230,53,.25);padding:8px 18px;display:none;align-items:center;gap:10px;font-family:'Space Mono',monospace;font-size:10px}
 #hist-bar.open{display:flex}
@@ -320,6 +337,29 @@ body.hist-open #panel{top:92px}body.hist-open #detail{top:92px}body.hist-open #l
   <button class="t-btn" id="connect-btn" onclick="toggleConnect()">⟷ CONNECT</button>
   <div class="t-sep"></div>
   <div id="t-clock"></div>
+  <div class="t-sep"></div>
+  <button id="auth-btn" onclick="handleAuthClick()">
+    <img id="auth-avatar" alt="">
+    <span id="auth-label">SIGN IN</span>
+  </button>
+</div>
+<!-- Auth modal (sign-in) -->
+<div id="auth-modal" onclick="if(event.target===this)this.classList.remove('open')">
+  <div id="auth-card">
+    <div class="auth-logo">ATL<em>A</em>S</div>
+    <div class="auth-sub">Global Intelligence Feed</div>
+    <button id="google-btn" onclick="signInWithGoogle()">
+      <svg width="18" height="18" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.31-8.16 2.31-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
+      Continue with Google
+    </button>
+    <div class="auth-note">Your preferences, watchlist, and saved events sync across devices.</div>
+  </div>
+</div>
+<!-- Signed-in user panel -->
+<div id="auth-user-panel">
+  <div class="aup-name" id="aup-name"></div>
+  <div class="aup-email" id="aup-email"></div>
+  <button class="aup-signout" onclick="signOut()">Sign Out</button>
 </div>
 <div id="hist-bar">
   <span class="hb-lbl">⏱ HISTORY</span>
@@ -400,8 +440,90 @@ body.hist-open #panel{top:92px}body.hist-open #detail{top:92px}body.hist-open #l
   <div class="tk-label">Markets</div>
   <div class="tk-track"><div class="tk-inner" id="tk-inner"></div></div>
 </div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <script src="https://unpkg.com/globe.gl@2.27.2/dist/globe.gl.min.js"></script>
 <script>
+// =============================================================================
+// SUPABASE + AUTH
+// =============================================================================
+var SUPABASE_URL = 'https://hprkoonlydcjqxrgjwtr.supabase.co';
+var SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imhwcmtvb25seWRjanF4cmdqd3RyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgwOTEzNDAsImV4cCI6MjA5MzY2NzM0MH0.e7g7DAO0suW59LYMxQotxBoecTRvckAU3FldZmmIy9Q';
+var sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+var currentUser = null;
+
+function signInWithGoogle() {
+  document.getElementById('auth-modal').classList.remove('open');
+  sb.auth.signInWithOAuth({
+    provider: 'google',
+    options: { redirectTo: window.location.origin + window.location.pathname }
+  });
+}
+
+function signOut() {
+  document.getElementById('auth-user-panel').classList.remove('open');
+  sb.auth.signOut();
+}
+
+function handleAuthClick() {
+  if (currentUser) {
+    var panel = document.getElementById('auth-user-panel');
+    panel.classList.toggle('open');
+  } else {
+    document.getElementById('auth-modal').classList.add('open');
+  }
+}
+
+function updateAuthUI(user) {
+  var btn = document.getElementById('auth-btn');
+  var label = document.getElementById('auth-label');
+  var avatar = document.getElementById('auth-avatar');
+  if (user) {
+    var meta = user.user_metadata || {};
+    var name = meta.full_name || meta.name || user.email.split('@')[0];
+    var pic = meta.avatar_url || meta.picture;
+    label.textContent = name.split(' ')[0].toUpperCase();
+    if (pic) { avatar.src = pic; avatar.style.display = 'block'; }
+    document.getElementById('aup-name').textContent = name;
+    document.getElementById('aup-email').textContent = user.email;
+    btn.style.borderColor = 'rgba(163,230,53,.4)';
+  } else {
+    label.textContent = 'SIGN IN';
+    avatar.style.display = 'none';
+    avatar.src = '';
+    btn.style.borderColor = '';
+  }
+}
+
+async function syncPrefsFromDB(userId) {
+  var { data } = await sb.from('user_preferences').select('*').eq('user_id', userId).single();
+  if (!data) return;
+  if (data.theme !== undefined && data.theme !== null) {
+    var themeMap = { night: 0, day: 1, irl: 2 };
+    var t = themeMap[data.theme];
+    if (t !== undefined) { document.getElementById('theme-btn').value = t; setTheme(t); }
+  }
+}
+
+async function saveThemePref(themeName) {
+  if (!currentUser) return;
+  await sb.from('user_preferences').upsert({ user_id: currentUser.id, theme: themeName }, { onConflict: 'user_id' });
+}
+
+// close user panel on outside click
+document.addEventListener('click', function(e) {
+  var panel = document.getElementById('auth-user-panel');
+  var btn = document.getElementById('auth-btn');
+  if (panel && panel.classList.contains('open') && !panel.contains(e.target) && !btn.contains(e.target))
+    panel.classList.remove('open');
+});
+
+// auth state listener — runs once on load and on every sign-in/out
+sb.auth.onAuthStateChange(function(event, session) {
+  currentUser = session ? session.user : null;
+  updateAuthUI(currentUser);
+  if (currentUser) syncPrefsFromDB(currentUser.id);
+});
+
 // =============================================================================
 // CONSTANTS
 // =============================================================================
@@ -1889,7 +2011,12 @@ function applyThemeMode() {
     });
   }
 }
-function setTheme(val) { themeMode = parseInt(val); applyThemeMode(); }
+function setTheme(val) {
+  themeMode = parseInt(val);
+  applyThemeMode();
+  var names = ['night','day','irl'];
+  saveThemePref(names[themeMode] || 'night');
+}
 function cycleTheme() { themeMode = (themeMode + 1) % 3; applyThemeMode(); }
 function toggleDay() { cycleTheme(); }
 function setTab(el){
