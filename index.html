@@ -369,7 +369,6 @@ body.hist-open #panel{top:92px}body.hist-open #detail{top:92px}body.hist-open #l
     <div class="ms-section-label">Live feeds</div>
     <div class="ms-feed-grid">
       <div class="ms-feed-cell" onclick="selectMode('news')"><div class="ms-dot" id="msdot-news" style="background:#ef4444;--dc:#ef4444"></div><div class="ms-cell-name">Breaking News</div><div class="ms-cell-desc">Live world events and developing stories</div></div>
-      <div class="ms-feed-cell" onclick="selectMode('world')"><div class="ms-dot" id="msdot-world" style="background:#818cf8;--dc:#818cf8"></div><div class="ms-cell-name">World</div><div class="ms-cell-desc">Foreign press — Africa, Asia, Europe, Americas</div></div>
       <div class="ms-feed-cell" onclick="selectMode('usnews')"><div class="ms-dot" id="msdot-usnews" style="background:#94a3b8;--dc:#94a3b8"></div><div class="ms-cell-name">US News</div><div class="ms-cell-desc">Politics, society, and national stories</div></div>
       <div class="ms-feed-cell" onclick="selectMode('nyc')"><div class="ms-dot" id="msdot-nyc" style="background:#fb923c;--dc:#fb923c"></div><div class="ms-cell-name">NYC</div><div class="ms-cell-desc">New York City — local, culture, transit</div></div>
       <div class="ms-feed-cell" onclick="selectMode('money')"><div class="ms-dot" id="msdot-money" style="background:#34d399;--dc:#34d399"></div><div class="ms-cell-name">Money</div><div class="ms-cell-desc">Markets, economy, finance, luxury</div></div>
@@ -536,7 +535,6 @@ body.hist-open #panel{top:92px}body.hist-open #detail{top:92px}body.hist-open #l
     <div class="tab on" data-tab="all"         onclick="setTab(this)">All</div>
     <div class="tab"    data-tab="watchlist"    onclick="setTab(this)">Watchlist</div>
     <div class="tab"    data-tab="news"         onclick="setTab(this)">News</div>
-    <div class="tab"    data-tab="world"        onclick="setTab(this)">World</div>
     <div class="tab"    data-tab="usnews"       onclick="setTab(this)">US</div>
     <div class="tab"    data-tab="nyc"          onclick="setTab(this)">NYC</div>
     <div class="tab"    data-tab="money"        onclick="setTab(this)">Money</div>
@@ -721,12 +719,12 @@ var COLORS = {
   news:'#ef4444',conflict:'#f97316',disaster:'#eab308',storm:'#60a5fa',
   humanitarian:'#ec4899',flight:'#10b981',launch:'#a78bfa',
   tech:'#06b6d4',fashion:'#f472b6',astrology:'#c084fc',astronomy:'#38bdf8',connection:'#f59e0b',history:'#a3e635',
-  money:'#34d399',world:'#818cf8',nyc:'#fb923c',usnews:'#94a3b8',anchor:'#ef4444'
+  money:'#34d399',nyc:'#fb923c',usnews:'#94a3b8',anchor:'#ef4444'
 };
 var ICONS = {
   news:'📰',conflict:'⚔️',disaster:'🌊',storm:'🌀',humanitarian:'🏥',
   flight:'✈️',launch:'🚀',tech:'💻',fashion:'👗',astrology:'✨',astronomy:'🔭',connection:'🔗',history:'🕰️',
-  money:'💰',world:'🌐',nyc:'🗽',usnews:'🇺🇸',anchor:'⊕'
+  money:'💰',nyc:'🗽',usnews:'🇺🇸',anchor:'⊕'
 };
 var DAY_IMG   = '//unpkg.com/three-globe/example/img/earth-day.jpg';
 var NIGHT_IMG = '//unpkg.com/three-globe/example/img/earth-night.jpg';
@@ -836,7 +834,7 @@ var searchQ = '';
 var selectedId = null;
 var panelOpen = true;
 var watchTags = ['Gaza','Ukraine','AI','Markets','Fashion','Climate'];
-var layerVis = {news:true,conflict:true,disaster:true,storm:true,humanitarian:true,flight:true,launch:true,tech:true,fashion:true,astrology:true,astronomy:true,connection:true,history:false,money:true,world:true,nyc:true,usnews:true};
+var layerVis = {news:true,conflict:true,disaster:true,storm:true,humanitarian:true,flight:true,launch:true,tech:true,fashion:true,astrology:true,astronomy:true,connection:true,history:false,money:true,nyc:true,usnews:true};
 var globe;
 var themeMode = 0; // 0=NIGHT 1=DAY 2=IRL
 var dayMode = false; // kept for compat — true when themeMode===1
@@ -1443,13 +1441,13 @@ async function fetchMoneyNews() {
 // World news — broad geographic coverage via regional Guardian queries
 async function fetchWorldNews() {
   var queries = [
-    fetchGuardian('world', 'Africa OR Nigeria OR Kenya OR Ethiopia OR Egypt OR South Africa OR Ghana OR Congo', 'world', 8),
-    fetchGuardian('world', 'China OR Japan OR India OR Korea OR Indonesia OR Vietnam OR Thailand OR Philippines', 'world', 8),
-    fetchGuardian('world', '"Middle East" OR Iran OR Saudi Arabia OR Israel OR Lebanon OR Iraq OR Syria OR Yemen OR Jordan OR Qatar', 'world', 8),
-    fetchGuardian('world', 'Europe OR Germany OR France OR Poland OR Romania OR Italy OR Spain OR Netherlands OR Sweden', 'world', 8),
-    fetchGuardian('world', '"Latin America" OR Brazil OR Mexico OR Colombia OR Argentina OR Venezuela OR Chile OR Peru', 'world', 8),
-    fetchGuardian('world', 'Russia OR Ukraine OR Belarus OR NATO OR Balkans OR Turkey OR Caucasus OR Central Asia', 'world', 8),
-    fetchGuardian('world', 'Pacific OR Australia OR "New Zealand" OR Papua OR "Southeast Asia" OR ASEAN OR Oceania', 'world', 6)
+    fetchGuardian('world', 'Africa OR Nigeria OR Kenya OR Ethiopia OR Egypt OR South Africa OR Ghana OR Congo', 'news', 8),
+    fetchGuardian('world', 'China OR Japan OR India OR Korea OR Indonesia OR Vietnam OR Thailand OR Philippines', 'news', 8),
+    fetchGuardian('world', '"Middle East" OR Iran OR Saudi Arabia OR Israel OR Lebanon OR Iraq OR Syria OR Yemen OR Jordan OR Qatar', 'news', 8),
+    fetchGuardian('world', 'Europe OR Germany OR France OR Poland OR Romania OR Italy OR Spain OR Netherlands OR Sweden', 'news', 8),
+    fetchGuardian('world', '"Latin America" OR Brazil OR Mexico OR Colombia OR Argentina OR Venezuela OR Chile OR Peru', 'news', 8),
+    fetchGuardian('world', 'Russia OR Ukraine OR Belarus OR NATO OR Balkans OR Turkey OR Caucasus OR Central Asia', 'news', 8),
+    fetchGuardian('world', 'Pacific OR Australia OR "New Zealand" OR Papua OR "Southeast Asia" OR ASEAN OR Oceania', 'news', 6)
   ];
   var results = await Promise.allSettled(queries);
   var all = [];
@@ -2045,7 +2043,7 @@ function getFiltered() {
 function renderList() {
   var evs = getFiltered();
   document.getElementById('ph-count').textContent = evs.length + ' events';
-  ['news','conflict','disaster','storm','humanitarian','tech','fashion','astrology','astronomy','launch','connection','money','world','nyc','usnews'].forEach(function(t){
+  ['news','conflict','disaster','storm','humanitarian','tech','fashion','astrology','astronomy','launch','connection','money','nyc','usnews'].forEach(function(t){
     var el = document.getElementById('lc-'+t);
     if (el) el.textContent = allEvents.filter(function(e){return e.type===t;}).length || '\u2013';
   });
@@ -2253,7 +2251,7 @@ function toggleLayer(el){
   // History and flight stay as simple toggles
   if(l==='history'||l==='flight'){layerVis[l]=!layerVis[l];el.classList.toggle('off',!layerVis[l]);refreshGlobe();return;}
   // All other layers: isolate on click, reset to all-on if already isolated
-  var contentLayers=['news','world','usnews','nyc','money','conflict','disaster','storm','humanitarian','tech','fashion','astrology','astronomy','launch','connection'];
+  var contentLayers=['news','usnews','nyc','money','conflict','disaster','storm','humanitarian','tech','fashion','astrology','astronomy','launch','connection'];
   var activeCount=contentLayers.filter(function(k){return layerVis[k];}).length;
   if(layerVis[l]&&activeCount===1){
     // Already isolated — reset all on
@@ -3174,7 +3172,7 @@ async function loadLiveData() {
     fetchFashionNews()
   ]);
 
-  splash(55, 'Money · World · NYC · US feeds…');
+  splash(55, 'Money · NYC · US · World feeds…');
   var phase3 = await Promise.allSettled([fetchMoneyNews(), fetchWorldNews(), fetchNYCNews(), fetchUSNews()]);
 
   splash(72, 'Sky data + Astronomy + Markets…');
@@ -3213,7 +3211,6 @@ async function loadLiveData() {
   setLayerStatus('tech',        hnR.status==='fulfilled'&&hnR.value.length?'on':'fb');
   setLayerStatus('fashion',     fashR.status==='fulfilled'&&fashR.value.length?'on':'fb');
   setLayerStatus('money',       moneyR.status==='fulfilled'&&moneyR.value.length?'on':'fb');
-  setLayerStatus('world',       worldR.status==='fulfilled'&&worldR.value.length?'on':'fb');
   setLayerStatus('nyc',         nycR.status==='fulfilled'&&nycR.value.length?'on':'fb');
   setLayerStatus('usnews',      usR.status==='fulfilled'&&usR.value.length?'on':'fb');
   setLayerStatus('astrology',   'on');
@@ -3238,13 +3235,12 @@ async function checkAPIs() {
     { id: 'tech',      url: 'https://hn.algolia.com/api/v1/search?tags=front_page&hitsPerPage=1' },
     { id: 'launch',    url: 'https://ll.thespacedevs.com/2.2.0/launch/upcoming/?format=json&limit=1&mode=list' },
     { id: 'astronomy', url: 'https://services.swpc.noaa.gov/products/noaa-planetary-k-index-forecast.json' },
-    // Guardian covers news / conflict / storm / fashion / money / world / nyc / usnews
+    // Guardian covers news / conflict / storm / fashion / money / nyc / usnews
     { id: 'news',      url: 'https://content.guardianapis.com/search?api-key=test&page-size=1&format=json' },
     { id: 'conflict',  url: 'https://content.guardianapis.com/search?api-key=test&page-size=1&q=conflict&format=json' },
     { id: 'storm',     url: 'https://content.guardianapis.com/search?api-key=test&page-size=1&section=environment&format=json' },
     { id: 'fashion',   url: 'https://content.guardianapis.com/search?api-key=test&page-size=1&section=fashion&format=json' },
     { id: 'money',     url: 'https://content.guardianapis.com/search?api-key=test&page-size=1&section=business&format=json' },
-    { id: 'world',     url: 'https://content.guardianapis.com/search?api-key=test&page-size=1&section=world&format=json' },
     { id: 'nyc',       url: 'https://content.guardianapis.com/search?api-key=test&page-size=1&q=New+York+City&format=json' },
     { id: 'usnews',    url: 'https://content.guardianapis.com/search?api-key=test&page-size=1&section=us-news&format=json' },
   ];
