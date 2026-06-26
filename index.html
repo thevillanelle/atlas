@@ -274,6 +274,36 @@ body.hist-open #panel{top:92px}body.hist-open #detail{top:92px}body.hist-open #l
 #star-orbs{position:fixed;top:0;left:0;pointer-events:none;z-index:130;width:0;height:0}
 .sorb{position:absolute;transform:translate(-50%,-50%);border-radius:50%;cursor:pointer;pointer-events:all;transition:opacity .3s}
 .sorb:hover{filter:brightness(2) saturate(1.5);z-index:200}
+/* anchor */
+#anchor-modal{position:fixed;inset:0;z-index:9000;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.6);backdrop-filter:blur(8px)}
+#anchor-modal.open{display:flex}
+#anchor-card{background:var(--glass2);border:1px solid var(--border);border-radius:16px;padding:32px;width:340px;box-shadow:0 24px 64px rgba(0,0,0,.5)}
+.anc-logo{font-family:'Space Mono',monospace;font-size:13px;font-weight:700;letter-spacing:4px;color:#ef4444;text-transform:uppercase;margin-bottom:4px}
+.anc-sub{font-size:10px;color:var(--muted);letter-spacing:3px;text-transform:uppercase;margin-bottom:24px}
+.anc-label{font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);font-family:'Space Mono',monospace;margin-bottom:6px}
+.anc-row{display:flex;gap:8px;margin-bottom:16px}
+.anc-select{flex:1;padding:9px 10px;background:rgba(255,255,255,.05);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:11px;font-family:'Space Mono',monospace;outline:none;transition:border-color .2s;-webkit-appearance:none;appearance:none}
+.anc-select:focus{border-color:#ef4444}
+.anc-geo-row{display:flex;gap:8px;margin-bottom:8px}
+.anc-geo-input{flex:1;padding:9px 12px;background:rgba(255,255,255,.05);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:11px;font-family:'Space Mono',monospace;outline:none;transition:border-color .2s}
+.anc-geo-input:focus{border-color:#ef4444}
+.anc-geo-input::placeholder{color:var(--muted)}
+.anc-lookup{padding:9px 14px;background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.3);border-radius:8px;color:#ef4444;font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;cursor:pointer;font-family:'Space Mono',monospace;white-space:nowrap;transition:all .2s}
+.anc-lookup:hover{background:rgba(239,68,68,.22);border-color:rgba(239,68,68,.5)}
+.anc-lookup:disabled{opacity:.4;cursor:not-allowed}
+.anc-resolved{font-size:9px;color:#a3e635;font-family:'Space Mono',monospace;letter-spacing:1px;min-height:14px;margin-bottom:12px}
+.anc-err{font-size:9px;color:#f87171;font-family:'Space Mono',monospace;min-height:14px;margin-bottom:10px}
+.anc-btns{display:flex;gap:8px;margin-top:4px}
+#anc-save{flex:1;padding:11px;background:#ef4444;border:none;border-radius:8px;color:#000;font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;cursor:pointer;font-family:'Space Mono',monospace;transition:opacity .2s}
+#anc-save:hover{opacity:.85}
+#anc-save:disabled{opacity:.35;cursor:not-allowed}
+#anc-clear{padding:11px 16px;background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:8px;color:var(--muted);font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;cursor:pointer;font-family:'Space Mono',monospace;transition:all .2s}
+#anc-clear:hover{color:var(--text);border-color:var(--border2)}
+.anc-upsell{font-size:11px;color:var(--muted);text-align:center;line-height:1.8;padding:8px 0}
+.anc-upsell strong{color:#f59e0b}
+.marker.anchor-marker .m-dot{background:#ef4444!important;width:11px!important;height:11px!important}
+.marker.anchor-marker .m-ring{border-color:#ef4444!important;width:26px!important;height:26px!important}
+.marker.anchor-marker .m-ring2{border-color:rgba(239,68,68,.4)!important;width:38px!important;height:38px!important}
 </style>
 </head>
 <body>
@@ -343,6 +373,8 @@ body.hist-open #panel{top:92px}body.hist-open #detail{top:92px}body.hist-open #l
   </select>
   <div class="t-sep"></div>
   <button class="t-btn" id="connect-btn" onclick="toggleConnect()">⟷ CONNECT</button>
+  <div class="t-sep" id="anchor-sep" style="display:none"></div>
+  <button class="t-btn" id="anchor-btn" onclick="openAnchorModal()" style="display:none">⊕ ANCHOR</button>
   <div class="t-sep"></div>
   <div id="t-clock"></div>
   <div class="t-sep"></div>
@@ -368,6 +400,42 @@ body.hist-open #panel{top:92px}body.hist-open #detail{top:92px}body.hist-open #l
   <div class="aup-name" id="aup-name"></div>
   <div class="aup-email" id="aup-email"></div>
   <button class="aup-signout" onclick="signOut()">Sign Out</button>
+</div>
+<!-- Personal Anchor modal -->
+<div id="anchor-modal" onclick="if(event.target===this)closeAnchorModal()">
+  <div id="anchor-card">
+    <div class="anc-logo">⊕ Personal Anchor</div>
+    <div class="anc-sub">Where and when were you born?</div>
+    <div id="anc-form">
+      <div class="anc-label">Birth month &amp; year</div>
+      <div class="anc-row">
+        <select id="anc-month" class="anc-select">
+          <option value="1">January</option><option value="2">February</option>
+          <option value="3">March</option><option value="4">April</option>
+          <option value="5">May</option><option value="6">June</option>
+          <option value="7">July</option><option value="8">August</option>
+          <option value="9">September</option><option value="10">October</option>
+          <option value="11">November</option><option value="12">December</option>
+        </select>
+        <input id="anc-year" class="anc-select" type="number" min="1900" max="2025" placeholder="Year" style="width:80px;flex:none">
+      </div>
+      <div class="anc-label">Birthplace</div>
+      <div class="anc-geo-row">
+        <input id="anc-city" class="anc-geo-input" type="text" placeholder="City, Country" onkeydown="if(event.key==='Enter')lookupAnchorGeo()">
+        <button id="anc-lookup" class="anc-lookup" onclick="lookupAnchorGeo()">LOOK UP</button>
+      </div>
+      <div class="anc-resolved" id="anc-resolved"></div>
+      <div class="anc-err" id="anc-err"></div>
+      <div class="anc-btns">
+        <button id="anc-save" onclick="submitAnchor()">DROP ANCHOR</button>
+        <button id="anc-clear" onclick="clearAnchor()">CLEAR</button>
+      </div>
+    </div>
+    <div id="anc-upsell" class="anc-upsell" style="display:none">
+      <strong>Personal Anchor is a Pro feature.</strong><br>
+      Upgrade to drop your birthdate on the globe and see every concurrent event in history drawn back to you.
+    </div>
+  </div>
 </div>
 <div id="hist-bar">
   <span class="hb-lbl">⏱ HISTORY</span>
@@ -558,7 +626,16 @@ document.addEventListener('click', function(e) {
 sb.auth.onAuthStateChange(function(event, session) {
   currentUser = session ? session.user : null;
   updateAuthUI(currentUser);
-  if (currentUser) syncPrefsFromDB(currentUser.id);
+  if (currentUser) {
+    syncPrefsFromDB(currentUser.id);
+    fetchUserTier(currentUser.id);
+    loadAnchorFromDB(currentUser.id);
+  } else {
+    currentUserTier = 'free';
+    anchorData = null; anchorEvents = []; anchorActive = false; anchorGeoResolved = null;
+    updateAnchorBtnVisibility();
+    refreshGlobe(); refreshArcs();
+  }
 });
 
 // =============================================================================
@@ -568,12 +645,12 @@ var COLORS = {
   news:'#ef4444',conflict:'#f97316',disaster:'#eab308',storm:'#60a5fa',
   humanitarian:'#ec4899',flight:'#10b981',launch:'#a78bfa',
   tech:'#06b6d4',fashion:'#f472b6',astrology:'#c084fc',astronomy:'#38bdf8',connection:'#f59e0b',history:'#a3e635',
-  money:'#34d399',world:'#818cf8',nyc:'#fb923c',usnews:'#94a3b8'
+  money:'#34d399',world:'#818cf8',nyc:'#fb923c',usnews:'#94a3b8',anchor:'#ef4444'
 };
 var ICONS = {
   news:'📰',conflict:'⚔️',disaster:'🌊',storm:'🌀',humanitarian:'🏥',
   flight:'✈️',launch:'🚀',tech:'💻',fashion:'👗',astrology:'✨',astronomy:'🔭',connection:'🔗',history:'🕰️',
-  money:'💰',world:'🌐',nyc:'🗽',usnews:'🇺🇸'
+  money:'💰',world:'🌐',nyc:'🗽',usnews:'🇺🇸',anchor:'⊕'
 };
 var DAY_IMG   = '//unpkg.com/three-globe/example/img/earth-day.jpg';
 var NIGHT_IMG = '//unpkg.com/three-globe/example/img/earth-night.jpg';
@@ -694,6 +771,11 @@ var activeEngine = 'guardian';
 var engineCache = {};
 var histEvents = [];
 var histDate = null; // set when history mode is active — planets render at this date
+var anchorData = null;       // {birthDate, birthPlace, lat, lng} — null until saved
+var anchorEvents = [];       // historical Wikipedia events for birth month/year
+var anchorActive = false;
+var anchorGeoResolved = null; // {lat, lng, display} from Nominatim
+var currentUserTier = 'free';
 var irlCanvas = null, irlMaskCanvas = null, irlDayCanvas = null;
 var irlImgDay = null, irlImgNight = null, irlImgsLoaded = false;
 var irlBlobUrl = null;
@@ -1370,6 +1452,17 @@ function initGlobe() {
 
 function buildMarker(d) {
   var el = document.createElement('div');
+  if (d.type === 'anchor') {
+    el.className = 'marker anchor-marker';
+    el.style.cssText = '--mc:#ef4444;width:22px;height:22px;cursor:pointer;pointer-events:auto';
+    el.setAttribute('data-id', '__anchor__');
+    el.title = d.title;
+    el.innerHTML = '<div class="m-ring" style="animation-delay:0s"></div><div class="m-ring m-ring2" style="animation-delay:.9s"></div><div class="m-dot"></div>';
+    var _at, _ax, _ay;
+    el.addEventListener('pointerdown', function(e){e.stopPropagation();_at=Date.now();_ax=e.clientX;_ay=e.clientY;});
+    el.addEventListener('pointerup', function(e){if(Date.now()-_at<400&&Math.abs(e.clientX-_ax)<8&&Math.abs(e.clientY-_ay)<8){openAnchorModal();}});
+    return el;
+  }
   el.className = 'marker' + (d.severity >= 4 ? ' sev5' : '') + (connectedIds.indexOf(d.id)!==-1?' csel':'');
   el.style.cssText = '--mc:' + (COLORS[d.type]||'#fff') + ';width:22px;height:22px;cursor:pointer;pointer-events:auto';
   el.setAttribute('data-id', d.id);
@@ -1392,8 +1485,7 @@ function buildMarker(d) {
 function refreshGlobe() {
   var histBarOpen = document.getElementById('hist-bar').classList.contains('open');
   if (histBarOpen) {
-    // Globe clears to only historical dots (empty until GO is clicked)
-    globe.htmlElementsData(histEvents);
+    globe.htmlElementsData(histEvents.concat(anchorActive && anchorData ? [anchorPinEvent()] : []));
     globe.pointsData([]);
     updateTerminator();
     return;
@@ -1417,7 +1509,8 @@ function refreshGlobe() {
     live = live.filter(function(e){return e.type === currentTab;});
   }
   var hist = (histEvents.length && layerVis.history) ? histEvents : [];
-  var visEvs = live.concat(hist);
+  var anchorPin = anchorActive && anchorData ? [anchorPinEvent()] : [];
+  var visEvs = live.concat(hist).concat(anchorActive ? anchorEvents : []).concat(anchorPin);
   globe.htmlElementsData(visEvs);
   flightPoints = layerVis.flight ? getFlightPoints() : [];
   globe.pointsData(flightPoints);
@@ -2159,22 +2252,21 @@ function syncConnectUI() {
     var id = el.id.replace('ev-','');
     el.classList.toggle('csel', connectedIds.indexOf(id)!==-1);
   });
-  drawArcs();
+  refreshArcs();
 }
 
 function findEventById(id) {
   return allEvents.find(function(e){return e.id===id;}) || histEvents.find(function(e){return e.id===id;});
 }
 
-function drawArcs() {
-  if (connectedIds.length < 2) { globe.arcsData([]); return; }
+function buildConnectionArcs() {
+  if (connectedIds.length < 2) return [];
   var evs = connectedIds.map(findEventById).filter(Boolean);
   var arcs = [];
   for (var i=0;i<evs.length;i++) {
     for (var j=i+1;j<evs.length;j++) {
       var temporal = evs[i].type==='history' || evs[j].type==='history';
       var shared = (evs[i].tags||[]).filter(function(t){return (evs[j].tags||[]).indexOf(t)!==-1;}).length;
-      // temporal arcs = teal; same-era arcs = purple
       var strong = temporal ? '#2dd4bf' : '#a855f7';
       var weak   = temporal ? 'rgba(45,212,191,0.3)' : 'rgba(168,85,247,0.3)';
       arcs.push({
@@ -2184,7 +2276,21 @@ function drawArcs() {
       });
     }
   }
-  globe.arcsData(arcs);
+  return arcs;
+}
+
+function buildAnchorArcs() {
+  if (!anchorActive || !anchorData) return [];
+  var evs = anchorEvents.concat(allEvents).filter(function(e){ return e.lat && e.lng; });
+  if (!evs.length) return [];
+  var red = '#ef4444', faint = 'rgba(239,68,68,0.2)';
+  return evs.map(function(ev) {
+    return {sLat:anchorData.lat, sLng:anchorData.lng, eLat:ev.lat, eLng:ev.lng, color:[red,faint], w:0.5};
+  });
+}
+
+function refreshArcs() {
+  globe.arcsData(buildConnectionArcs().concat(buildAnchorArcs()));
 }
 
 // =============================================================================
@@ -2676,6 +2782,146 @@ function parseWikiExtract(text, monthName, year) {
       tags:[String(year),monthName,'Historical',loc],_live:false});
   });
   return events;
+}
+
+// =============================================================================
+// PERSONAL ANCHOR
+// =============================================================================
+function anchorPinEvent() {
+  return {id:'__anchor__',type:'anchor',title:'⊕ '+anchorData.birthPlace,
+    location:anchorData.birthPlace,lat:anchorData.lat,lng:anchorData.lng,severity:5,_live:false};
+}
+
+async function fetchUserTier(userId) {
+  var { data } = await sb.from('users').select('tier').eq('id', userId).single();
+  currentUserTier = (data && data.tier) || 'free';
+  updateAnchorBtnVisibility();
+}
+
+function updateAnchorBtnVisibility() {
+  var show = !!currentUser;
+  document.getElementById('anchor-btn').style.display = show ? '' : 'none';
+  document.getElementById('anchor-sep').style.display = show ? '' : 'none';
+}
+
+function updateAnchorBtn() {
+  var btn = document.getElementById('anchor-btn');
+  if (!btn) return;
+  btn.classList.toggle('active', anchorActive);
+  btn.textContent = anchorActive ? '⊕ ANCHORED' : '⊕ ANCHOR';
+}
+
+async function loadAnchorFromDB(userId) {
+  var { data } = await sb.from('user_anchors').select('*').eq('user_id', userId).single();
+  if (!data) { updateAnchorBtnVisibility(); return; }
+  anchorData = {birthDate:data.birth_date, birthPlace:data.birth_place, lat:data.birth_lat, lng:data.birth_lng};
+  await activateAnchor();
+  updateAnchorBtnVisibility();
+}
+
+async function activateAnchor() {
+  if (!anchorData) return;
+  var parts = anchorData.birthDate.split('-');
+  var month = parseInt(parts[1]), year = parseInt(parts[0]);
+  try {
+    var evs = await fetchHistoricalEvents(month, year);
+    anchorEvents = evs.map(function(e){ return Object.assign({}, e, {id:'anc_'+e.id}); });
+  } catch(e) { anchorEvents = []; }
+  anchorActive = true;
+  updateAnchorBtn();
+  refreshGlobe();
+  refreshArcs();
+}
+
+async function clearAnchor() {
+  if (currentUser) await sb.from('user_anchors').delete().eq('user_id', currentUser.id);
+  anchorData = null; anchorEvents = []; anchorActive = false; anchorGeoResolved = null;
+  updateAnchorBtn();
+  refreshGlobe(); refreshArcs();
+  closeAnchorModal();
+}
+
+async function geocodePlace(query) {
+  var url = 'https://nominatim.openstreetmap.org/search?q=' + encodeURIComponent(query) + '&format=json&limit=1';
+  var data = await apiFetch(url, 8000);
+  if (!data || !data[0]) return null;
+  return {lat:parseFloat(data[0].lat), lng:parseFloat(data[0].lon),
+    display:data[0].display_name.split(',').slice(0,3).join(',').trim()};
+}
+
+async function lookupAnchorGeo() {
+  var input = document.getElementById('anc-city').value.trim();
+  if (!input) return;
+  var btn = document.getElementById('anc-lookup');
+  var resolvedEl = document.getElementById('anc-resolved');
+  var errEl = document.getElementById('anc-err');
+  btn.disabled = true; btn.textContent = '…';
+  resolvedEl.textContent = ''; errEl.textContent = '';
+  try {
+    var geo = await geocodePlace(input);
+    if (!geo) { errEl.textContent = 'Location not found. Try a city name or country.'; anchorGeoResolved = null; }
+    else { anchorGeoResolved = geo; resolvedEl.textContent = '✓ ' + geo.display; }
+  } catch(e) { errEl.textContent = 'Lookup failed. Check your connection.'; anchorGeoResolved = null; }
+  btn.disabled = false; btn.textContent = 'LOOK UP';
+}
+
+async function submitAnchor() {
+  var saveBtn = document.getElementById('anc-save');
+  var errEl = document.getElementById('anc-err');
+  var month = document.getElementById('anc-month').value;
+  var year = document.getElementById('anc-year').value.trim();
+  if (!month || !year || isNaN(parseInt(year))) { errEl.textContent = 'Enter a valid month and year.'; return; }
+  var yr = parseInt(year);
+  if (yr < 1900 || yr > 2025) { errEl.textContent = 'Year must be between 1900 and 2025.'; return; }
+  if (!anchorGeoResolved) { errEl.textContent = 'Look up your birthplace first.'; return; }
+  var birthDate = yr + '-' + String(parseInt(month)).padStart(2,'0') + '-01';
+  saveBtn.disabled = true; errEl.textContent = '';
+  try {
+    var { error } = await sb.from('user_anchors').upsert({
+      user_id: currentUser.id,
+      birth_date: birthDate,
+      birth_place: document.getElementById('anc-city').value.trim(),
+      birth_lat: anchorGeoResolved.lat,
+      birth_lng: anchorGeoResolved.lng
+    }, {onConflict:'user_id'});
+    if (error) throw error;
+    anchorData = {birthDate:birthDate, birthPlace:document.getElementById('anc-city').value.trim(),
+      lat:anchorGeoResolved.lat, lng:anchorGeoResolved.lng};
+    await activateAnchor();
+    closeAnchorModal();
+  } catch(e) {
+    errEl.textContent = currentUserTier === 'free'
+      ? 'Personal Anchor requires a Pro account.'
+      : 'Save failed. Try again.';
+  }
+  saveBtn.disabled = false;
+}
+
+function openAnchorModal() {
+  var modal = document.getElementById('anchor-modal');
+  var form = document.getElementById('anc-form');
+  var upsell = document.getElementById('anc-upsell');
+  document.getElementById('anc-err').textContent = '';
+  if (currentUserTier === 'free') {
+    form.style.display = 'none'; upsell.style.display = '';
+  } else {
+    form.style.display = ''; upsell.style.display = 'none';
+    if (anchorData) {
+      var parts = anchorData.birthDate.split('-');
+      document.getElementById('anc-month').value = parseInt(parts[1]);
+      document.getElementById('anc-year').value = parts[0];
+      document.getElementById('anc-city').value = anchorData.birthPlace;
+      if (!anchorGeoResolved) anchorGeoResolved = {lat:anchorData.lat, lng:anchorData.lng, display:anchorData.birthPlace};
+      document.getElementById('anc-resolved').textContent = '✓ ' + anchorData.birthPlace;
+    } else {
+      document.getElementById('anc-resolved').textContent = anchorGeoResolved ? '✓ ' + anchorGeoResolved.display : '';
+    }
+  }
+  modal.classList.add('open');
+}
+
+function closeAnchorModal() {
+  document.getElementById('anchor-modal').classList.remove('open');
 }
 
 // =============================================================================
