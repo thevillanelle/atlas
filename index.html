@@ -304,6 +304,46 @@ body.hist-open #panel{top:92px}body.hist-open #detail{top:92px}body.hist-open #l
 .marker.anchor-marker .m-dot{background:#ef4444!important;width:11px!important;height:11px!important}
 .marker.anchor-marker .m-ring{border-color:#ef4444!important;width:26px!important;height:26px!important}
 .marker.anchor-marker .m-ring2{border-color:rgba(239,68,68,.4)!important;width:38px!important;height:38px!important}
+/* throughlines */
+.ap-save-str{font-size:9px;color:#f59e0b;cursor:pointer;padding:2px 8px;border:1px solid rgba(245,158,11,.35);border-radius:4px;transition:all .15s;background:rgba(245,158,11,.08);font-family:'Space Mono',monospace;font-weight:700;letter-spacing:1px}
+.ap-save-str:hover{background:rgba(245,158,11,.2);border-color:rgba(245,158,11,.6)}
+#throughline-modal{position:fixed;inset:0;z-index:9000;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.6);backdrop-filter:blur(8px)}
+#throughline-modal.open{display:flex}
+#throughline-card{background:var(--glass2);border:1px solid var(--border);border-radius:16px;padding:32px;width:340px;box-shadow:0 24px 64px rgba(0,0,0,.5)}
+.tl-logo{font-family:'Space Mono',monospace;font-size:13px;font-weight:700;letter-spacing:4px;color:#f59e0b;text-transform:uppercase;margin-bottom:4px}
+.tl-sub{font-size:10px;color:var(--muted);letter-spacing:3px;text-transform:uppercase;margin-bottom:20px}
+.tl-input{width:100%;padding:10px 12px;background:rgba(255,255,255,.05);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:12px;font-family:'Space Mono',monospace;outline:none;box-sizing:border-box;transition:border-color .2s;margin-bottom:12px}
+.tl-input:focus{border-color:#f59e0b}
+.tl-input::placeholder{color:var(--muted)}
+.tl-preview{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:12px;min-height:20px}
+.tl-prev-badge{font-size:8px;padding:3px 7px;border-radius:4px;font-family:'Space Mono',monospace;font-weight:700;letter-spacing:.5px}
+.tl-err{font-size:10px;color:#f87171;min-height:14px;margin-bottom:10px}
+#tl-save{width:100%;padding:11px;background:#f59e0b;border:none;border-radius:8px;color:#000;font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;cursor:pointer;font-family:'Space Mono',monospace;transition:opacity .2s}
+#tl-save:hover{opacity:.85}
+#tl-save:disabled{opacity:.35;cursor:not-allowed}
+.tl-success{font-size:10px;color:#a3e635;font-family:'Space Mono',monospace;letter-spacing:1px;margin-bottom:12px}
+.tl-link{display:block;font-size:9px;color:var(--muted);font-family:'Space Mono',monospace;word-break:break-all;background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:6px;padding:9px 10px;margin-bottom:10px}
+.tl-copy-btn{width:100%;padding:10px;background:rgba(245,158,11,.12);border:1px solid rgba(245,158,11,.4);border-radius:8px;color:#f59e0b;font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;cursor:pointer;font-family:'Space Mono',monospace;transition:all .2s;margin-bottom:12px}
+.tl-copy-btn:hover{background:rgba(245,158,11,.22)}
+.tl-note{font-size:9px;color:var(--muted);line-height:1.6}
+.tl-upsell{font-size:11px;color:var(--muted);text-align:center;line-height:1.8;padding:8px 0}
+.tl-upsell strong{color:#f59e0b}
+/* string view card */
+#string-card{position:fixed;bottom:80px;right:16px;z-index:270;width:284px;background:var(--glass2);border:1px solid rgba(245,158,11,.4);border-radius:14px;padding:20px;backdrop-filter:blur(28px) saturate(180%);display:none;box-shadow:0 12px 48px rgba(0,0,0,.55)}
+#string-card.open{display:block}
+.sc-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.sc-eyebrow{font-size:8px;font-weight:700;letter-spacing:3px;color:#f59e0b;text-transform:uppercase;font-family:'Space Mono',monospace}
+.sc-close{background:none;border:none;color:var(--muted);cursor:pointer;font-size:13px;line-height:1;padding:0;transition:color .15s}
+.sc-close:hover{color:var(--text)}
+.sc-title{font-size:12px;font-weight:700;color:var(--text);margin-bottom:14px;line-height:1.45;font-family:'Space Mono',monospace;letter-spacing:.3px}
+.sc-events{display:flex;flex-direction:column;gap:7px;margin-bottom:16px}
+.sc-ev{display:flex;align-items:flex-start;gap:8px;font-size:10px;color:rgba(216,221,232,.8);line-height:1.4}
+.sc-ev-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0;margin-top:3px}
+.sc-footer{display:flex;align-items:center;gap:10px}
+.sc-copy{padding:6px 12px;background:rgba(245,158,11,.12);border:1px solid rgba(245,158,11,.35);border-radius:6px;color:#f59e0b;font-size:8px;font-weight:700;letter-spacing:2px;text-transform:uppercase;cursor:pointer;font-family:'Space Mono',monospace;transition:all .15s;white-space:nowrap}
+.sc-copy:hover{background:rgba(245,158,11,.25)}
+.sc-cta{font-size:8px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;cursor:pointer;font-family:'Space Mono',monospace;transition:color .15s}
+.sc-cta:hover{color:var(--text)}
 </style>
 </head>
 <body>
@@ -435,6 +475,42 @@ body.hist-open #panel{top:92px}body.hist-open #detail{top:92px}body.hist-open #l
       <strong>Personal Anchor is a Pro feature.</strong><br>
       Upgrade to drop your birthdate on the globe and see every concurrent event in history drawn back to you.
     </div>
+  </div>
+</div>
+<!-- Throughline save modal -->
+<div id="throughline-modal" onclick="if(event.target===this)closeThroughlineModal()">
+  <div id="throughline-card">
+    <div class="tl-logo">⊛ Save String</div>
+    <div class="tl-sub">Name this connection</div>
+    <div id="tl-form">
+      <input id="tl-title" class="tl-input" type="text" placeholder="e.g. Fashion → Civil Rights → Space">
+      <div class="tl-preview" id="tl-preview"></div>
+      <div class="tl-err" id="tl-err"></div>
+      <button id="tl-save" onclick="saveThroughline()">SAVE &amp; GET LINK</button>
+    </div>
+    <div id="tl-result" style="display:none">
+      <div class="tl-success">✓ String saved.</div>
+      <code class="tl-link" id="tl-link"></code>
+      <button class="tl-copy-btn" id="tl-copy-btn" onclick="copyThroughlineLink()">COPY LINK</button>
+      <div class="tl-note">Anyone with this link can view your string — no account needed.</div>
+    </div>
+    <div id="tl-upsell" class="tl-upsell" style="display:none">
+      <strong>Strings are a Pro feature.</strong><br>
+      Upgrade to save and share named event chains as visual cards.
+    </div>
+  </div>
+</div>
+<!-- Shared string view card -->
+<div id="string-card">
+  <div class="sc-header">
+    <div class="sc-eyebrow">⊛ String</div>
+    <button class="sc-close" onclick="closeStringCard()">✕</button>
+  </div>
+  <div class="sc-title" id="sc-title"></div>
+  <div class="sc-events" id="sc-events"></div>
+  <div class="sc-footer">
+    <button class="sc-copy" onclick="copyStringLink()">COPY LINK</button>
+    <span class="sc-cta" onclick="clearStringView()">EXPLORE ATLAS →</span>
   </div>
 </div>
 <div id="hist-bar">
@@ -776,6 +852,9 @@ var anchorEvents = [];       // historical Wikipedia events for birth month/year
 var anchorActive = false;
 var anchorGeoResolved = null; // {lat, lng, display} from Nominatim
 var currentUserTier = 'free';
+var throughlineMode = false;
+var throughlineEvents = [];   // snapshot events from a shared throughline
+var currentThroughline = null; // full throughline row from DB
 var irlCanvas = null, irlMaskCanvas = null, irlDayCanvas = null;
 var irlImgDay = null, irlImgNight = null, irlImgsLoaded = false;
 var irlBlobUrl = null;
@@ -1510,7 +1589,7 @@ function refreshGlobe() {
   }
   var hist = (histEvents.length && layerVis.history) ? histEvents : [];
   var anchorPin = anchorActive && anchorData ? [anchorPinEvent()] : [];
-  var visEvs = live.concat(hist).concat(anchorActive ? anchorEvents : []).concat(anchorPin);
+  var visEvs = live.concat(hist).concat(anchorActive ? anchorEvents : []).concat(anchorPin).concat(throughlineEvents);
   globe.htmlElementsData(visEvs);
   flightPoints = layerVis.flight ? getFlightPoints() : [];
   globe.pointsData(flightPoints);
@@ -2289,8 +2368,22 @@ function buildAnchorArcs() {
   });
 }
 
+function buildThroughlineArcs() {
+  if (!throughlineMode || throughlineEvents.length < 2) return [];
+  var arcs = [];
+  var amber = '#f59e0b', faint = 'rgba(245,158,11,0.2)';
+  for (var i=0;i<throughlineEvents.length;i++) {
+    for (var j=i+1;j<throughlineEvents.length;j++) {
+      var a = throughlineEvents[i], b = throughlineEvents[j];
+      if (!a.lat || !b.lat) continue;
+      arcs.push({sLat:a.lat, sLng:a.lng, eLat:b.lat, eLng:b.lng, color:[amber,faint], w:0.85});
+    }
+  }
+  return arcs;
+}
+
 function refreshArcs() {
-  globe.arcsData(buildConnectionArcs().concat(buildAnchorArcs()));
+  globe.arcsData(buildConnectionArcs().concat(buildAnchorArcs()).concat(buildThroughlineArcs()));
 }
 
 // =============================================================================
@@ -2485,6 +2578,7 @@ function renderAP() {
   }).join('');
 
   var header = '<div class="ap-hdr"><span class="ap-title">⟷ CONNECT — '+evs.length+' selected</span>' +
+    (evs.length >= 2 ? '<span class="ap-save-str" onclick="openThroughlineModal()">⊛ SAVE STRING</span>' : '') +
     '<span class="ap-close" onclick="clearConnect()">Clear all</span></div>' +
     '<div class="ap-sel">'+badges+'</div>';
 
@@ -2785,6 +2879,144 @@ function parseWikiExtract(text, monthName, year) {
 }
 
 // =============================================================================
+// SOCIAL THROUGHLINE
+// =============================================================================
+function genSlug() {
+  var chars = 'abcdefghijklmnopqrstuvwxyz0123456789';
+  var arr = new Uint8Array(8);
+  crypto.getRandomValues(arr);
+  return Array.from(arr).map(function(b){ return chars[b % chars.length]; }).join('');
+}
+
+function autoThroughlineTitle(evs) {
+  var labels = {news:'News',conflict:'Conflict',disaster:'Disaster',storm:'Storm',
+    humanitarian:'Aid',tech:'Tech',fashion:'Fashion',astrology:'Astrology',
+    astronomy:'Space',launch:'Launch',connection:'Chokepoint',history:'History',
+    money:'Finance',world:'World',nyc:'NYC',usnews:'US News',anchor:'Anchor'};
+  var seen = [], unique = [];
+  evs.forEach(function(e){
+    var label = labels[e.type] || e.type;
+    if (seen.indexOf(label) === -1){ seen.push(label); unique.push(label); }
+  });
+  return unique.join(' → ');
+}
+
+function openThroughlineModal() {
+  var modal = document.getElementById('throughline-modal');
+  document.getElementById('tl-err').textContent = '';
+  document.getElementById('tl-result').style.display = 'none';
+  if (currentUserTier === 'free') {
+    document.getElementById('tl-form').style.display = 'none';
+    document.getElementById('tl-upsell').style.display = '';
+  } else {
+    document.getElementById('tl-form').style.display = '';
+    document.getElementById('tl-upsell').style.display = 'none';
+    var evs = connectedIds.map(findEventById).filter(Boolean);
+    document.getElementById('tl-title').value = autoThroughlineTitle(evs);
+    document.getElementById('tl-preview').innerHTML = evs.map(function(e){
+      var c = COLORS[e.type]||'#fff';
+      return '<div class="tl-prev-badge" style="background:'+c+'1a;border:1px solid '+c+'40;color:'+c+'">' +
+        e.title.slice(0,22)+(e.title.length>22?'…':'')+'</div>';
+    }).join('');
+  }
+  modal.classList.add('open');
+}
+
+function closeThroughlineModal() {
+  document.getElementById('throughline-modal').classList.remove('open');
+}
+
+async function saveThroughline() {
+  var btn = document.getElementById('tl-save');
+  var errEl = document.getElementById('tl-err');
+  var title = document.getElementById('tl-title').value.trim();
+  if (!title) { errEl.textContent = 'Give your string a name.'; return; }
+  var evs = connectedIds.map(findEventById).filter(Boolean);
+  if (evs.length < 2) { errEl.textContent = 'Connect at least 2 events first.'; return; }
+  btn.disabled = true; errEl.textContent = '';
+  var slug = genSlug();
+  var snapshot = evs.map(function(e){
+    return {id:e.id, type:e.type, title:e.title, location:e.location||'', lat:e.lat||0, lng:e.lng||0};
+  });
+  try {
+    var res = await sb.from('throughlines').insert({
+      user_id:currentUser.id, slug:slug, title:title,
+      event_count:evs.length, events:snapshot, is_public:true
+    });
+    if (res.error) throw res.error;
+    var link = window.location.origin + '/?s=' + slug;
+    document.getElementById('tl-link').textContent = link;
+    document.getElementById('tl-form').style.display = 'none';
+    document.getElementById('tl-result').style.display = '';
+  } catch(e) {
+    errEl.textContent = currentUserTier === 'free'
+      ? 'Strings require a Pro account.' : 'Save failed. Try again.';
+  }
+  btn.disabled = false;
+}
+
+function copyThroughlineLink() {
+  var link = document.getElementById('tl-link').textContent;
+  navigator.clipboard.writeText(link).then(function(){
+    var btn = document.getElementById('tl-copy-btn');
+    btn.textContent = 'COPIED!';
+    setTimeout(function(){ btn.textContent = 'COPY LINK'; }, 1500);
+  });
+}
+
+async function loadThroughlineFromURL(slug) {
+  try {
+    var res = await sb.from('throughlines').select('*').eq('slug', slug).eq('is_public', true).single();
+    if (res.error || !res.data) return;
+    currentThroughline = res.data;
+    throughlineEvents = res.data.events.map(function(e, i){
+      return Object.assign({}, e, {id:'tl_'+i+'_'+e.id, severity:3, _live:false});
+    });
+    throughlineMode = true;
+    renderStringCard(res.data);
+    refreshGlobe(); refreshArcs();
+    // Fly to centroid of the events
+    var lats = throughlineEvents.filter(function(e){return e.lat;}).map(function(e){return e.lat;});
+    var lngs = throughlineEvents.filter(function(e){return e.lng;}).map(function(e){return e.lng;});
+    if (lats.length) {
+      var lat = lats.reduce(function(a,b){return a+b;},0) / lats.length;
+      var lng = lngs.reduce(function(a,b){return a+b;},0) / lngs.length;
+      globe.pointOfView({lat:lat, lng:lng, altitude:2.5}, 1500);
+    }
+  } catch(e) { console.warn('Throughline load failed:', e); }
+}
+
+function renderStringCard(data) {
+  document.getElementById('sc-title').textContent = data.title;
+  document.getElementById('sc-events').innerHTML = data.events.map(function(e){
+    var c = COLORS[e.type] || '#fff';
+    return '<div class="sc-ev"><div class="sc-ev-dot" style="background:'+c+'"></div>' +
+      '<div>'+e.title.slice(0,58)+(e.title.length>58?'…':'')+'</div></div>';
+  }).join('');
+  document.getElementById('string-card').classList.add('open');
+}
+
+function closeStringCard() {
+  document.getElementById('string-card').classList.remove('open');
+}
+
+function copyStringLink() {
+  if (!currentThroughline) return;
+  var link = window.location.origin + '/?s=' + currentThroughline.slug;
+  navigator.clipboard.writeText(link).then(function(){
+    var btn = document.querySelector('.sc-copy');
+    if (btn) { btn.textContent = 'COPIED!'; setTimeout(function(){ btn.textContent='COPY LINK'; }, 1500); }
+  });
+}
+
+function clearStringView() {
+  throughlineMode = false; throughlineEvents = []; currentThroughline = null;
+  closeStringCard();
+  history.replaceState(null, '', window.location.pathname);
+  refreshGlobe(); refreshArcs();
+}
+
+// =============================================================================
 // PERSONAL ANCHOR
 // =============================================================================
 function anchorPinEvent() {
@@ -3068,7 +3300,9 @@ async function init() {
     document.getElementById('splash').classList.add('out');
     setTimeout(function(){
       var s = document.getElementById('splash'); if (s) s.remove();
-      document.getElementById('mode-select').classList.add('open');
+      var slug = new URLSearchParams(location.search).get('s');
+      if (slug) { loadThroughlineFromURL(slug); }
+      else { document.getElementById('mode-select').classList.add('open'); }
     }, 700);
   }, 500);
   initPlanetOrbs();
