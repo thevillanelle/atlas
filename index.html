@@ -398,6 +398,7 @@ body.hist-open #panel{top:92px}body.hist-open #detail{top:92px}body.hist-open #l
       <div class="ms-feed-cell" onclick="selectMode('tech')"><div class="ms-dot" id="msdot-tech" style="background:#06b6d4;--dc:#06b6d4"></div><div class="ms-cell-name">Tech</div><div class="ms-cell-desc">Hacker News, AI, the internet</div></div>
       <div class="ms-feed-cell" onclick="selectMode('science')"><div class="ms-dot" id="msdot-science" style="background:#22d3ee;--dc:#22d3ee"></div><div class="ms-cell-name">Science</div><div class="ms-cell-desc">Research, climate, biology, space science</div></div>
       <div class="ms-feed-cell" onclick="selectMode('fashion')"><div class="ms-dot" id="msdot-fashion" style="background:#f472b6;--dc:#f472b6"></div><div class="ms-cell-name">Fashion</div><div class="ms-cell-desc">Runway, luxury, global style</div></div>
+      <div class="ms-feed-cell" onclick="selectMode('culture')"><div class="ms-dot" id="msdot-culture" style="background:#fb7185;--dc:#fb7185"></div><div class="ms-cell-name">Culture</div><div class="ms-cell-desc">Film, music, books, arts, theater</div></div>
       <div class="ms-feed-cell" onclick="selectMode('astrology')"><div class="ms-dot" id="msdot-astrology" style="background:#c084fc;--dc:#c084fc"></div><div class="ms-cell-name">Astrology</div><div class="ms-cell-desc">Planetary placements, celestial events</div></div>
       <div class="ms-feed-cell" onclick="selectMode('astronomy')"><div class="ms-dot" id="msdot-astronomy" style="background:#38bdf8;--dc:#38bdf8"></div><div class="ms-cell-name">Astronomy</div><div class="ms-cell-desc">Space news pinned to planets</div></div>
       <div class="ms-feed-cell" onclick="selectMode('conflict')"><div class="ms-dot" id="msdot-conflict" style="background:#f97316;--dc:#f97316"></div><div class="ms-cell-name">Conflicts</div><div class="ms-cell-desc">Wars, attacks, military movements</div></div>
@@ -584,6 +585,7 @@ body.hist-open #panel{top:92px}body.hist-open #detail{top:92px}body.hist-open #l
     <div class="tab"    data-tab="tech"         onclick="setTab(this)">Tech</div>
     <div class="tab"    data-tab="science"      onclick="setTab(this)">Science</div>
     <div class="tab"    data-tab="fashion"      onclick="setTab(this)">Fashion</div>
+    <div class="tab"    data-tab="culture"      onclick="setTab(this)">Culture</div>
     <div class="tab"    data-tab="astrology"    onclick="setTab(this)">Astrology</div>
     <div class="tab"    data-tab="astronomy"    onclick="setTab(this)">Astronomy</div>
     <div class="tab"    data-tab="conflict"     onclick="setTab(this)">Conflicts</div>
@@ -869,12 +871,12 @@ var COLORS = {
   news:'#ef4444',conflict:'#f97316',disaster:'#eab308',storm:'#60a5fa',
   humanitarian:'#ec4899',flight:'#10b981',launch:'#a78bfa',
   tech:'#06b6d4',fashion:'#f472b6',astrology:'#c084fc',astronomy:'#38bdf8',connection:'#f59e0b',history:'#a3e635',
-  money:'#34d399',world:'#818cf8',nyc:'#fb923c',usnews:'#94a3b8',science:'#22d3ee',anchor:'#ef4444'
+  money:'#34d399',world:'#818cf8',nyc:'#fb923c',usnews:'#94a3b8',science:'#22d3ee',culture:'#fb7185',anchor:'#ef4444'
 };
 var ICONS = {
   news:'📰',conflict:'⚔️',disaster:'🌊',storm:'🌀',humanitarian:'🏥',
   flight:'✈️',launch:'🚀',tech:'💻',fashion:'👗',astrology:'✨',astronomy:'🔭',connection:'🔗',history:'🕰️',
-  money:'💰',world:'🌐',nyc:'🗽',usnews:'🇺🇸',science:'🔬',anchor:'⊕'
+  money:'💰',world:'🌐',nyc:'🗽',usnews:'🇺🇸',science:'🔬',culture:'🎭',anchor:'⊕'
 };
 var DAY_IMG   = '//unpkg.com/three-globe/example/img/earth-day.jpg';
 var NIGHT_IMG = '//unpkg.com/three-globe/example/img/earth-night.jpg';
@@ -985,7 +987,7 @@ var selectedId = null;
 var panelOpen = true;
 var watchTags = ['Gaza','Ukraine','AI','Markets','Fashion','Climate'];
 var userCities = [{name:'New York City', lat:40.7128, lng:-74.006}];
-var layerVis = {news:true,conflict:true,disaster:true,storm:true,humanitarian:true,flight:true,launch:true,tech:true,fashion:true,astrology:true,astronomy:true,connection:true,history:false,money:true,world:true,nyc:true,usnews:true,science:true};
+var layerVis = {news:true,conflict:true,disaster:true,storm:true,humanitarian:true,flight:true,launch:true,tech:true,fashion:true,astrology:true,astronomy:true,connection:true,history:false,money:true,world:true,nyc:true,usnews:true,science:true,culture:true};
 var globe;
 var themeMode = 0; // 0=NIGHT 1=DAY 2=IRL
 var dayMode = false; // kept for compat — true when themeMode===1
@@ -1637,6 +1639,19 @@ async function fetchScienceNews() {
   return dedupeByTitle(all).slice(0, 30);
 }
 
+async function fetchCultureNews() {
+  var results = await Promise.allSettled([
+    fetchGuardian('culture', null, 'culture', 12),
+    fetchGuardian('books', null, 'culture', 8),
+    fetchGuardian('film', null, 'culture', 8),
+    fetchGuardian('music', null, 'culture', 8),
+    fetchGuardian('stage', null, 'culture', 6)
+  ]);
+  var all = [];
+  results.forEach(function(r){if (r.status==='fulfilled') all.push.apply(all, r.value);});
+  return dedupeByTitle(all).slice(0, 30);
+}
+
 async function fetchUSNews() {
   var results = await Promise.allSettled([
     fetchGuardian('us-news', null, 'usnews', 15),
@@ -2223,7 +2238,7 @@ function getFiltered() {
 function renderList() {
   var evs = getFiltered();
   document.getElementById('ph-count').textContent = evs.length + ' events';
-  ['news','world','conflict','disaster','storm','humanitarian','tech','fashion','astrology','astronomy','launch','connection','money','nyc','usnews','science'].forEach(function(t){
+  ['news','world','conflict','disaster','storm','humanitarian','tech','fashion','astrology','astronomy','launch','connection','money','nyc','usnews','science','culture'].forEach(function(t){
     var el = document.getElementById('lc-'+t);
     if (el) el.textContent = allEvents.filter(function(e){return e.type===t;}).length || '\u2013';
   });
@@ -2432,7 +2447,7 @@ function toggleLayer(el){
   // History and flight stay as simple toggles
   if(l==='history'||l==='flight'){layerVis[l]=!layerVis[l];el.classList.toggle('off',!layerVis[l]);refreshGlobe();return;}
   // All other layers: isolate on click, reset to all-on if already isolated
-  var contentLayers=['news','world','usnews','nyc','money','conflict','disaster','storm','humanitarian','tech','fashion','astrology','astronomy','launch','connection','science'];
+  var contentLayers=['news','world','usnews','nyc','money','conflict','disaster','storm','humanitarian','tech','fashion','astrology','astronomy','launch','connection','science','culture'];
   var activeCount=contentLayers.filter(function(k){return layerVis[k];}).length;
   if(layerVis[l]&&activeCount===1){
     // Already isolated — reset all on
@@ -3355,7 +3370,7 @@ async function loadLiveData() {
   ]);
 
   splash(55, 'Money · Local · US · Science feeds…');
-  var phase3 = await Promise.allSettled([fetchMoneyNews(), fetchWorldNews(), fetchLocalNews(userCities), fetchUSNews(), fetchScienceNews()]);
+  var phase3 = await Promise.allSettled([fetchMoneyNews(), fetchWorldNews(), fetchLocalNews(userCities), fetchUSNews(), fetchScienceNews(), fetchCultureNews()]);
 
   splash(72, 'Sky data + Astronomy + Markets…');
   var phase4 = await Promise.allSettled([fetchSkyData(), fetchAstronomyNews()]);
@@ -3363,7 +3378,7 @@ async function loadLiveData() {
 
   var usgs     = phase1[0], launches = phase1[1];
   var newsR    = phase2[0], conflR   = phase2[1], stormR = phase2[2], hnR = phase2[3], fashR = phase2[4];
-  var moneyR   = phase3[0], worldR   = phase3[1], nycR   = phase3[2], usR  = phase3[3], sciR = phase3[4];
+  var moneyR   = phase3[0], worldR   = phase3[1], nycR   = phase3[2], usR  = phase3[3], sciR = phase3[4], cultR = phase3[5];
   var skyR     = phase4[0], astroNewsR = phase4[1];
 
   var disasters   = dedupeByTitle(usgs.status==='fulfilled' ? usgs.value : []).slice(0,30);
@@ -3377,13 +3392,14 @@ async function loadLiveData() {
   var nycEvs      = nycR.status==='fulfilled' ? nycR.value : [];
   var usEvs       = usR.status==='fulfilled' ? usR.value : [];
   var sciEvs      = sciR.status==='fulfilled' ? sciR.value : [];
+  var cultEvs     = cultR.status==='fulfilled' ? cultR.value : [];
   var astroEvs    = skyR.status==='fulfilled' ? skyR.value : computeSkyEvents();
   var astronomyEvs = astroNewsR.status==='fulfilled' ? astroNewsR.value : [];
   var launchEvs   = launches.status==='fulfilled' ? launches.value : FALLBACK_LAUNCHES;
 
   var connectionEvs = [].concat(CHOKEPOINTS, ECONOMIC_STRESS, POLITICAL_FLASH);
   allEvents = [].concat(newsEvs, conflicts, disasters, storms, SEEDS.humanitarian,
-    techEvs, fashionEvs, moneyEvs, worldEvs, nycEvs, usEvs, sciEvs,
+    techEvs, fashionEvs, moneyEvs, worldEvs, nycEvs, usEvs, sciEvs, cultEvs,
     astroEvs, astronomyEvs, launchEvs, connectionEvs);
   setLayerStatus('connection','on');
 
@@ -3401,6 +3417,7 @@ async function loadLiveData() {
   setLayerStatus('astronomy',   astroNewsR.status==='fulfilled'&&astroNewsR.value.length?'on':'fb');
   setLayerStatus('launch',      launches.status==='fulfilled'?'on':'fb');
   setLayerStatus('science',     sciR.status==='fulfilled'&&sciR.value.length?'on':'fb');
+  setLayerStatus('culture',     cultR.status==='fulfilled'&&cultR.value.length?'on':'fb');
   setLayerStatus('humanitarian','fb');
   setLayerStatus('flight',      'fb');
 }
@@ -3412,23 +3429,30 @@ function dotLive(id) {
 
 async function checkAPIs() {
   var status = document.getElementById('ms-status-txt');
-  // Always-on: history (static) and connection (static) and humanitarian (seeds) and astrology (computed)
-  setTimeout(function(){ dotLive('history'); dotLive('connection'); dotLive('humanitarian'); dotLive('astrology'); }, 80);
 
   var checks = [
+    // External APIs
     { id: 'disaster',  url: 'https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&minmagnitude=5.0&limit=1&orderby=time' },
     { id: 'tech',      url: 'https://hn.algolia.com/api/v1/search?tags=front_page&hitsPerPage=1' },
     { id: 'launch',    url: 'https://ll.thespacedevs.com/2.2.0/launch/upcoming/?format=json&limit=1&mode=list' },
     { id: 'astronomy', url: 'https://services.swpc.noaa.gov/products/noaa-planetary-k-index-forecast.json' },
-    // Guardian covers news / conflict / storm / fashion / money / nyc / usnews
+    // Guardian — one check per vertical that uses it
     { id: 'news',      url: 'https://content.guardianapis.com/search?api-key=test&page-size=1&format=json' },
+    { id: 'world',     url: 'https://content.guardianapis.com/search?api-key=test&page-size=1&section=world&format=json' },
+    { id: 'usnews',    url: 'https://content.guardianapis.com/search?api-key=test&page-size=1&section=us-news&format=json' },
+    { id: 'nyc',       url: 'https://content.guardianapis.com/search?api-key=test&page-size=1&q=New+York+City&format=json' },
+    { id: 'money',     url: 'https://content.guardianapis.com/search?api-key=test&page-size=1&section=business&format=json' },
+    { id: 'science',   url: 'https://content.guardianapis.com/search?api-key=test&page-size=1&section=science&format=json' },
+    { id: 'culture',   url: 'https://content.guardianapis.com/search?api-key=test&page-size=1&section=culture&format=json' },
+    { id: 'fashion',   url: 'https://content.guardianapis.com/search?api-key=test&page-size=1&section=fashion&format=json' },
     { id: 'conflict',  url: 'https://content.guardianapis.com/search?api-key=test&page-size=1&q=conflict&format=json' },
     { id: 'storm',     url: 'https://content.guardianapis.com/search?api-key=test&page-size=1&section=environment&format=json' },
-    { id: 'fashion',   url: 'https://content.guardianapis.com/search?api-key=test&page-size=1&section=fashion&format=json' },
-    { id: 'money',     url: 'https://content.guardianapis.com/search?api-key=test&page-size=1&section=business&format=json' },
-    { id: 'nyc',       url: 'https://content.guardianapis.com/search?api-key=test&page-size=1&q=New+York+City&format=json' },
-    { id: 'usnews',    url: 'https://content.guardianapis.com/search?api-key=test&page-size=1&section=us-news&format=json' },
   ];
+
+  // Always-on: static/computed — light immediately
+  // history=static, connection=static seeds, humanitarian=static seeds, astrology=computed
+  var ALWAYS_ON = ['history', 'connection', 'humanitarian', 'astrology'];
+  setTimeout(function(){ ALWAYS_ON.forEach(dotLive); }, 80);
 
   var passed = 0;
   await Promise.allSettled(checks.map(function(c) {
@@ -3438,8 +3462,8 @@ async function checkAPIs() {
   }));
 
   if (status) {
-    var total = passed + 4; // +4 always-on (history, connection, humanitarian, astrology)
-    status.textContent = '● ' + total + ' / ' + (checks.length + 4) + ' systems nominal';
+    var total = passed + ALWAYS_ON.length;
+    status.textContent = '● ' + total + ' / ' + (checks.length + ALWAYS_ON.length) + ' systems nominal';
   }
 }
 
