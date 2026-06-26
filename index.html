@@ -98,6 +98,28 @@ select#theme-btn option{background:#070b18;color:var(--text);font-size:12px;lett
 .aup-email{font-size:10px;color:var(--muted);margin-bottom:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .aup-signout{width:100%;padding:8px;background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:8px;color:var(--muted);font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;cursor:pointer;font-family:'Space Mono',monospace;transition:all .2s}
 .aup-signout:hover{color:var(--text);border-color:var(--border2)}
+.aup-cities-btn{width:100%;padding:8px;background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:8px;color:var(--muted);font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;cursor:pointer;font-family:'Space Mono',monospace;transition:all .2s;margin-bottom:8px}
+.aup-cities-btn:hover{color:var(--text);border-color:var(--border2)}
+#cities-modal{position:fixed;inset:0;background:rgba(0,0,0,.7);backdrop-filter:blur(8px);z-index:600;display:none;align-items:center;justify-content:center}
+#cities-modal.open{display:flex}
+#cities-card{background:var(--panel);border:1px solid var(--border);border-radius:16px;padding:28px;width:360px;box-shadow:0 24px 64px rgba(0,0,0,.5)}
+.cities-logo{font-size:13px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--accent);margin-bottom:4px}
+.cities-sub{font-size:11px;color:var(--muted);margin-bottom:20px}
+#cities-list{display:flex;flex-direction:column;gap:6px;margin-bottom:16px;max-height:180px;overflow-y:auto}
+.city-row{display:flex;align-items:center;gap:8px;padding:7px 10px;background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:8px;font-size:11px;color:var(--text)}
+.city-row-name{flex:1}
+.city-row-del{background:none;border:none;color:var(--muted);cursor:pointer;font-size:14px;line-height:1;padding:0 2px}
+.city-row-del:hover{color:#f87171}
+.cities-add-row{display:flex;gap:8px}
+#city-input{flex:1;background:rgba(255,255,255,.06);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:11px;padding:8px 12px;font-family:'Space Mono',monospace;outline:none}
+#city-input:focus{border-color:var(--accent)}
+#city-lookup{padding:8px 14px;background:var(--accent);border:none;border-radius:8px;color:#fff;font-size:10px;font-weight:700;letter-spacing:1px;cursor:pointer;font-family:'Space Mono',monospace;white-space:nowrap}
+#city-lookup:disabled{opacity:.4;cursor:not-allowed}
+.cities-resolved{font-size:10px;color:#34d399;margin-top:6px;min-height:14px}
+.cities-err{font-size:10px;color:#f87171;margin-top:4px;min-height:14px}
+.cities-actions{display:flex;justify-content:flex-end;gap:10px;margin-top:20px}
+.cities-cancel{background:none;border:1px solid var(--border);border-radius:8px;color:var(--muted);font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;cursor:pointer;font-family:'Space Mono',monospace;padding:8px 16px}
+.cities-save{background:var(--accent);border:none;border-radius:8px;color:#fff;font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;cursor:pointer;font-family:'Space Mono',monospace;padding:8px 16px}
 #connect-btn.active{background:rgba(168,85,247,.15);border-color:rgba(168,85,247,.5);color:#a855f7}
 #hist-bar{position:fixed;top:48px;left:0;right:0;z-index:290;background:rgba(10,12,18,.96);border-bottom:1px solid rgba(163,230,53,.25);padding:8px 18px;display:none;align-items:center;gap:10px;font-family:'Space Mono',monospace;font-size:10px}
 #hist-bar.open{display:flex}
@@ -370,7 +392,7 @@ body.hist-open #panel{top:92px}body.hist-open #detail{top:92px}body.hist-open #l
     <div class="ms-feed-grid">
       <div class="ms-feed-cell" onclick="selectMode('news')"><div class="ms-dot" id="msdot-news" style="background:#ef4444;--dc:#ef4444"></div><div class="ms-cell-name">Breaking News</div><div class="ms-cell-desc">Live world events and developing stories</div></div>
       <div class="ms-feed-cell" onclick="selectMode('usnews')"><div class="ms-dot" id="msdot-usnews" style="background:#94a3b8;--dc:#94a3b8"></div><div class="ms-cell-name">US News</div><div class="ms-cell-desc">Politics, society, and national stories</div></div>
-      <div class="ms-feed-cell" onclick="selectMode('nyc')"><div class="ms-dot" id="msdot-nyc" style="background:#fb923c;--dc:#fb923c"></div><div class="ms-cell-name">NYC</div><div class="ms-cell-desc">New York City — local, culture, transit</div></div>
+      <div class="ms-feed-cell" onclick="selectMode('nyc')"><div class="ms-dot" id="msdot-nyc" style="background:#fb923c;--dc:#fb923c"></div><div class="ms-cell-name">Local</div><div class="ms-cell-desc">News from your home cities</div></div>
       <div class="ms-feed-cell" onclick="selectMode('money')"><div class="ms-dot" id="msdot-money" style="background:#34d399;--dc:#34d399"></div><div class="ms-cell-name">Money</div><div class="ms-cell-desc">Markets, economy, finance, luxury</div></div>
       <div class="ms-feed-cell" onclick="selectMode('conflict')"><div class="ms-dot" id="msdot-conflict" style="background:#f97316;--dc:#f97316"></div><div class="ms-cell-name">Conflicts</div><div class="ms-cell-desc">Wars, attacks, military movements</div></div>
       <div class="ms-feed-cell" onclick="selectMode('disaster')"><div class="ms-dot" id="msdot-disaster" style="background:#eab308;--dc:#eab308"></div><div class="ms-cell-name">Disasters</div><div class="ms-cell-desc">Earthquakes, floods, natural events</div></div>
@@ -438,7 +460,27 @@ body.hist-open #panel{top:92px}body.hist-open #detail{top:92px}body.hist-open #l
 <div id="auth-user-panel">
   <div class="aup-name" id="aup-name"></div>
   <div class="aup-email" id="aup-email"></div>
+  <button class="aup-cities-btn" onclick="openCitiesModal()">⊙ Manage Cities</button>
   <button class="aup-signout" onclick="signOut()">Sign Out</button>
+</div>
+
+<!-- Cities modal -->
+<div id="cities-modal" onclick="if(event.target===this)closeCitiesModal()">
+  <div id="cities-card">
+    <div class="cities-logo">⊙ Your Cities</div>
+    <div class="cities-sub">Drive your Local feed with the cities that matter to you.</div>
+    <div id="cities-list"></div>
+    <div class="cities-add-row">
+      <input id="city-input" placeholder="Add a city…" onkeydown="if(event.key==='Enter')lookupCity()">
+      <button id="city-lookup" onclick="lookupCity()">+ ADD</button>
+    </div>
+    <div class="cities-resolved" id="city-resolved"></div>
+    <div class="cities-err" id="city-err"></div>
+    <div class="cities-actions">
+      <button class="cities-cancel" onclick="closeCitiesModal()">Cancel</button>
+      <button class="cities-save" onclick="saveCities()">Save</button>
+    </div>
+  </div>
 </div>
 <!-- Personal Anchor modal -->
 <div id="anchor-modal" onclick="if(event.target===this)closeAnchorModal()">
@@ -536,7 +578,7 @@ body.hist-open #panel{top:92px}body.hist-open #detail{top:92px}body.hist-open #l
     <div class="tab"    data-tab="watchlist"    onclick="setTab(this)">Watchlist</div>
     <div class="tab"    data-tab="news"         onclick="setTab(this)">News</div>
     <div class="tab"    data-tab="usnews"       onclick="setTab(this)">US</div>
-    <div class="tab"    data-tab="nyc"          onclick="setTab(this)">NYC</div>
+    <div class="tab"    data-tab="nyc"          onclick="setTab(this)">Local</div>
     <div class="tab"    data-tab="money"        onclick="setTab(this)">Money</div>
     <div class="tab"    data-tab="tech"         onclick="setTab(this)">Tech</div>
     <div class="tab"    data-tab="fashion"      onclick="setTab(this)">Fashion</div>
@@ -681,6 +723,110 @@ async function syncPrefsFromDB(userId) {
     var t = themeMap[data.theme];
     if (t !== undefined) { document.getElementById('theme-btn').value = t; setTheme(t); }
   }
+  if (data.home_cities && Array.isArray(data.home_cities) && data.home_cities.length) {
+    userCities = data.home_cities;
+    updateLocalTabLabel();
+  }
+}
+
+async function saveHomeCities() {
+  if (!currentUser) return;
+  await sb.from('user_preferences').upsert(
+    { user_id: currentUser.id, home_cities: userCities },
+    { onConflict: 'user_id' }
+  );
+}
+
+function updateLocalTabLabel() {
+  var label = userCities.length === 1 ? userCities[0].name : 'Local';
+  var tab = document.querySelector('.tab[data-tab="nyc"]');
+  if (tab) tab.textContent = label;
+  var msTile = document.querySelector('#msdot-nyc');
+  if (msTile) {
+    var cell = msTile.closest('.ms-feed-cell');
+    if (cell) {
+      cell.querySelector('.ms-cell-name').textContent = label;
+      cell.querySelector('.ms-cell-desc').textContent =
+        userCities.map(function(c){return c.name;}).join(' · ');
+    }
+  }
+}
+
+// --- Cities modal ---
+var _pendingCities = [];
+var _pendingGeo = null;
+
+function openCitiesModal() {
+  document.getElementById('auth-user-panel').classList.remove('open');
+  _pendingCities = userCities.slice();
+  _pendingGeo = null;
+  document.getElementById('city-input').value = '';
+  document.getElementById('city-resolved').textContent = '';
+  document.getElementById('city-err').textContent = '';
+  renderCityList();
+  document.getElementById('cities-modal').classList.add('open');
+}
+
+function closeCitiesModal() {
+  document.getElementById('cities-modal').classList.remove('open');
+}
+
+function renderCityList() {
+  var list = document.getElementById('cities-list');
+  if (!_pendingCities.length) {
+    list.innerHTML = '<div style="font-size:10px;color:var(--muted);padding:6px">No cities added yet.</div>';
+    return;
+  }
+  list.innerHTML = _pendingCities.map(function(c, i) {
+    return '<div class="city-row"><span class="city-row-name">' + c.name + '</span>' +
+      '<button class="city-row-del" onclick="removePendingCity(' + i + ')">×</button></div>';
+  }).join('');
+}
+
+function removePendingCity(i) {
+  _pendingCities.splice(i, 1);
+  renderCityList();
+}
+
+async function lookupCity() {
+  var input = document.getElementById('city-input').value.trim();
+  if (!input) return;
+  var btn = document.getElementById('city-lookup');
+  var resolvedEl = document.getElementById('city-resolved');
+  var errEl = document.getElementById('city-err');
+  btn.disabled = true; btn.textContent = '…';
+  resolvedEl.textContent = ''; errEl.textContent = '';
+  try {
+    var geo = await geocodePlace(input);
+    if (!geo) {
+      errEl.textContent = 'City not found. Try a different spelling.';
+      _pendingGeo = null;
+    } else {
+      _pendingGeo = geo;
+      // Build a clean short name from the geocode display
+      var shortName = input.charAt(0).toUpperCase() + input.slice(1);
+      _pendingGeo.name = shortName;
+      resolvedEl.textContent = '✓ ' + geo.display;
+      _pendingCities.push({name: shortName, lat: geo.lat, lng: geo.lng});
+      document.getElementById('city-input').value = '';
+      _pendingGeo = null;
+      renderCityList();
+    }
+  } catch(e) {
+    errEl.textContent = 'Lookup failed. Try again.';
+  }
+  btn.disabled = false; btn.textContent = '+ ADD';
+}
+
+async function saveCities() {
+  if (!_pendingCities.length) {
+    document.getElementById('city-err').textContent = 'Add at least one city.';
+    return;
+  }
+  userCities = _pendingCities.slice();
+  updateLocalTabLabel();
+  closeCitiesModal();
+  if (currentUser) await saveHomeCities();
 }
 
 async function saveThemePref(themeName) {
@@ -834,6 +980,7 @@ var searchQ = '';
 var selectedId = null;
 var panelOpen = true;
 var watchTags = ['Gaza','Ukraine','AI','Markets','Fashion','Climate'];
+var userCities = [{name:'New York City', lat:40.7128, lng:-74.006}];
 var layerVis = {news:true,conflict:true,disaster:true,storm:true,humanitarian:true,flight:true,launch:true,tech:true,fashion:true,astrology:true,astronomy:true,connection:true,history:false,money:true,nyc:true,usnews:true};
 var globe;
 var themeMode = 0; // 0=NIGHT 1=DAY 2=IRL
@@ -1455,17 +1602,21 @@ async function fetchWorldNews() {
   return dedupeByTitle(all).slice(0, 50);
 }
 
-// NYC — New York City local news
-async function fetchNYCNews() {
-  var results = await Promise.allSettled([
-    fetchGuardian('us-news', '"New York City" OR NYC OR Manhattan OR Brooklyn OR Bronx OR Queens OR "Staten Island"', 'nyc', 12),
-    fetchGuardian(null, 'MTA OR NYPD OR "New York mayor" OR "New York governor" OR "New York housing" OR "New York transit"', 'nyc', 10),
-    fetchGuardian('culture', '"New York" OR Broadway OR "Metropolitan Museum" OR "Lincoln Center" OR "Central Park"', 'nyc', 8)
-  ]);
+// Local news — queries Guardian for each of the user's home cities
+async function fetchLocalNews(cities) {
+  if (!cities || !cities.length) return [];
+  var perCity = Math.max(8, Math.ceil(25 / cities.length));
+  var queries = cities.map(function(city) {
+    return fetchGuardian(null, '"' + city.name + '"', 'nyc', perCity);
+  });
+  var results = await Promise.allSettled(queries);
   var all = [];
-  results.forEach(function(r){if (r.status==='fulfilled') all.push.apply(all, r.value);});
-  // Pin all NYC events to NYC coordinates
-  all.forEach(function(e){ e.lat = 40.71; e.lng = -74.01; });
+  results.forEach(function(r, i) {
+    if (r.status !== 'fulfilled') return;
+    var city = cities[i];
+    r.value.forEach(function(e) { e.lat = city.lat; e.lng = city.lng; });
+    all.push.apply(all, r.value);
+  });
   return dedupeByTitle(all).slice(0, 25);
 }
 
@@ -1525,6 +1676,18 @@ function initGlobe() {
   // Start on night side so the sun orb is visible from the first frame
   globe.pointOfView({lat:-sun.lat, lng:sun.lng+180, altitude:2.2}, 0);
   updateTerminator();
+
+  // Handle GPU context loss gracefully — browser may kill WebGL when backgrounded
+  var canvas = document.querySelector('#globe-wrap canvas');
+  if (canvas) {
+    canvas.addEventListener('webglcontextlost', function(e) {
+      e.preventDefault();
+      var msg = document.createElement('div');
+      msg.style.cssText = 'position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.85);z-index:9999;color:#fff;font-family:Space Mono,monospace;font-size:13px;text-align:center;letter-spacing:.05em;';
+      msg.innerHTML = '<div><div style="font-size:24px;margin-bottom:12px">⚠</div>Globe context lost.<br><br><button onclick="location.reload()" style="margin-top:12px;padding:8px 24px;background:#3b82f6;border:none;border-radius:8px;color:#fff;font-family:inherit;cursor:pointer;font-size:13px">↺ RELOAD</button></div>';
+      document.body.appendChild(msg);
+    }, false);
+  }
 }
 
 function buildMarker(d) {
@@ -1560,6 +1723,7 @@ function buildMarker(d) {
 }
 
 function refreshGlobe() {
+  if (!globe || !globe.htmlElementsData) return;
   var histBarOpen = document.getElementById('hist-bar').classList.contains('open');
   if (histBarOpen) {
     globe.htmlElementsData(histEvents.concat(anchorActive && anchorData ? [anchorPinEvent()] : []));
@@ -2190,6 +2354,7 @@ function closeDetail() {
 // UI CONTROLS
 // =============================================================================
 function applyThemeMode() {
+  if (!globe || !globe.globeImageUrl) return;
   dayMode = (themeMode === 1);
   irlMode = (themeMode === 2);
   document.getElementById('theme-btn').value = themeMode;
@@ -2381,6 +2546,7 @@ function buildThroughlineArcs() {
 }
 
 function refreshArcs() {
+  if (!globe || !globe.arcsData) return;
   globe.arcsData(buildConnectionArcs().concat(buildAnchorArcs()).concat(buildThroughlineArcs()));
 }
 
@@ -3173,7 +3339,7 @@ async function loadLiveData() {
   ]);
 
   splash(55, 'Money · NYC · US · World feeds…');
-  var phase3 = await Promise.allSettled([fetchMoneyNews(), fetchWorldNews(), fetchNYCNews(), fetchUSNews()]);
+  var phase3 = await Promise.allSettled([fetchMoneyNews(), fetchWorldNews(), fetchLocalNews(userCities), fetchUSNews()]);
 
   splash(72, 'Sky data + Astronomy + Markets…');
   var phase4 = await Promise.allSettled([fetchSkyData(), fetchAstronomyNews()]);
