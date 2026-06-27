@@ -170,10 +170,14 @@ select#theme-btn option{background:#070b18;color:var(--text);font-size:12px;lett
 .porb{position:absolute;display:none;transform:translate(-50%,-50%);cursor:pointer;pointer-events:all}
 .porb-dot{display:block;border-radius:50%;width:calc(var(--pr) * 2);height:calc(var(--pr) * 2);
   background:radial-gradient(circle at 35% 35%, color-mix(in srgb,var(--pc) 60%,#fff), var(--pc) 55%, color-mix(in srgb,var(--pc) 80%,#000));
-  box-shadow:0 0 calc(var(--pr) * 3) calc(var(--pr)) var(--pc),0 0 calc(var(--pr) * 8) calc(var(--pr) * 2) color-mix(in srgb,var(--pc) 40%,transparent)}
+  box-shadow:0 0 calc(var(--pr) * 3) calc(var(--pr)) var(--pc),0 0 calc(var(--pr) * 8) calc(var(--pr) * 2) color-mix(in srgb,var(--pc) 40%,transparent);
+  position:relative;z-index:1}
 .porb-label{position:absolute;top:calc(var(--pr) * 2 + 6px);left:50%;transform:translateX(-50%);
   font-family:'Space Mono',monospace;font-size:8px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;
   color:var(--pc);white-space:nowrap;text-shadow:0 0 8px var(--pc),0 0 16px var(--pc)}
+.porb-ring{position:absolute;top:50%;left:50%;border-radius:50%;pointer-events:none}
+.porb-ring.back{z-index:0}
+.porb-ring.front{z-index:2}
 #ptoggle{position:fixed;top:60px;left:300px;z-index:202;width:20px;height:34px;background:var(--glass);border:1px solid var(--border);border-left:none;border-radius:0 6px 6px 0;cursor:pointer;color:var(--muted);display:flex;align-items:center;justify-content:center;font-size:10px;backdrop-filter:blur(20px);transition:left .35s cubic-bezier(.4,0,.2,1);outline:none;user-select:none}
 #ptoggle:hover{color:var(--text)}
 #ptoggle.closed{left:0}
@@ -1988,8 +1992,8 @@ var PLANET_DEFS = [
   {name:'Venus',  color:'#ffe580',r:7, N0:76.6799, dN:2.46590e-5, i0:3.3946, di:2.75e-8, w0:54.8910,  dw:1.38374e-5, a0:0.723330, da:0,        e0:0.006773,de:-1.302e-9, M0:48.0052, dM:1.6021302244},
   {name:'Mars',   color:'#ff6b3d',r:6, N0:49.5574, dN:2.11081e-5, i0:1.8497, di:-1.78e-8,w0:286.5016, dw:2.92961e-5, a0:1.523688, da:0,        e0:0.093405,de:2.516e-9,  M0:18.6021, dM:0.5240207766},
   {name:'Jupiter',color:'#ffcc88',r:9, N0:100.4542,dN:2.76854e-5, i0:1.3030, di:-1.557e-7,w0:273.8777,dw:1.64505e-5, a0:5.20256,  da:0,        e0:0.048498,de:4.469e-9,  M0:19.8950, dM:0.0830853001},
-  {name:'Saturn', color:'#e8d580',r:8, N0:113.6634,dN:2.38980e-5, i0:2.4886, di:-1.081e-7,w0:339.3939,dw:2.97661e-5, a0:9.55475,  da:0,        e0:0.055546,de:-9.499e-9, M0:316.9670,dM:0.0334442282},
-  {name:'Uranus', color:'#7de8e8',r:5, N0:74.0005, dN:1.3978e-5,  i0:0.7733, di:1.9e-8,  w0:96.6612,  dw:3.0565e-5,  a0:19.18171, da:-1.55e-8, e0:0.047318,de:7.45e-9,   M0:142.5905,dM:0.011725806},
+  {name:'Saturn', color:'#e8d580',r:8, rings:{w:5.5,h:1.8,rot:-22,opacity:0.62}, N0:113.6634,dN:2.38980e-5, i0:2.4886, di:-1.081e-7,w0:339.3939,dw:2.97661e-5, a0:9.55475,  da:0,        e0:0.055546,de:-9.499e-9, M0:316.9670,dM:0.0334442282},
+  {name:'Uranus', color:'#7de8e8',r:5, rings:{w:3.2,h:4.2,rot:80, opacity:0.35}, N0:74.0005, dN:1.3978e-5,  i0:0.7733, di:1.9e-8,  w0:96.6612,  dw:3.0565e-5,  a0:19.18171, da:-1.55e-8, e0:0.047318,de:7.45e-9,   M0:142.5905,dM:0.011725806},
   {name:'Neptune',color:'#6688ff',r:5, N0:131.7806,dN:3.0173e-5,  i0:1.7700, di:-2.55e-7, w0:272.8461,dw:-6.027e-6,  a0:30.05826, da:3.313e-8, e0:0.008606,de:2.15e-9,   M0:260.2471,dM:0.005995147},
   {name:'Pluto',  color:'#c2a27a',r:3, N0:110.3039,dN:1.98169e-5, i0:17.1417,di:1.1e-8,   w0:113.7633, dw:1.71e-5,   a0:39.48168, da:-3.16e-7, e0:0.24883, de:5.1e-10,   M0:14.5300, dM:0.003974},
 ];
@@ -2045,7 +2049,16 @@ function initPlanetOrbs() {
     el.id = 'porb-' + p.name.toLowerCase();
     el.style.setProperty('--pc', p.color);
     el.style.setProperty('--pr', p.r + 'px');
-    el.innerHTML = '<span class="porb-dot"></span><span class="porb-label">' + p.name + '</span>';
+    var backRing = '', frontRing = '';
+    if (p.rings) {
+      var rg = p.rings;
+      var rStyle = 'width:calc(var(--pr)*' + rg.w + ');height:calc(var(--pr)*' + rg.h + ');' +
+                   'border:1.5px solid ' + p.color + Math.round(rg.opacity*255).toString(16).padStart(2,'0') + ';' +
+                   'transform:translate(-50%,-50%) rotate(' + rg.rot + 'deg);';
+      backRing  = '<span class="porb-ring back"  style="' + rStyle + '"></span>';
+      frontRing = '<span class="porb-ring front" style="' + rStyle + 'clip-path:polygon(0% 50%,100% 50%,100% 100%,0% 100%)"></span>';
+    }
+    el.innerHTML = backRing + '<span class="porb-dot"></span><span class="porb-label">' + p.name + '</span>' + frontRing;
     el.style.cursor = 'pointer';
     (function(planet){ el.onclick = function(e){ e.stopPropagation(); showPlanetDetail(planet); }; })(p);
     c.appendChild(el);
