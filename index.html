@@ -2257,10 +2257,7 @@ function showPlanetDetail(p) {
   var d = daysSinceJ2000(histDate || new Date());
   var pos = planetGeogLatLng(p, d);
 
-  // Fly to antipodal point so planet orb centres on screen
-  globe.controls().autoRotate = false;
-  globe.pointOfView({lat: -pos.lat, lng: pos.lng + 180, altitude: 3.5}, 1200);
-  setTimeout(function(){globe.controls().autoRotate = true;}, 6000);
+  // Planets are sky objects — don't navigate the globe (that would put Earth in the way)
 
   // Related news: astronomy/astrology/tech/news articles mentioning the planet
   var pname = p.name.toLowerCase();
@@ -2344,7 +2341,7 @@ function tickPlanets() {
     if (opacity <= 0) { el.style.display = 'none'; return; }
     var pos = planetGeogLatLng(p, d);
     var lat = pos.lat * DEG, lng = pos.lng * DEG, dist = 620;
-    var sp = projectToScreen(dist*Math.cos(lat)*Math.sin(lng), dist*Math.sin(lat), dist*Math.cos(lat)*Math.cos(lng), false);
+    var sp = projectToScreen(dist*Math.cos(lat)*Math.sin(lng), dist*Math.sin(lat), dist*Math.cos(lat)*Math.cos(lng), true);
     if (!sp) { el.style.display = 'none'; return; }
     el.style.display = 'block';
     el.style.opacity = opacity;
@@ -2401,13 +2398,22 @@ function tickPlanets() {
         });
         var clat = c.dec * DEG, clng = norm180(c.ra - gmstC) * DEG;
         var lsp = projectToScreen(619*Math.cos(clat)*Math.sin(clng), 619*Math.sin(clat), 619*Math.cos(clat)*Math.cos(clng), true);
+        _constLabelPos[c.name] = lsp || null;
         if (lsp) {
-          ctx.fillStyle = 'rgba(180,185,255,' + (constOpacity * 0.55) + ')';
-          ctx.font = '8px monospace';
+          var isHovered = _constHovered === c.name;
+          ctx.fillStyle = 'rgba(' + (isHovered ? '220,225,255' : '180,185,255') + ',' + (constOpacity * (isHovered ? 0.9 : 0.55)) + ')';
+          ctx.font = (isHovered ? 'bold ' : '') + '8px monospace';
           ctx.textAlign = 'center';
           ctx.fillText(c.name.toUpperCase(), lsp.x, lsp.y - 10);
+          if (isHovered) {
+            ctx.strokeStyle = 'rgba(180,185,255,' + (constOpacity * 0.35) + ')';
+            ctx.lineWidth = 1;
+            ctx.strokeRect(lsp.x - 28, lsp.y - 20, 56, 13);
+          }
         }
       });
+    } else {
+      Object.keys(_constLabelPos).forEach(function(k){ _constLabelPos[k] = null; });
     }
   } else if (oc) {
     var ctx2 = oc.getContext('2d');
@@ -2573,6 +2579,106 @@ var CONSTELLATIONS = [
     [[199.73,-0.60],[213.22,10.96]], // arm right toward Vindemiatrix
   ]},
 ];
+
+// Per-frame constellation label screen positions (populated by tickPlanets, read by click handler)
+var _constLabelPos = {};
+var _constHovered = null;
+
+var CONSTELLATION_DATA = {
+  'Orion': {
+    area:'594 sq°', hemisphere:'Both', season:'Dec–Feb',
+    stars:'Rigel (blue supergiant, ~100,000× solar luminosity), Betelgeuse (red supergiant, ~700 solar radii), Belt: Mintaka · Alnilam · Alnitak',
+    note:'The Hunter. Three-star belt has guided navigators across every civilization for 30,000+ years. Betelgeuse (upper left) is expected to go supernova within 100,000 years — briefly visible in daylight. Rigel (lower right) is one of the most luminous stars visible to the naked eye.'
+  },
+  'Ursa Major': {
+    area:'1280 sq°', hemisphere:'Northern', season:'Year-round',
+    stars:'Dubhe & Merak (pointer stars to Polaris), Alioth (brightest), Mizar (showpiece visual double)',
+    note:'The Great Bear. The Big Dipper asterism never sets from most northern latitudes. Five of the seven dipper stars form the Ursa Major Moving Group — a cluster of stars physically drifting through the galaxy together. Alkaid, at the handle tip, is an unrelated interloper traveling a different path.'
+  },
+  'Cassiopeia': {
+    area:'598 sq°', hemisphere:'Northern', season:'Year-round',
+    stars:'Schedar (orange giant α), Caph (β), γ Cas (variable erupting Be star), Ruchbah (δ)',
+    note:'The Queen, chained to her throne as punishment for vanity. The W shape is circumpolar from most of the northern hemisphere — never sets. Tycho Brahe observed a supernova here in 1572 bright enough to see in daylight. Cassiopeia A is now one of the strongest radio sources in the sky.'
+  },
+  'Crux': {
+    area:'68 sq°', hemisphere:'Southern', season:'Apr–May',
+    stars:'Acrux (α, southern tip, blue double), Mimosa (β, upper left, blue giant), Gacrux (γ, top, red giant)',
+    note:'The Southern Cross — smallest constellation by area, most instantly recognized in the southern hemisphere. Acrux points toward the south celestial pole and has served navigation for millennia. The Coalsack Nebula beside it is one of the most prominent dark nebulae visible to the naked eye.'
+  },
+  'Leo': {
+    area:'947 sq°', hemisphere:'Both', season:'Mar–May',
+    stars:'Regulus (heart, spins near breakup speed, ~4× solar radius), Denebola (tail), Algieba (golden visual double)',
+    note:'The Lion. The Sickle asterism traces the lion\'s head and mane — a backward question mark ending at Regulus. Regulus is so oblate from its rapid spin that its equatorial diameter is 32% wider than pole-to-pole. The Leonid meteor shower radiates from this constellation every November.'
+  },
+  'Scorpius': {
+    area:'497 sq°', hemisphere:'Southern', season:'Jun–Jul',
+    stars:'Antares (red supergiant, "rival of Mars", ~700 solar radii), Graffias (triple star head), Shaula · Lesath (stinger)',
+    note:'The Scorpion of Greek myth, sent to kill Orion — which is why they never share the sky simultaneously. Antares would swallow Mars\'s orbit if placed at our Sun\'s position. The S-curved tail ends in the stinger Shaula, one of the sky\'s brightest stars. The galactic center lies just to the north.'
+  },
+  'Gemini': {
+    area:'514 sq°', hemisphere:'Northern', season:'Jan–Feb',
+    stars:'Castor (6-star system — 3 spectroscopic binaries orbiting each other), Pollux (brightest, has confirmed exoplanet)',
+    note:'The Twins of Greek myth — Castor mortal, Pollux divine, both sons of Zeus. Though visually similar, Pollux at 34 light-years is half the distance of Castor at 51. Castor is actually a sextuple star system. The Geminid meteor shower, one of the year\'s finest, radiates from here every December.'
+  },
+  'Taurus': {
+    area:'797 sq°', hemisphere:'Northern', season:'Nov–Jan',
+    stars:'Aldebaran (red giant eye, 65× solar diameter), Elnath (shared tip with Auriga), Pleiades cluster (Seven Sisters)',
+    note:'The Bull. The V-shaped Hyades cluster marks the bull\'s face — the nearest open cluster to Earth. The Pleiades (M45) rest on its shoulder and appear in cultures from Aboriginal Australian astronomy to pre-Columbian Mesoamerican calendars. Aldebaran follows the Pleiades across the sky, giving it its name: "the follower."'
+  },
+  'Cygnus': {
+    area:'804 sq°', hemisphere:'Northern', season:'Aug–Sep',
+    stars:'Deneb (one of the most luminous stars known, ~200,000× solar), Albireo (stunning color-contrast double), γ Cygni',
+    note:'The Swan, flying south along the Milky Way. Deneb is the most intrinsically luminous star in the Summer Triangle — it appears moderate only because it\'s ~2,600 light-years away. Together with Vega (Lyra) and Altair (Aquila), it forms the Summer Triangle asterism that dominates summer nights.'
+  },
+  'Lyra': {
+    area:'286 sq°', hemisphere:'Northern', season:'Jul–Aug',
+    stars:'Vega (3rd brightest overall, 25 ly, touched by the Voyager trajectory), ε Lyrae (the "Double Double"), Ring Nebula (M57)',
+    note:'The Lyre of Orpheus, dropped into the sky upon his death. Vega was the north pole star 14,000 years ago and will be again in ~13,700 years due to axial precession. The Ring Nebula between β and γ Lyrae is one of the finest planetary nebulae in the sky, visible in small telescopes.'
+  },
+  'Aquila': {
+    area:'652 sq°', hemisphere:'Both', season:'Aug–Sep',
+    stars:'Altair (one of the closest bright stars at 17 ly, spins once per 9 hours, visibly oblate), Tarazed (orange giant)',
+    note:'The Eagle of Zeus, which carried thunderbolts. Altair is one of the nearest bright stars and spins so fast (once per 9 hours vs. our Sun\'s 25 days) that it is 20% wider at the equator than pole-to-pole. With Deneb and Vega it forms the Summer Triangle visible from June through October.'
+  },
+  'Sagittarius': {
+    area:'867 sq°', hemisphere:'Southern', season:'Jul–Aug',
+    stars:'Kaus Australis (brightest, ε Sgr), Nunki (σ, blue-white giant), Teapot asterism (8 stars)',
+    note:'The Archer — though the Teapot is the better asterism. Looking toward Sagittarius is looking toward the galactic center. Sagittarius A*, the Milky Way\'s supermassive black hole (4 million solar masses), lies in this direction. More Messier objects crowd this constellation than any other — trifid nebula, lagoon nebula, many globular clusters.'
+  },
+  'Perseus': {
+    area:'615 sq°', hemisphere:'Northern', season:'Oct–Dec',
+    stars:'Mirfak (α, brightest, yellow-white supergiant, cluster centerpiece), Algol (β, the Demon Star)',
+    note:'The Hero who slew Medusa. Algol (β Persei) was the first eclipsing binary identified — its brightness dips predictably every 2.87 days as a dimmer companion transits in front. Arabic astronomers noticed the wink and named it "Ras al Ghul" (head of the demon). The Perseus Moving Group physically surrounds Mirfak.'
+  },
+  'Boötes': {
+    area:'907 sq°', hemisphere:'Northern', season:'May–Jun',
+    stars:'Arcturus (4th brightest star, 37 ly, moving toward Virgo at 122 km/s), Izar (showpiece colored double), Nekkar',
+    note:'The Herdsman, driving Ursa Major around the pole. Arcturus was the first star observed in daylight through a telescope (1635). Its 1933 light was used to trigger the opening of the Chicago World\'s Fair. Arcturus moves remarkably fast relative to the solar neighborhood — in ~500,000 years it will have passed below the horizon for most northern observers.'
+  },
+  'Virgo': {
+    area:'1294 sq°', hemisphere:'Both', season:'Apr–May',
+    stars:'Spica (1st magnitude, blue-white binary, discovery key for Earth\'s axial precession), Porrima (equal double), Vindemiatrix',
+    note:'The Maiden — associated with Demeter (harvest) and Dike (justice). Hipparchus used Spica to discover Earth\'s axial precession in 127 BC by comparing observations 150 years apart. The Virgo Cluster — the nearest galaxy supercluster (~1,300 galaxies including M87 with its famous black hole jet) — dominates this region of sky.'
+  }
+};
+
+function showConstellationDetail(name) {
+  var data = CONSTELLATION_DATA[name] || {};
+  var con = CONSTELLATIONS.find(function(c){return c.name===name;});
+  var det = document.getElementById('detail');
+  det.innerHTML =
+    '<button id="d-close" onclick="closeDetail()">&#x2715;</button>' +
+    '<div id="d-body">' +
+    '<div style="margin-bottom:16px">' +
+      '<div style="font-size:10px;letter-spacing:3px;color:rgba(160,170,255,.7);text-transform:uppercase;margin-bottom:5px">Constellation</div>' +
+      '<div style="font-size:22px;font-weight:700;color:var(--text);letter-spacing:.02em">' + name + '</div>' +
+      (data.area ? '<div style="font-size:10px;color:var(--muted);margin-top:3px">' + data.area + ' &nbsp;·&nbsp; ' + data.hemisphere + ' &nbsp;·&nbsp; Best: ' + data.season + '</div>' : '') +
+    '</div>' +
+    (data.note ? '<div style="font-size:12px;line-height:1.75;color:rgba(255,255,255,.72);margin-bottom:14px">' + data.note + '</div>' : '') +
+    (data.stars ? '<div class="d-sep"></div><div class="d-lbl">Notable Stars</div><div style="font-size:11px;color:var(--muted);line-height:1.7;margin-top:6px">' + data.stars + '</div>' : '') +
+    '</div>';
+  det.classList.add('open');
+}
 
 function computeOrbitPaths() {
   var d0 = daysSinceJ2000(histDate || new Date());
@@ -2759,8 +2865,8 @@ function selectEvent(id) {
   if (!ev) return;
   globe.controls().autoRotate = false;
   var isPlanetEvent = (ev.type === 'astronomy' || ev.type === 'astrology') && (ev._planet || ev._star);
-  var alt = isPlanetEvent ? 3.5 : (ev.type === 'astronomy' || ev.type === 'astrology') ? 2.8 : 1.6;
-  // For planet-linked events navigate to the antipodal point so the orb appears centre-screen
+  var alt = isPlanetEvent ? 6.0 : (ev.type === 'astronomy' || ev.type === 'astrology') ? 2.8 : 1.6;
+  // Sky-body events: pull way back so Earth reads as a disc in space, not a wall
   var navLat = isPlanetEvent ? -ev.lat : ev.lat;
   var navLng = isPlanetEvent ? ev.lng + 180 : ev.lng;
   globe.pointOfView({lat:navLat, lng:navLng, altitude:alt}, 1200);
@@ -3999,6 +4105,35 @@ async function init() {
   initStars();
   computeOrbitPaths();
   tickPlanets();
+
+  // Constellation click + hover detection (orbit-canvas is pointer-events:none, so listen on document)
+  document.addEventListener('click', function(e) {
+    // Only active when zoomed out enough to see constellations
+    var camDist = globe && globe.camera ? Math.sqrt(globe.camera().position.x**2+globe.camera().position.y**2+globe.camera().position.z**2) : 0;
+    if (camDist < 200) return;
+    var best = null, bestD = 38;
+    Object.keys(_constLabelPos).forEach(function(name) {
+      var pos = _constLabelPos[name];
+      if (!pos) return;
+      var dx = e.clientX - pos.x, dy = e.clientY - pos.y;
+      var dist = Math.sqrt(dx*dx + dy*dy);
+      if (dist < bestD) { bestD = dist; best = name; }
+    });
+    if (best) { showConstellationDetail(best); }
+  });
+  document.addEventListener('mousemove', function(e) {
+    var camDist = globe && globe.camera ? Math.sqrt(globe.camera().position.x**2+globe.camera().position.y**2+globe.camera().position.z**2) : 0;
+    if (camDist < 200) { if (_constHovered) { _constHovered = null; document.body.style.cursor = ''; } return; }
+    var best = null, bestD = 38;
+    Object.keys(_constLabelPos).forEach(function(name) {
+      var pos = _constLabelPos[name];
+      if (!pos) return;
+      var dx = e.clientX - pos.x, dy = e.clientY - pos.y;
+      var dist = Math.sqrt(dx*dx + dy*dy);
+      if (dist < bestD) { bestD = dist; best = name; }
+    });
+    if (best !== _constHovered) { _constHovered = best; document.body.style.cursor = best ? 'pointer' : ''; }
+  });
   tickClock();
   setInterval(tickClock, 1000);
   setInterval(fetchMarkets, 60000);
