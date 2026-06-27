@@ -218,13 +218,56 @@ select#theme-btn option{background:#070b18;color:var(--text);font-size:12px;lett
 .wl-tag.on{background:rgba(59,130,246,.14);border-color:var(--accent);color:var(--accent)}
 .wl-tag-x{opacity:.5;font-size:10px;line-height:1;transition:opacity .15s}.wl-tag-x:hover{opacity:1;color:#ef4444}
 .wl-clear{margin-left:6px;font-size:9px;color:var(--muted);cursor:pointer;padding:2px 5px;border:1px solid var(--border);border-radius:4px;transition:all .15s}.wl-clear:hover{color:#ef4444;border-color:#ef4444}
-.astro-grid{display:grid;grid-template-columns:1fr 1fr;gap:5px;padding:5px}
-.astro-card{padding:9px 8px;border-radius:9px;background:rgba(255,255,255,.03);border:1px solid var(--border);cursor:pointer;transition:all .15s;text-align:center}
-.astro-card:hover{background:rgba(192,132,252,.07);border-color:rgba(192,132,252,.25)}
-.astro-card.sel{background:rgba(192,132,252,.12);border-color:rgba(192,132,252,.4)}
-.astro-sign{font-size:11px;font-weight:700;color:var(--text);margin-bottom:2px}
-.astro-site{font-size:8px;color:var(--muted)}
-.astro-snip{font-size:9px;color:rgba(192,132,252,.7);margin-top:4px;line-height:1.4;text-align:left;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.natal-wrap{padding:10px;display:flex;flex-direction:column;gap:9px}
+.natal-hdr{display:flex;justify-content:space-between;align-items:flex-start}
+.natal-hdr-info{}
+.natal-hdr-title{font-size:10px;font-weight:700;letter-spacing:2px;color:var(--text);text-transform:uppercase}
+.natal-hdr-date{font-size:8px;color:var(--muted);margin-top:2px}
+.natal-edit{font-size:8px;color:#c084fc;cursor:pointer;text-decoration:underline;padding-top:2px}
+.natal-big-three{display:grid;grid-template-columns:repeat(3,1fr);gap:5px}
+.natal-body{border-radius:10px;padding:10px 6px;text-align:center}
+.natal-body.sun{background:rgba(251,191,36,.07);border:1px solid rgba(251,191,36,.2)}
+.natal-body.moon{background:rgba(226,232,240,.05);border:1px solid rgba(226,232,240,.15)}
+.natal-body.rising{background:rgba(192,132,252,.09);border:1px solid rgba(192,132,252,.25)}
+.natal-body.rising.no-time{background:rgba(100,116,139,.05);border:1px solid rgba(100,116,139,.15)}
+.natal-body-glyph{font-size:18px;line-height:1}
+.natal-body-planet{font-size:7px;letter-spacing:2px;color:var(--muted);text-transform:uppercase;margin-top:4px}
+.natal-body-sign{font-size:12px;font-weight:700;color:var(--text);margin:3px 0 1px}
+.natal-body-deg{font-size:8px;color:var(--muted)}
+.natal-section-label{font-size:7px;letter-spacing:3px;color:var(--muted);text-transform:uppercase;padding:2px 0 0}
+.natal-planets{display:grid;grid-template-columns:1fr 1fr;gap:4px}
+.natal-prow{background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:8px;padding:7px 8px;display:flex;align-items:center;gap:7px}
+.natal-prow-icon{font-size:13px;width:18px;text-align:center;flex-shrink:0}
+.natal-prow-info{min-width:0}
+.natal-prow-name{font-size:7px;color:var(--muted);letter-spacing:1px;text-transform:uppercase}
+.natal-prow-sign{font-size:10px;font-weight:600;color:var(--text)}
+.natal-prow-deg{font-size:7px;color:var(--muted)}
+.natal-pluto-gen{background:linear-gradient(135deg,rgba(192,132,252,.1),rgba(220,38,38,.06));border:1px solid rgba(192,132,252,.25);border-radius:10px;padding:11px 12px}
+.natal-pluto-gen-hdr{display:flex;align-items:center;gap:7px;margin-bottom:5px}
+.natal-pluto-gen-glyph{font-size:16px}
+.natal-pluto-gen-label{font-size:7px;letter-spacing:2px;color:#c084fc;text-transform:uppercase}
+.natal-pluto-gen-sign{font-size:11px;font-weight:700;color:var(--text)}
+.natal-pluto-gen-text{font-size:9px;color:var(--muted);line-height:1.6}
+.natal-upsell{padding:24px 16px;text-align:center}
+.natal-upsell-icon{font-size:30px;margin-bottom:10px}
+.natal-upsell-title{font-size:11px;font-weight:700;letter-spacing:2px;color:var(--text);margin-bottom:8px;text-transform:uppercase}
+.natal-upsell-text{font-size:9px;color:var(--muted);line-height:1.6;margin-bottom:14px}
+.natal-form{padding:12px;display:flex;flex-direction:column;gap:10px}
+.natal-form-title{font-size:10px;font-weight:700;letter-spacing:2px;color:var(--text);text-transform:uppercase}
+.natal-form-sub{font-size:9px;color:var(--muted);line-height:1.5}
+.natal-field{display:flex;flex-direction:column;gap:4px}
+.natal-label{font-size:8px;letter-spacing:1px;text-transform:uppercase;color:var(--muted)}
+.natal-opt{opacity:.6;font-size:7px}
+.natal-input{background:rgba(255,255,255,.06);border:1px solid var(--border);border-radius:8px;padding:9px 10px;color:var(--text);font-size:10px;font-family:'Space Mono',monospace;width:100%;box-sizing:border-box}
+.natal-input:focus{outline:none;border-color:rgba(192,132,252,.45)}
+.natal-geo-row{display:flex;gap:5px}
+.natal-geo-row .natal-input{flex:1}
+.natal-geo-btn{padding:9px 10px;background:rgba(192,132,252,.12);border:1px solid rgba(192,132,252,.3);border-radius:8px;color:#c084fc;font-size:8px;font-weight:700;letter-spacing:1px;cursor:pointer;white-space:nowrap;font-family:'Space Mono',monospace}
+.natal-resolved{font-size:8px;color:#4ade80;margin-top:2px}
+.natal-field-err{font-size:8px;color:#ef4444;margin-top:2px}
+.natal-submit{padding:11px;background:#c084fc;border:none;border-radius:8px;color:#000;font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;cursor:pointer;font-family:'Space Mono',monospace;width:100%}
+.natal-submit:hover{opacity:.85}
+.natal-submit:disabled{opacity:.35;cursor:not-allowed}
 body.hist-open #panel{top:92px}body.hist-open #detail{top:92px}body.hist-open #lctrl{top:104px}
 #lctrl{display:none}
 .lc-hdr{font-size:8px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--muted);padding:1px 5px 4px;display:flex;align-items:center;cursor:pointer;user-select:none;gap:5px}
@@ -1389,6 +1432,234 @@ function computeSkyEvents() {
 }
 
 // =============================================================================
+// NATAL CHART — zodiac signs, generation descriptions, computation
+// =============================================================================
+var SIGNS = [
+  {name:'Aries',      glyph:'♈',element:'Fire',  ruler:'Mars'},
+  {name:'Taurus',     glyph:'♉',element:'Earth', ruler:'Venus'},
+  {name:'Gemini',     glyph:'♊',element:'Air',   ruler:'Mercury'},
+  {name:'Cancer',     glyph:'♋',element:'Water', ruler:'Moon'},
+  {name:'Leo',        glyph:'♌',element:'Fire',  ruler:'Sun'},
+  {name:'Virgo',      glyph:'♍',element:'Earth', ruler:'Mercury'},
+  {name:'Libra',      glyph:'♎',element:'Air',   ruler:'Venus'},
+  {name:'Scorpio',    glyph:'♏',element:'Water', ruler:'Pluto'},
+  {name:'Sagittarius',glyph:'♐',element:'Fire',  ruler:'Jupiter'},
+  {name:'Capricorn',  glyph:'♑',element:'Earth', ruler:'Saturn'},
+  {name:'Aquarius',   glyph:'♒',element:'Air',   ruler:'Uranus'},
+  {name:'Pisces',     glyph:'♓',element:'Water', ruler:'Neptune'},
+];
+
+var PLUTO_GENS = {
+  'Virgo':    {years:'1957–1972', text:'The reform generation. Came of age critiquing institutions from the inside. Gave the world the personal computer, second-wave feminism, and the idea that systems could be rebuilt — if you worked hard enough.'},
+  'Libra':    {years:'1971–1984', text:'The balance generation. Raised during divorce reform and dual-income households. Deeply preoccupied with fairness, aesthetics, and relationships — and quietly devastated when those things fail.'},
+  'Scorpio':  {years:'1983–1995', text:'The intensity generation. AIDS crisis, grunge, rave, the internet\'s ugly dawn. Collectively unafraid of darkness, obsessed with authenticity, and congenitally suspicious of anything that looks too clean. Came for the truth.'},
+  'Sagittarius':{years:'1995–2008',text:'The globalization generation. Born into the internet and watched every border blur. Questions every authority with a browser open. Optimistic in theory, exhausted in practice.'},
+  'Capricorn':{years:'2008–2024', text:'The structure generation. Born during the financial crash. Will inherit — and likely dismantle — the institutions their parents built. Grimly practical. Has always known the system is broken.'},
+  'Aquarius': {years:'2024–2044', text:'The network generation. AI, collective intelligence, and radical democratization of power will define their world before they\'re old enough to vote. Already arriving.'},
+};
+
+var PLANET_GLYPHS = {Sun:'☉',Moon:'☽',Mercury:'☿',Venus:'♀',Mars:'♂',Jupiter:'♃',Saturn:'♄',Uranus:'♅',Neptune:'♆',Pluto:'♇'};
+
+var natalData = null;  // {date, time, place, lat, lng} from localStorage
+var _natalGeo = null;  // pending geocode result
+
+function loadNatalData() {
+  try { natalData = JSON.parse(localStorage.getItem('atlas_natal') || 'null'); } catch(e) { natalData = null; }
+}
+
+function signFromLon(lon) {
+  var idx = Math.floor(norm360(lon) / 30);
+  var deg = norm360(lon) % 30;
+  return {sign: SIGNS[idx], degree: Math.floor(deg)};
+}
+
+function sunEclipticLon(t) {
+  var L0 = norm360(280.46646 + 36000.76983 * t);
+  var M = norm360(357.52911 + 35999.05029 * t - 0.0001537 * t * t) * DEG;
+  var C = (1.914602 - 0.004817 * t) * Math.sin(M) + 0.019993 * Math.sin(2*M) + 0.000289 * Math.sin(3*M);
+  return norm360(L0 + C);
+}
+
+function moonEclipticLon(t) {
+  var L1 = norm360(218.3164477 + 481267.88123421 * t);
+  var D = norm360(297.8501921 + 445267.1114034 * t) * DEG;
+  var M = norm360(357.5291092 + 35999.0502909 * t) * DEG;
+  var Mp = norm360(134.9633964 + 477198.8675055 * t) * DEG;
+  var F = norm360(93.2720950 + 483202.0175233 * t) * DEG;
+  return norm360(L1 + 6.288774*Math.sin(Mp) + 1.274027*Math.sin(2*D-Mp) + 0.658314*Math.sin(2*D) + 0.213618*Math.sin(2*Mp) - 0.185116*Math.sin(M) - 0.114332*Math.sin(2*F));
+}
+
+function planetEclipticLon(pEl, d) {
+  var ph = keplerXYZ(pEl, d);
+  var eh = keplerXYZ(EARTH_ELEMS, d);
+  return norm360(Math.atan2(ph.y - eh.y, ph.x - eh.x) * RAD);
+}
+
+function ascendantEclipticLon(d, lat, lng) {
+  var RAMC = norm360(280.46061837 + 360.98564736629 * d + lng) * DEG;
+  var eps = (23.4393 - 3.563e-7 * d) * DEG;
+  var phi = lat * DEG;
+  return norm360(Math.atan2(-Math.cos(RAMC), Math.sin(eps) * Math.tan(phi) + Math.cos(eps) * Math.sin(RAMC)) * RAD);
+}
+
+function computeNatalChart(dateStr, timeStr, lat, lng) {
+  var hasTime = !!(timeStr && timeStr.length >= 4);
+  var hasPlace = (lat !== null && lng !== null && lat !== undefined && lng !== undefined);
+  var dtStr = dateStr + 'T' + (hasTime ? timeStr : '12:00') + ':00';
+  var dt;
+  if (hasTime && hasPlace) {
+    var approxOffset = lng / 15;
+    dt = new Date(new Date(dtStr).getTime() - approxOffset * 3600000);
+  } else {
+    dt = new Date(dtStr + 'Z');
+  }
+  var d = daysSinceJ2000(dt);
+  var t = d / 36525;
+  var sunLon  = sunEclipticLon(t);
+  var moonLon = moonEclipticLon(t);
+  var ascLon  = (hasTime && hasPlace) ? ascendantEclipticLon(d, lat, lng) : null;
+  var planets = PLANET_DEFS.map(function(p) {
+    return {name: p.name, color: p.color, lon: planetEclipticLon(p, d)};
+  });
+  return {sunLon: sunLon, moonLon: moonLon, ascLon: ascLon, planets: planets, hasTime: hasTime, hasPlace: hasPlace};
+}
+
+async function lookupNatalCity() {
+  var input = document.getElementById('natal-city').value.trim();
+  if (!input) return;
+  var btn = document.getElementById('natal-city-btn');
+  var res = document.getElementById('natal-city-result');
+  btn.disabled = true; btn.textContent = '…';
+  res.className = ''; res.textContent = '';
+  try {
+    var geo = await geocodePlace(input);
+    if (!geo) {
+      res.className = 'natal-field-err'; res.textContent = 'City not found.';
+      _natalGeo = null;
+    } else {
+      _natalGeo = geo;
+      res.className = 'natal-resolved'; res.textContent = '✓ ' + geo.display;
+    }
+  } catch(e) { res.className = 'natal-field-err'; res.textContent = 'Lookup failed.'; }
+  btn.disabled = false; btn.textContent = 'FIND';
+}
+
+function editNatalChart() {
+  natalData = null;
+  localStorage.removeItem('atlas_natal');
+  renderEventList();
+}
+
+function saveNatalChart() {
+  var dateVal = document.getElementById('natal-date').value;
+  if (!dateVal) { document.getElementById('natal-date').focus(); return; }
+  var timeVal = document.getElementById('natal-time').value;
+  natalData = {
+    date: dateVal,
+    time: timeVal || null,
+    place: _natalGeo ? document.getElementById('natal-city').value.trim() : null,
+    lat: _natalGeo ? _natalGeo.lat : null,
+    lng: _natalGeo ? _natalGeo.lng : null,
+  };
+  localStorage.setItem('atlas_natal', JSON.stringify(natalData));
+  _natalGeo = null;
+  renderEventList();
+}
+
+function renderAstrologyTab() {
+  var list = document.getElementById('evlist');
+  if (!list) return;
+
+  // Pro gate
+  if (currentUserTier === 'free') {
+    list.innerHTML = '<div class="natal-upsell">' +
+      '<div class="natal-upsell-icon">♇</div>' +
+      '<div class="natal-upsell-title">Natal Chart</div>' +
+      '<div class="natal-upsell-text">Enter your birthdate and time to unlock your full planetary placements — Sun, Moon, Rising, Mercury through Pluto — computed live from the same orbital mechanics powering the globe.</div>' +
+      '<div class="natal-upsell-btn" onclick="document.getElementById(\'auth-user-panel\').classList.add(\'open\')">Upgrade to Pro</div>' +
+    '</div>';
+    return;
+  }
+
+  // Show input form if no natal data saved
+  if (!natalData || !natalData.date) {
+    list.innerHTML = '<div class="natal-form">' +
+      '<div class="natal-form-title">Your Natal Chart</div>' +
+      '<div class="natal-form-sub">Enter your birth details. Time and place are optional but unlock your Moon sign accuracy and Rising sign.</div>' +
+      '<div class="natal-field"><div class="natal-label">Birth Date *</div>' +
+        '<input class="natal-input" type="date" id="natal-date" max="' + new Date().toISOString().split('T')[0] + '"></div>' +
+      '<div class="natal-field"><div class="natal-label">Birth Time <span class="natal-opt">(optional — for Moon & Rising)</span></div>' +
+        '<input class="natal-input" type="time" id="natal-time"></div>' +
+      '<div class="natal-field"><div class="natal-label">Birthplace <span class="natal-opt">(optional — for Rising sign)</span></div>' +
+        '<div class="natal-geo-row"><input class="natal-input" type="text" id="natal-city" placeholder="City, Country">' +
+        '<button class="natal-geo-btn" id="natal-city-btn" onclick="lookupNatalCity()">FIND</button></div>' +
+        '<div id="natal-city-result"></div></div>' +
+      '<button class="natal-submit" onclick="saveNatalChart()">Generate Chart</button>' +
+    '</div>';
+    return;
+  }
+
+  // Compute chart
+  var chart = computeNatalChart(natalData.date, natalData.time, natalData.lat, natalData.lng);
+  var sun   = signFromLon(chart.sunLon);
+  var moon  = signFromLon(chart.moonLon);
+  var asc   = chart.ascLon !== null ? signFromLon(chart.ascLon) : null;
+
+  function big3Card(cls, glyph, label, placement, deg, note) {
+    return '<div class="natal-body ' + cls + '">' +
+      '<div class="natal-body-glyph">' + glyph + '</div>' +
+      '<div class="natal-body-planet">' + label + '</div>' +
+      '<div class="natal-body-sign">' + placement.sign.glyph + ' ' + placement.sign.name + '</div>' +
+      '<div class="natal-body-deg">' + deg + '°' + (note ? ' · ' + note : '') + '</div></div>';
+  }
+
+  var dateDisplay = new Date(natalData.date + 'T12:00:00Z').toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'});
+  var timeDisplay = natalData.time ? ' · ' + natalData.time : '';
+  var placeDisplay = natalData.place ? ' · ' + natalData.place : '';
+
+  var planetRows = chart.planets.map(function(p) {
+    var s = signFromLon(p.lon);
+    var glyph = PLANET_GLYPHS[p.name] || '●';
+    return '<div class="natal-prow">' +
+      '<div class="natal-prow-icon" style="color:' + p.color + '">' + glyph + '</div>' +
+      '<div class="natal-prow-info">' +
+        '<div class="natal-prow-name">' + p.name + '</div>' +
+        '<div class="natal-prow-sign">' + s.sign.glyph + ' ' + s.sign.name + '</div>' +
+        '<div class="natal-prow-deg">' + s.degree + '°</div>' +
+      '</div></div>';
+  }).join('');
+
+  var plutoSign = signFromLon(chart.planets.find(function(p){return p.name==='Pluto';}).lon).sign.name;
+  var gen = PLUTO_GENS[plutoSign] || null;
+  var genBlock = gen ? '<div class="natal-pluto-gen">' +
+    '<div class="natal-pluto-gen-hdr">' +
+      '<div class="natal-pluto-gen-glyph">♇</div>' +
+      '<div><div class="natal-pluto-gen-label">Pluto Generation · ' + gen.years + '</div>' +
+           '<div class="natal-pluto-gen-sign">Pluto in ' + plutoSign + '</div></div>' +
+    '</div>' +
+    '<div class="natal-pluto-gen-text">' + gen.text + '</div></div>' : '';
+
+  list.innerHTML = '<div class="natal-wrap">' +
+    '<div class="natal-hdr">' +
+      '<div class="natal-hdr-info">' +
+        '<div class="natal-hdr-title">Natal Chart</div>' +
+        '<div class="natal-hdr-date">' + dateDisplay + timeDisplay + placeDisplay + '</div>' +
+      '</div>' +
+      '<div class="natal-edit" onclick="editNatalChart()">Edit</div>' +
+    '</div>' +
+    '<div class="natal-big-three">' +
+      big3Card('sun',  '☉', 'Sun',  sun,  sun.degree,  null) +
+      big3Card('moon', '☽', 'Moon', moon, moon.degree, !chart.hasTime ? 'approx' : null) +
+      (asc ? big3Card('rising', '↑', 'Rising', asc, asc.degree, null) :
+             '<div class="natal-body rising no-time"><div class="natal-body-glyph" style="opacity:.4">↑</div><div class="natal-body-planet">Rising</div><div class="natal-body-sign" style="font-size:9px;color:var(--muted)">Add time &amp; place</div></div>') +
+    '</div>' +
+    '<div class="natal-section-label">Planetary Placements</div>' +
+    '<div class="natal-planets">' + planetRows + '</div>' +
+    genBlock +
+  '</div>';
+}
+
+// =============================================================================
 // API FETCHERS
 // Only APIs confirmed to work with CORS * from GitHub Pages:
 //   USGS, Guardian, HN Algolia, Space Devs, CoinGecko, open.er-api, NOAA SWPC
@@ -1597,87 +1868,7 @@ async function fetchAuroraKp() {
   return Math.max.apply(null, predicted.slice(0,4).map(function(r){return parseFloat(r[1])||0;}));
 }
 
-// Zodiac sign → ruling planet for article-to-pin mapping
-var ZODIAC_RULERS = {
-  aries:'Mars',taurus:'Venus',gemini:'Mercury',cancer:'Moon',
-  leo:'Sun',virgo:'Mercury',libra:'Venus',scorpio:'Mars',
-  sagittarius:'Jupiter',capricorn:'Saturn',aquarius:'Saturn',pisces:'Jupiter'
-};
-
-async function fetchAstrologyNews() {
-  var queries = [
-    'astrology OR horoscope OR "Mercury retrograde" OR "planetary alignment"',
-    'zodiac OR "birth chart" OR "Venus in" OR "Mars in" OR "Jupiter in"',
-    'eclipse OR "full moon" OR "new moon" OR retrograde'
-  ];
-  var raw = await Promise.allSettled(queries.map(function(q){
-    return apiFetch(guardianUrl('lifeandstyle', q, 8), 10000);
-  }));
-  var articles = [];
-  raw.forEach(function(r){
-    if (r.status === 'fulfilled') articles.push.apply(articles, (r.value.response && r.value.response.results)||[]);
-  });
-  var seen = new Set();
-  articles = articles.filter(function(a){
-    var k = a.webTitle.toLowerCase().replace(/[^a-z0-9]/g,'').slice(0,50);
-    if (seen.has(k)) return false; seen.add(k); return true;
-  });
-
-  var d = daysSinceJ2000(new Date());
-  var gmst = norm360(280.46061837 + 360.98564736629 * d);
-
-  return articles.map(function(a, i){
-    var fields = a.fields || {};
-    var low = a.webTitle.toLowerCase();
-
-    var matchedPlanet = null;
-    PLANET_DEFS.forEach(function(p){ if (!matchedPlanet && low.indexOf(p.name.toLowerCase())!==-1) matchedPlanet = p; });
-
-    if (!matchedPlanet) {
-      Object.keys(ZODIAC_RULERS).forEach(function(sign){
-        if (!matchedPlanet && low.indexOf(sign)!==-1)
-          matchedPlanet = PLANET_DEFS.find(function(p){return p.name===ZODIAC_RULERS[sign];}) || null;
-      });
-    }
-
-    var isMoon = !matchedPlanet && (low.indexOf('moon')!==-1 || low.indexOf('lunar')!==-1);
-    var isSun  = !matchedPlanet && !isMoon && (low.indexOf('sun')!==-1 || low.indexOf('solar')!==-1);
-
-    var lat, lng, bodyName, bodyColor;
-    if (matchedPlanet) {
-      var pos = planetGeogLatLng(matchedPlanet, d);
-      lat = pos.lat; lng = pos.lng;
-      bodyName = matchedPlanet.name; bodyColor = matchedPlanet.color;
-    } else if (isMoon) {
-      var mLng = norm360(218.316 + 13.176396 * d - gmst); if (mLng > 180) mLng -= 360;
-      lat = 5.13 * Math.sin((93.272 + 13.064993 * d) * DEG); lng = mLng;
-      bodyName = 'Moon'; bodyColor = '#e2e8f0';
-    } else if (isSun) {
-      lat = 23.45 * Math.sin((280.46 + 0.9856 * d) * DEG);
-      var sLng = norm360(356.047 + 0.9856 * d + 282.94 - gmst); if (sLng > 180) sLng -= 360;
-      lng = sLng;
-      bodyName = 'Sun'; bodyColor = '#fbbf24';
-    } else {
-      var hubs = [[40.7,-74.0],[51.5,-0.1],[48.8,2.3],[-33.9,18.4],[35.7,139.7]];
-      var h = hubs[i % hubs.length]; lat = h[0]; lng = h[1];
-      bodyName = 'Cosmos'; bodyColor = '#c084fc';
-    }
-
-    return {
-      id:'astro_art_'+i, type:'astrology',
-      title:a.webTitle, location:bodyName,
-      lat:lat, lng:lng, severity:2,
-      age: a.webPublicationDate ? timeAgo(a.webPublicationDate) : 'Recent',
-      brief:(fields.trailText||a.webTitle).replace(/<[^>]*>/g,'').trim(),
-      url:a.webUrl,
-      sources:[{n:'The Guardian',a:a.webPublicationDate?timeAgo(a.webPublicationDate):'Recent',url:a.webUrl}],
-      tags:['Astrology',bodyName], _live:true,
-      _planet:{name:bodyName, color:bodyColor, emoji:'✨'}
-    };
-  });
-}
-
-// Sky data — planets computed client-side + astrology news + Aurora from NOAA
+// Sky data — planets computed client-side + Aurora from NOAA
 async function fetchSkyData() {
   var events = computeSkyEvents();
   try {
@@ -1698,10 +1889,6 @@ async function fetchSkyData() {
         _live:true, _planet:{emoji:'🌌',name:'Aurora'}
       });
     }
-  } catch(_){}
-  try {
-    var astroArticles = await fetchAstrologyNews();
-    events.push.apply(events, astroArticles);
   } catch(_){}
   return events;
 }
@@ -2433,14 +2620,7 @@ function renderList() {
   if (!evs.length) { list.innerHTML = '<div class="ev-empty">No events match your filters</div>'; return; }
 
   if (currentTab === 'astrology') {
-    list.innerHTML = '<div class="astro-grid">' + evs.map(function(ev){
-      var p = ev._planet || {};
-      var snip = ev.brief ? ev.brief.replace(/\n/g,' ').slice(0,70)+'…' : '';
-      return '<div class="astro-card'+(ev.id===selectedId?' sel':'')+'" id="ev-'+ev.id+'" onclick="selectEvent(\''+ev.id+'\')">' +
-        '<div class="astro-sign">'+(p.name||ev.title)+'</div>' +
-        '<div class="astro-site">'+ev.location+'</div>' +
-        '<div class="astro-snip">'+snip+'</div></div>';
-    }).join('')+'</div>';
+    renderAstrologyTab();
     return;
   }
 
@@ -3703,6 +3883,7 @@ async function init() {
       else { document.getElementById('mode-select').classList.add('open'); }
     }, 700);
   }, 500);
+  loadNatalData();
   initPlanetOrbs();
   initStars();
   computeOrbitPaths();
