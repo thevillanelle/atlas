@@ -167,7 +167,7 @@ select#theme-btn option{background:#070b18;color:var(--text);font-size:12px;lett
   background:radial-gradient(circle,rgba(255,230,100,1) 0%,rgba(255,180,30,.7) 25%,rgba(255,120,0,.25) 55%,transparent 75%);
   filter:blur(4px);mix-blend-mode:screen}
 #planet-orbs{position:fixed;top:0;left:0;pointer-events:none;z-index:140;width:0;height:0}
-.porb{position:absolute;display:none;transform:translate(-50%,-50%);cursor:pointer}
+.porb{position:absolute;display:none;transform:translate(-50%,-50%);cursor:pointer;pointer-events:all}
 .porb-dot{display:block;border-radius:50%;width:calc(var(--pr) * 2);height:calc(var(--pr) * 2);
   background:radial-gradient(circle at 35% 35%, color-mix(in srgb,var(--pc) 60%,#fff), var(--pc) 55%, color-mix(in srgb,var(--pc) 80%,#000));
   box-shadow:0 0 calc(var(--pr) * 3) calc(var(--pr)) var(--pc),0 0 calc(var(--pr) * 8) calc(var(--pr) * 2) color-mix(in srgb,var(--pc) 40%,transparent)}
@@ -1981,6 +1981,7 @@ var PLANET_DATA = {
   Saturn: {dist:'9.58 AU',period:'29.5 yrs',moons:146,radius:'58,232 km',type:'Gas Giant',wiki:'https://en.wikipedia.org/wiki/Saturn',note:'The least dense planet — it would float in water. Its rings span 282,000 km but are only ~10 meters thick. Titan, its largest moon, has liquid methane lakes and a thick nitrogen atmosphere — the only moon with one.'},
   Uranus: {dist:'19.2 AU',period:'84 yrs',moons:28,radius:'25,362 km',type:'Ice Giant',wiki:'https://en.wikipedia.org/wiki/Uranus',note:'Rotates on its side — axial tilt of 98°, likely the result of a massive ancient collision. Its north pole points almost directly at the Sun for 42 years at a time. Coldest planetary atmosphere at -224°C.'},
   Neptune:{dist:'30.1 AU',period:'165 yrs',moons:16,radius:'24,622 km',type:'Ice Giant',wiki:'https://en.wikipedia.org/wiki/Neptune',note:'The windiest planet — supersonic winds reach 2,100 km/h. Its moon Triton orbits backwards and is almost certainly a captured Kuiper Belt object. Neptune was predicted mathematically before it was ever observed.'},
+  Pluto:  {dist:'~39.5 AU',period:'248 yrs',moons:5,radius:'1,188 km',type:'Dwarf Planet',wiki:'https://en.wikipedia.org/wiki/Pluto',note:'Reclassified as a dwarf planet by the IAU in 2006 — a decision Atlas respectfully ignores. Pluto has a heart-shaped nitrogen ice plain called Tombaugh Regio and five moons. Charon is so large relative to Pluto that they orbit a point in space between them. New Horizons flew past in 2015, revealing a surprisingly geologically active world.'},
 };
 var PLANET_DEFS = [
   {name:'Mercury',color:'#c8c8c8',r:4, N0:48.3313, dN:3.24587e-5, i0:7.0047, di:5e-8,   w0:29.1241,  dw:1.01444e-5, a0:0.387098,da:0,        e0:0.205635,de:5.59e-10,  M0:168.6562,dM:4.0923344368},
@@ -1990,6 +1991,7 @@ var PLANET_DEFS = [
   {name:'Saturn', color:'#e8d580',r:8, N0:113.6634,dN:2.38980e-5, i0:2.4886, di:-1.081e-7,w0:339.3939,dw:2.97661e-5, a0:9.55475,  da:0,        e0:0.055546,de:-9.499e-9, M0:316.9670,dM:0.0334442282},
   {name:'Uranus', color:'#7de8e8',r:5, N0:74.0005, dN:1.3978e-5,  i0:0.7733, di:1.9e-8,  w0:96.6612,  dw:3.0565e-5,  a0:19.18171, da:-1.55e-8, e0:0.047318,de:7.45e-9,   M0:142.5905,dM:0.011725806},
   {name:'Neptune',color:'#6688ff',r:5, N0:131.7806,dN:3.0173e-5,  i0:1.7700, di:-2.55e-7, w0:272.8461,dw:-6.027e-6,  a0:30.05826, da:3.313e-8, e0:0.008606,de:2.15e-9,   M0:260.2471,dM:0.005995147},
+  {name:'Pluto',  color:'#c2a27a',r:3, N0:110.3039,dN:1.98169e-5, i0:17.1417,di:1.1e-8,   w0:113.7633, dw:1.71e-5,   a0:39.48168, da:-3.16e-7, e0:0.24883, de:5.1e-10,   M0:14.5300, dM:0.003974},
 ];
 
 function daysSinceJ2000(date) { return date.getTime()/86400000 - 10957.5; }
