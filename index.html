@@ -100,6 +100,40 @@ select#theme-btn option{background:#070b18;color:var(--text);font-size:12px;lett
 .aup-signout:hover{color:var(--text);border-color:var(--border2)}
 .aup-cities-btn{width:100%;padding:8px;background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:8px;color:var(--muted);font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;cursor:pointer;font-family:'Space Mono',monospace;transition:all .2s;margin-bottom:8px}
 .aup-cities-btn:hover{color:var(--text);border-color:var(--border2)}
+/* Profile modal */
+#profile-modal{position:fixed;inset:0;z-index:600;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.72);backdrop-filter:blur(10px)}
+#profile-modal.open{display:flex}
+#profile-card{background:var(--panel);border:1px solid var(--border);border-radius:18px;width:500px;max-height:88vh;overflow-y:auto;box-shadow:0 28px 72px rgba(0,0,0,.6);position:relative}
+.prof-header{padding:28px 28px 22px;border-bottom:1px solid rgba(255,255,255,.05);display:flex;align-items:flex-start;gap:16px}
+.prof-avatar{width:54px;height:54px;border-radius:50%;background:rgba(255,255,255,.08);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:700;color:var(--text);overflow:hidden;flex-shrink:0;letter-spacing:0}
+.prof-avatar img{width:100%;height:100%;object-fit:cover;border-radius:50%}
+.prof-identity{flex:1;min-width:0;padding-top:2px}
+.prof-name{font-size:15px;font-weight:700;color:var(--text);margin-bottom:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.prof-email-txt{font-size:10px;color:var(--muted);letter-spacing:.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-bottom:8px}
+.prof-tier{font-size:9px;font-weight:700;letter-spacing:2px;padding:3px 9px;border-radius:20px;text-transform:uppercase;display:inline-block}
+.prof-tier.free{background:rgba(148,163,184,.1);color:#94a3b8;border:1px solid rgba(148,163,184,.25)}
+.prof-tier.pro{background:rgba(250,204,21,.1);color:#facc15;border:1px solid rgba(250,204,21,.25)}
+.prof-tier.team{background:rgba(192,132,252,.1);color:#c084fc;border:1px solid rgba(192,132,252,.25)}
+.prof-close{position:absolute;top:18px;right:20px;background:none;border:none;color:var(--muted);font-size:20px;cursor:pointer;line-height:1;padding:4px 6px;border-radius:6px;transition:color .15s}
+.prof-close:hover{color:var(--text)}
+.prof-section{padding:20px 28px;border-bottom:1px solid rgba(255,255,255,.04)}
+.prof-section-label{font-size:9px;font-weight:700;letter-spacing:2px;color:var(--muted);text-transform:uppercase;margin-bottom:12px}
+.prof-chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px}
+.prof-chip{font-size:10px;color:var(--text);background:rgba(255,255,255,.06);border:1px solid var(--border);border-radius:20px;padding:4px 11px;letter-spacing:.3px}
+.prof-chip.clickable{cursor:pointer;transition:all .15s}
+.prof-chip.clickable:hover{border-color:var(--accent);color:var(--accent)}
+.prof-empty{font-size:11px;color:var(--muted);font-style:italic;display:block;margin-bottom:10px}
+.prof-anchor-place{font-size:12px;color:var(--text);font-weight:600;margin-bottom:3px}
+.prof-anchor-date{font-size:10px;color:var(--muted);margin-bottom:12px}
+.prof-tl-list{display:flex;flex-direction:column;gap:7px}
+.prof-tl-row{background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:9px;padding:11px 14px;display:flex;align-items:center;gap:10px}
+.prof-tl-title{font-size:11px;color:var(--text);font-weight:600;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.prof-tl-meta{font-size:9px;color:var(--muted);flex-shrink:0}
+.prof-tl-link{font-size:9px;color:var(--accent);text-decoration:none;letter-spacing:1px;flex-shrink:0;font-weight:700}
+.prof-tl-link:hover{text-decoration:underline}
+.prof-footer{padding:16px 28px 24px;display:flex;flex-direction:column;gap:8px}
+.prof-action-btn{width:100%;padding:9px;background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:8px;color:var(--muted);font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;cursor:pointer;font-family:'Space Mono',monospace;transition:all .2s}
+.prof-action-btn:hover{color:var(--text);border-color:var(--border2)}
 #cities-modal{position:fixed;inset:0;background:rgba(0,0,0,.7);backdrop-filter:blur(8px);z-index:600;display:none;align-items:center;justify-content:center}
 #cities-modal.open{display:flex}
 #cities-card{background:var(--panel);border:1px solid var(--border);border-radius:16px;padding:28px;width:360px;box-shadow:0 24px 64px rgba(0,0,0,.5)}
@@ -465,8 +499,44 @@ body.hist-open #panel{top:92px}body.hist-open #detail{top:92px}body.hist-open #l
 <div id="auth-user-panel">
   <div class="aup-name" id="aup-name"></div>
   <div class="aup-email" id="aup-email"></div>
-  <button class="aup-cities-btn" onclick="openCitiesModal()">⊙ Manage Cities</button>
+  <button class="aup-cities-btn" onclick="openProfileModal()">⊙ View Profile</button>
   <button class="aup-signout" onclick="signOut()">Sign Out</button>
+</div>
+
+<!-- Profile modal -->
+<div id="profile-modal" onclick="if(event.target===this)closeProfileModal()">
+  <div id="profile-card">
+    <button class="prof-close" onclick="closeProfileModal()">×</button>
+    <div class="prof-header">
+      <div class="prof-avatar" id="prof-avatar-wrap"></div>
+      <div class="prof-identity">
+        <div class="prof-name" id="prof-name"></div>
+        <div class="prof-email-txt" id="prof-email-txt"></div>
+        <span class="prof-tier free" id="prof-tier">FREE</span>
+      </div>
+    </div>
+    <div class="prof-section">
+      <div class="prof-section-label">Your Cities</div>
+      <div class="prof-chips" id="prof-cities"></div>
+      <button class="prof-action-btn" onclick="closeProfileModal();openCitiesModal()">⊙ Manage Cities</button>
+    </div>
+    <div class="prof-section">
+      <div class="prof-section-label">Watchlist</div>
+      <div class="prof-chips" id="prof-wl"></div>
+      <button class="prof-action-btn" onclick="closeProfileModal();setTab(document.querySelector('[data-tab=watchlist]'));renderList()">View Watchlist →</button>
+    </div>
+    <div class="prof-section">
+      <div class="prof-section-label">Personal Anchor</div>
+      <div id="prof-anchor-content"></div>
+    </div>
+    <div class="prof-section">
+      <div class="prof-section-label">Saved Throughlines</div>
+      <div id="prof-throughlines"><span class="prof-empty">Loading…</span></div>
+    </div>
+    <div class="prof-footer">
+      <button class="prof-action-btn" onclick="closeProfileModal();signOut()">Sign Out</button>
+    </div>
+  </div>
 </div>
 
 <!-- Cities modal -->
@@ -654,6 +724,84 @@ var sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 var currentUser = null;
 
 var authMode = 'signin'; // 'signin' | 'signup'
+
+function openProfileModal() {
+  document.getElementById('auth-user-panel').classList.remove('open');
+  renderProfileModal();
+  document.getElementById('profile-modal').classList.add('open');
+  loadProfileThroughlines();
+}
+
+function closeProfileModal() {
+  document.getElementById('profile-modal').classList.remove('open');
+}
+
+function renderProfileModal() {
+  if (!currentUser) return;
+  var meta = currentUser.user_metadata || {};
+  var name = meta.full_name || meta.name || currentUser.email.split('@')[0];
+  var pic  = meta.avatar_url || meta.picture;
+
+  // Identity
+  document.getElementById('prof-name').textContent = name;
+  document.getElementById('prof-email-txt').textContent = currentUser.email;
+  var avatarWrap = document.getElementById('prof-avatar-wrap');
+  avatarWrap.innerHTML = pic
+    ? '<img src="' + pic + '" alt="">'
+    : name.charAt(0).toUpperCase();
+  var tierEl = document.getElementById('prof-tier');
+  tierEl.textContent = currentUserTier.toUpperCase();
+  tierEl.className = 'prof-tier ' + currentUserTier;
+
+  // Cities
+  var citiesEl = document.getElementById('prof-cities');
+  citiesEl.innerHTML = userCities.length
+    ? userCities.map(function(c) { return '<span class="prof-chip">' + c.name + '</span>'; }).join('')
+    : '<span class="prof-empty">No cities set yet</span>';
+
+  // Watchlist
+  var wlEl = document.getElementById('prof-wl');
+  wlEl.innerHTML = watchTags.length
+    ? watchTags.map(function(t) {
+        return '<span class="prof-chip clickable" onclick="closeProfileModal();watchFilter(\'' + t + '\')">' + t + '</span>';
+      }).join('')
+    : '<span class="prof-empty">No tags being watched</span>';
+
+  // Anchor
+  var anchorEl = document.getElementById('prof-anchor-content');
+  if (anchorData) {
+    var d = new Date(anchorData.birthDate + '-02'); // +02 avoids UTC rollback to prev month
+    var mon = d.toLocaleString('default', { month: 'long', year: 'numeric' });
+    anchorEl.innerHTML =
+      '<div class="prof-anchor-place">' + anchorData.birthPlace + '</div>' +
+      '<div class="prof-anchor-date">' + mon + '</div>';
+  } else {
+    anchorEl.innerHTML = '<span class="prof-empty">No anchor set — available on Pro &amp; Team</span>';
+  }
+}
+
+async function loadProfileThroughlines() {
+  var el = document.getElementById('prof-throughlines');
+  if (!currentUser) { el.innerHTML = '<span class="prof-empty">Sign in to view saved throughlines</span>'; return; }
+  var res = await sb.from('throughlines')
+    .select('id,title,event_count,slug,created_at')
+    .eq('user_id', currentUser.id)
+    .order('created_at', { ascending: false })
+    .limit(10);
+  var data = res.data;
+  if (!data || !data.length) {
+    el.innerHTML = '<span class="prof-empty">No throughlines saved yet — connect events and save them as a String</span>';
+    return;
+  }
+  el.innerHTML = '<div class="prof-tl-list">' + data.map(function(tl) {
+    var link = window.location.origin + '/?s=' + tl.slug;
+    return '<div class="prof-tl-row">' +
+      '<span class="prof-tl-title">' + tl.title + '</span>' +
+      '<span class="prof-tl-meta">' + tl.event_count + ' events</span>' +
+      '<a class="prof-tl-link" href="' + link + '" target="_blank">SHARE →</a>' +
+      '</div>';
+  }).join('') + '</div>';
+}
 
 function toggleAuthMode() {
   authMode = authMode === 'signin' ? 'signup' : 'signin';
