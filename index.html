@@ -399,6 +399,8 @@ body.hist-open #panel{top:92px}body.hist-open #detail{top:92px}body.hist-open #l
       <div class="ms-feed-cell" onclick="selectMode('science')"><div class="ms-dot" id="msdot-science" style="background:#22d3ee;--dc:#22d3ee"></div><div class="ms-cell-name">Science</div><div class="ms-cell-desc">Research, climate, biology, space science</div></div>
       <div class="ms-feed-cell" onclick="selectMode('fashion')"><div class="ms-dot" id="msdot-fashion" style="background:#f472b6;--dc:#f472b6"></div><div class="ms-cell-name">Fashion</div><div class="ms-cell-desc">Runway, luxury, global style</div></div>
       <div class="ms-feed-cell" onclick="selectMode('culture')"><div class="ms-dot" id="msdot-culture" style="background:#fb7185;--dc:#fb7185"></div><div class="ms-cell-name">Culture</div><div class="ms-cell-desc">Film, music, books, arts, theater</div></div>
+      <div class="ms-feed-cell" onclick="selectMode('party')"><div class="ms-dot" id="msdot-party" style="background:#e879f9;--dc:#e879f9"></div><div class="ms-cell-name">Party</div><div class="ms-cell-desc">Nightlife, dining, hospitality, events</div></div>
+      <div class="ms-feed-cell" onclick="selectMode('fraud')"><div class="ms-dot" id="msdot-fraud" style="background:#dc2626;--dc:#dc2626"></div><div class="ms-cell-name">Fraud</div><div class="ms-cell-desc">Scams, corruption, white collar crime, cults</div></div>
       <div class="ms-feed-cell" onclick="selectMode('astrology')"><div class="ms-dot" id="msdot-astrology" style="background:#c084fc;--dc:#c084fc"></div><div class="ms-cell-name">Astrology</div><div class="ms-cell-desc">Planetary placements, celestial events</div></div>
       <div class="ms-feed-cell" onclick="selectMode('astronomy')"><div class="ms-dot" id="msdot-astronomy" style="background:#38bdf8;--dc:#38bdf8"></div><div class="ms-cell-name">Astronomy</div><div class="ms-cell-desc">Space news pinned to planets</div></div>
       <div class="ms-feed-cell" onclick="selectMode('conflict')"><div class="ms-dot" id="msdot-conflict" style="background:#f97316;--dc:#f97316"></div><div class="ms-cell-name">Conflicts</div><div class="ms-cell-desc">Wars, attacks, military movements</div></div>
@@ -586,6 +588,8 @@ body.hist-open #panel{top:92px}body.hist-open #detail{top:92px}body.hist-open #l
     <div class="tab"    data-tab="science"      onclick="setTab(this)">Science</div>
     <div class="tab"    data-tab="fashion"      onclick="setTab(this)">Fashion</div>
     <div class="tab"    data-tab="culture"      onclick="setTab(this)">Culture</div>
+    <div class="tab"    data-tab="party"        onclick="setTab(this)">Party</div>
+    <div class="tab"    data-tab="fraud"        onclick="setTab(this)">Fraud</div>
     <div class="tab"    data-tab="astrology"    onclick="setTab(this)">Astrology</div>
     <div class="tab"    data-tab="astronomy"    onclick="setTab(this)">Astronomy</div>
     <div class="tab"    data-tab="conflict"     onclick="setTab(this)">Conflicts</div>
@@ -871,12 +875,14 @@ var COLORS = {
   news:'#ef4444',conflict:'#f97316',disaster:'#eab308',storm:'#60a5fa',
   humanitarian:'#ec4899',flight:'#10b981',launch:'#a78bfa',
   tech:'#06b6d4',fashion:'#f472b6',astrology:'#c084fc',astronomy:'#38bdf8',connection:'#f59e0b',history:'#a3e635',
-  money:'#34d399',world:'#818cf8',nyc:'#fb923c',usnews:'#94a3b8',science:'#22d3ee',culture:'#fb7185',anchor:'#ef4444'
+  money:'#34d399',world:'#818cf8',nyc:'#fb923c',usnews:'#94a3b8',science:'#22d3ee',culture:'#fb7185',
+  party:'#e879f9',fraud:'#dc2626',anchor:'#ef4444'
 };
 var ICONS = {
   news:'📰',conflict:'⚔️',disaster:'🌊',storm:'🌀',humanitarian:'🏥',
   flight:'✈️',launch:'🚀',tech:'💻',fashion:'👗',astrology:'✨',astronomy:'🔭',connection:'🔗',history:'🕰️',
-  money:'💰',world:'🌐',nyc:'🗽',usnews:'🇺🇸',science:'🔬',culture:'🎭',anchor:'⊕'
+  money:'💰',world:'🌐',nyc:'🗽',usnews:'🇺🇸',science:'🔬',culture:'🎭',
+  party:'🪩',fraud:'🕵️',anchor:'⊕'
 };
 var DAY_IMG   = '//unpkg.com/three-globe/example/img/earth-day.jpg';
 var NIGHT_IMG = '//unpkg.com/three-globe/example/img/earth-night.jpg';
@@ -987,7 +993,7 @@ var selectedId = null;
 var panelOpen = true;
 var watchTags = ['Gaza','Ukraine','AI','Markets','Fashion','Climate'];
 var userCities = [{name:'New York City', lat:40.7128, lng:-74.006}];
-var layerVis = {news:true,conflict:true,disaster:true,storm:true,humanitarian:true,flight:true,launch:true,tech:true,fashion:true,astrology:true,astronomy:true,connection:true,history:false,money:true,world:true,nyc:true,usnews:true,science:true,culture:true};
+var layerVis = {news:true,conflict:true,disaster:true,storm:true,humanitarian:true,flight:true,launch:true,tech:true,fashion:true,astrology:true,astronomy:true,connection:true,history:false,money:true,world:true,nyc:true,usnews:true,science:true,culture:true,party:true,fraud:true};
 var globe;
 var themeMode = 0; // 0=NIGHT 1=DAY 2=IRL
 var dayMode = false; // kept for compat — true when themeMode===1
@@ -1646,6 +1652,30 @@ async function fetchCultureNews() {
     fetchGuardian('film', null, 'culture', 8),
     fetchGuardian('music', null, 'culture', 8),
     fetchGuardian('stage', null, 'culture', 6)
+  ]);
+  var all = [];
+  results.forEach(function(r){if (r.status==='fulfilled') all.push.apply(all, r.value);});
+  return dedupeByTitle(all).slice(0, 30);
+}
+
+async function fetchPartyNews() {
+  var results = await Promise.allSettled([
+    fetchGuardian('food', null, 'party', 12),
+    fetchGuardian('lifeandstyle', 'nightlife OR restaurant OR cocktail OR bar OR club OR dining', 'party', 10),
+    fetchGuardian('travel', 'hotel OR resort OR luxury OR destination OR hospitality', 'party', 10),
+    fetchGuardian('lifeandstyle', 'festival OR event OR venue OR "music festival" OR pop-up', 'party', 8)
+  ]);
+  var all = [];
+  results.forEach(function(r){if (r.status==='fulfilled') all.push.apply(all, r.value);});
+  return dedupeByTitle(all).slice(0, 30);
+}
+
+async function fetchFraudNews() {
+  var results = await Promise.allSettled([
+    fetchGuardian('business', 'fraud OR scam OR corruption OR "white collar" OR embezzlement OR bribery', 'fraud', 12),
+    fetchGuardian('world', 'fraud OR scam OR corruption OR cult OR conspiracy', 'fraud', 10),
+    fetchGuardian('money', 'fraud OR "ponzi scheme" OR "financial crime" OR "securities fraud" OR "insider trading"', 'fraud', 10),
+    fetchGuardian('us-news', 'fraud OR scam OR corruption OR indictment OR prosecution OR "white collar"', 'fraud', 8)
   ]);
   var all = [];
   results.forEach(function(r){if (r.status==='fulfilled') all.push.apply(all, r.value);});
@@ -2447,7 +2477,7 @@ function toggleLayer(el){
   // History and flight stay as simple toggles
   if(l==='history'||l==='flight'){layerVis[l]=!layerVis[l];el.classList.toggle('off',!layerVis[l]);refreshGlobe();return;}
   // All other layers: isolate on click, reset to all-on if already isolated
-  var contentLayers=['news','world','usnews','nyc','money','conflict','disaster','storm','humanitarian','tech','fashion','astrology','astronomy','launch','connection','science','culture'];
+  var contentLayers=['news','world','usnews','nyc','money','conflict','disaster','storm','humanitarian','tech','fashion','astrology','astronomy','launch','connection','science','culture','party','fraud'];
   var activeCount=contentLayers.filter(function(k){return layerVis[k];}).length;
   if(layerVis[l]&&activeCount===1){
     // Already isolated — reset all on
@@ -3370,7 +3400,7 @@ async function loadLiveData() {
   ]);
 
   splash(55, 'Money · Local · US · Science feeds…');
-  var phase3 = await Promise.allSettled([fetchMoneyNews(), fetchWorldNews(), fetchLocalNews(userCities), fetchUSNews(), fetchScienceNews(), fetchCultureNews()]);
+  var phase3 = await Promise.allSettled([fetchMoneyNews(), fetchWorldNews(), fetchLocalNews(userCities), fetchUSNews(), fetchScienceNews(), fetchCultureNews(), fetchPartyNews(), fetchFraudNews()]);
 
   splash(72, 'Sky data + Astronomy + Markets…');
   var phase4 = await Promise.allSettled([fetchSkyData(), fetchAstronomyNews()]);
@@ -3378,7 +3408,7 @@ async function loadLiveData() {
 
   var usgs     = phase1[0], launches = phase1[1];
   var newsR    = phase2[0], conflR   = phase2[1], stormR = phase2[2], hnR = phase2[3], fashR = phase2[4];
-  var moneyR   = phase3[0], worldR   = phase3[1], nycR   = phase3[2], usR  = phase3[3], sciR = phase3[4], cultR = phase3[5];
+  var moneyR   = phase3[0], worldR   = phase3[1], nycR   = phase3[2], usR  = phase3[3], sciR = phase3[4], cultR = phase3[5], partyR = phase3[6], fraudR = phase3[7];
   var skyR     = phase4[0], astroNewsR = phase4[1];
 
   var disasters   = dedupeByTitle(usgs.status==='fulfilled' ? usgs.value : []).slice(0,30);
@@ -3393,13 +3423,15 @@ async function loadLiveData() {
   var usEvs       = usR.status==='fulfilled' ? usR.value : [];
   var sciEvs      = sciR.status==='fulfilled' ? sciR.value : [];
   var cultEvs     = cultR.status==='fulfilled' ? cultR.value : [];
+  var partyEvs    = partyR.status==='fulfilled' ? partyR.value : [];
+  var fraudEvs    = fraudR.status==='fulfilled' ? fraudR.value : [];
   var astroEvs    = skyR.status==='fulfilled' ? skyR.value : computeSkyEvents();
   var astronomyEvs = astroNewsR.status==='fulfilled' ? astroNewsR.value : [];
   var launchEvs   = launches.status==='fulfilled' ? launches.value : FALLBACK_LAUNCHES;
 
   var connectionEvs = [].concat(CHOKEPOINTS, ECONOMIC_STRESS, POLITICAL_FLASH);
   allEvents = [].concat(newsEvs, conflicts, disasters, storms, SEEDS.humanitarian,
-    techEvs, fashionEvs, moneyEvs, worldEvs, nycEvs, usEvs, sciEvs, cultEvs,
+    techEvs, fashionEvs, moneyEvs, worldEvs, nycEvs, usEvs, sciEvs, cultEvs, partyEvs, fraudEvs,
     astroEvs, astronomyEvs, launchEvs, connectionEvs);
   setLayerStatus('connection','on');
 
@@ -3418,6 +3450,8 @@ async function loadLiveData() {
   setLayerStatus('launch',      launches.status==='fulfilled'?'on':'fb');
   setLayerStatus('science',     sciR.status==='fulfilled'&&sciR.value.length?'on':'fb');
   setLayerStatus('culture',     cultR.status==='fulfilled'&&cultR.value.length?'on':'fb');
+  setLayerStatus('party',       partyR.status==='fulfilled'&&partyR.value.length?'on':'fb');
+  setLayerStatus('fraud',       fraudR.status==='fulfilled'&&fraudR.value.length?'on':'fb');
   setLayerStatus('humanitarian','fb');
   setLayerStatus('flight',      'fb');
 }
@@ -3447,6 +3481,8 @@ async function checkAPIs() {
     { id: 'fashion',   url: 'https://content.guardianapis.com/search?api-key=test&page-size=1&section=fashion&format=json' },
     { id: 'conflict',  url: 'https://content.guardianapis.com/search?api-key=test&page-size=1&q=conflict&format=json' },
     { id: 'storm',     url: 'https://content.guardianapis.com/search?api-key=test&page-size=1&section=environment&format=json' },
+    { id: 'party',     url: 'https://content.guardianapis.com/search?api-key=test&page-size=1&section=food&format=json' },
+    { id: 'fraud',     url: 'https://content.guardianapis.com/search?api-key=test&page-size=1&q=fraud+OR+scam+OR+corruption&format=json' },
   ];
 
   // Always-on: static/computed — light immediately
