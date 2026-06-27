@@ -1148,8 +1148,11 @@ function getNightPolygon(date) {
 
 function updateTerminator() {
   if (typeof globe === 'undefined') return;
-  if (themeMode === 2) { updateIRLTexture(); }
-  globe.polygonsData([]);
+  if (themeMode === 2) {
+    globe.polygonsData(getNightPolygon(new Date()));
+  } else {
+    globe.polygonsData([]);
+  }
 }
 
 function moonPhaseName(date) {
@@ -1694,7 +1697,7 @@ function initGlobe() {
     .arcDashAnimateTime(1800).arcStroke(function(d){return d.w;}).arcAltitude(0.18);
   globe.polygonsData([])
     .polygonGeoJsonGeometry(function(d){return d.geo;})
-    .polygonCapColor(function(){return 'rgba(0,4,28,0.42)';})
+    .polygonCapColor(function(){return 'rgba(0,4,30,0.72)';})
     .polygonSideColor(function(){return 'rgba(0,0,0,0)';})
     .polygonStrokeColor(function(){return 'rgba(99,140,255,0.18)';})
     .polygonAltitude(0.001);
@@ -2401,18 +2404,10 @@ function applyThemeMode() {
     globe.polygonsData([]);
     tickSunOrb();
   } else {
-    globe.atmosphereColor('#5bb8ff').atmosphereAltitude(0.22);
-    globe.polygonsData([]);
-    loadIRLImages().then(function() {
-      updateIRLTexture();
-      tickSunOrb();
-    }).catch(function() {
-      themeMode = 0; dayMode = false; irlMode = false;
-      document.getElementById('theme-btn').value = 0;
-      globe.globeImageUrl(NIGHT_IMG).atmosphereColor('#1e3a8a').atmosphereAltitude(0.14);
-      globe.polygonsData([]);
-      tickSunOrb();
-    });
+    if (irlBlobUrl) { URL.revokeObjectURL(irlBlobUrl); irlBlobUrl = null; }
+    globe.globeImageUrl(DAY_IMG).atmosphereColor('#5bb8ff').atmosphereAltitude(0.22);
+    updateTerminator();
+    tickSunOrb();
   }
 }
 function setTheme(val) {
