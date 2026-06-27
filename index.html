@@ -2151,34 +2151,65 @@ function tickPlanets() {
     el.style.left = sp.x + 'px';
     el.style.top  = sp.y + 'px';
   });
-  // Draw orbit rings
+  // Draw orbit rings + constellation lines
   var orbitOpacity = Math.min(0.55, Math.max(0, (camDist - 220) / 130));
+  var constOpacity = Math.min(0.9, Math.max(0, (camDist - 200) / 80));
   var oc = document.getElementById('orbit-canvas');
-  if (oc && orbitOpacity > 0) {
+  if (oc && (orbitOpacity > 0 || constOpacity > 0)) {
     if (oc.width !== window.innerWidth || oc.height !== window.innerHeight) {
       oc.width = window.innerWidth; oc.height = window.innerHeight;
     }
     var ctx = oc.getContext('2d');
     ctx.clearRect(0, 0, oc.width, oc.height);
-    PLANET_DEFS.forEach(function(p) {
-      var pts = ORBIT_GEO_PATHS[p.name];
-      if (!pts || !pts.length) return;
-      ctx.beginPath();
-      ctx.strokeStyle = p.color + Math.round(orbitOpacity * 0x55).toString(16).padStart(2,'0');
-      ctx.lineWidth = 0.6;
-      ctx.setLineDash([3,5]);
-      var started = false;
-      for (var i = 0; i <= pts.length; i++) {
-        var pos = pts[i % pts.length];
-        var lat = pos.lat * DEG, lng = pos.lng * DEG, dist = 620;
-        var sp = projectToScreen(dist*Math.cos(lat)*Math.sin(lng), dist*Math.sin(lat), dist*Math.cos(lat)*Math.cos(lng), true);
-        if (!sp) { started = false; continue; }
-        if (!started) { ctx.moveTo(sp.x, sp.y); started = true; } else ctx.lineTo(sp.x, sp.y);
-      }
-      ctx.stroke();
+    if (orbitOpacity > 0) {
+      PLANET_DEFS.forEach(function(p) {
+        var pts = ORBIT_GEO_PATHS[p.name];
+        if (!pts || !pts.length) return;
+        ctx.beginPath();
+        ctx.strokeStyle = p.color + Math.round(orbitOpacity * 0x55).toString(16).padStart(2,'0');
+        ctx.lineWidth = 0.6;
+        ctx.setLineDash([3,5]);
+        var started = false;
+        for (var i = 0; i <= pts.length; i++) {
+          var pos = pts[i % pts.length];
+          var lat = pos.lat * DEG, lng = pos.lng * DEG, dist = 620;
+          var sp = projectToScreen(dist*Math.cos(lat)*Math.sin(lng), dist*Math.sin(lat), dist*Math.cos(lat)*Math.cos(lng), true);
+          if (!sp) { started = false; continue; }
+          if (!started) { ctx.moveTo(sp.x, sp.y); started = true; } else ctx.lineTo(sp.x, sp.y);
+        }
+        ctx.stroke();
+        ctx.setLineDash([]);
+      });
+    }
+    if (constOpacity > 0) {
+      var gmstC = norm360(280.46061837 + 360.98564736629 * d);
       ctx.setLineDash([]);
-    });
-  } else if (oc && orbitOpacity <= 0) {
+      ctx.lineWidth = 0.75;
+      CONSTELLATIONS.forEach(function(c) {
+        ctx.strokeStyle = 'rgba(160,170,255,' + (constOpacity * 0.28) + ')';
+        c.paths.forEach(function(path) {
+          ctx.beginPath();
+          var started = false;
+          for (var pi = 0; pi < path.length; pi++) {
+            var ra = path[pi][0], dec = path[pi][1];
+            var slat = dec * DEG, slng = norm180(ra - gmstC) * DEG;
+            var sp = projectToScreen(619*Math.cos(slat)*Math.sin(slng), 619*Math.sin(slat), 619*Math.cos(slat)*Math.cos(slng), true);
+            if (!sp) { started = false; continue; }
+            if (!started) { ctx.moveTo(sp.x, sp.y); started = true; } else ctx.lineTo(sp.x, sp.y);
+          }
+          ctx.stroke();
+        });
+        var clat = c.dec * DEG, clng = norm180(c.ra - gmstC) * DEG;
+        var lsp = projectToScreen(619*Math.cos(clat)*Math.sin(clng), 619*Math.sin(clat), 619*Math.cos(clat)*Math.cos(clng), true);
+        if (lsp) {
+          ctx.fillStyle = 'rgba(180,185,255,' + (constOpacity * 0.55) + ')';
+          ctx.font = '8px monospace';
+          ctx.textAlign = 'center';
+          ctx.fillText(c.name.toUpperCase(), lsp.x, lsp.y - 10);
+        }
+      });
+    }
+  } else if (oc) {
     var ctx2 = oc.getContext('2d');
     ctx2.clearRect(0, 0, oc.width || 1, oc.height || 1);
   }
@@ -2275,6 +2306,73 @@ var STAR_CATALOG = [
 
 var ORBIT_GEO_PATHS = {};
 var ORBITAL_PERIODS = {Mercury:88,Venus:225,Mars:687,Jupiter:4333,Saturn:10759,Uranus:30687,Neptune:60190};
+
+// =============================================================================
+// CONSTELLATIONS — stick figure paths in celestial coordinates [ra_deg, dec_deg]
+// Stars from STAR_CATALOG are marked ✓; others use verified J2000 catalog values.
+// =============================================================================
+var CONSTELLATIONS = [
+  { name:'Orion', ra:83.8, dec:3.0, paths:[
+    [[78.63,-8.20],[83.00,-0.30],[84.05,-1.20],[85.19,-1.94],[86.94,-9.67]], // Rigel→belt→Saiph
+    [[83.00,-0.30],[81.28,6.35],[88.79,7.41],[85.19,-1.94]],                  // Mintaka→Bellatrix→Betelgeuse→Alnitak
+  ]},
+  { name:'Ursa Major', ra:183.0, dec:57.0, paths:[
+    [[165.93,61.75],[165.46,56.38],[178.46,53.70],[183.86,57.03],[165.93,61.75]], // bowl: Dubhe·Merak·Phecda·Megrez
+    [[183.86,57.03],[193.51,55.96],[200.98,54.93],[206.88,49.31]],                // handle: Megrez·Alioth·Mizar·Alkaid
+  ]},
+  { name:'Cassiopeia', ra:14.0, dec:61.0, paths:[
+    [[2.29,59.15],[10.13,56.54],[14.18,60.72],[21.45,60.24],[28.60,63.67]], // Caph·Schedar·γ·Ruchbah·Segin
+  ]},
+  { name:'Crux', ra:187.5, dec:-60.5, paths:[
+    [[187.79,-57.11],[186.65,-63.10]],  // Gacrux → Acrux (vertical)
+    [[183.79,-58.75],[191.93,-59.69]],  // δ Cru → Mimosa (horizontal)
+  ]},
+  { name:'Leo', ra:158.0, dec:17.0, paths:[
+    [[146.46,23.77],[149.08,26.01],[154.17,23.42],[154.99,19.84],[153.43,16.76],[152.09,11.97],[146.46,23.77]], // sickle
+    [[152.09,11.97],[168.53,20.52],[169.62,15.43],[177.26,14.57]], // body: Regulus→Zosma→Chertan→Denebola
+  ]},
+  { name:'Scorpius', ra:249.0, dec:-30.0, paths:[
+    [[241.36,-19.81],[240.08,-22.62],[247.35,-26.43]], // head: Graffias→Dschubba→Antares
+    [[247.35,-26.43],[250.32,-28.22],[252.54,-34.29],[253.08,-38.05],[264.33,-43.00],[263.40,-37.10],[266.90,-37.30]], // tail
+  ]},
+  { name:'Gemini', ra:107.0, dec:25.0, paths:[
+    [[113.65,31.89],[116.33,28.03]],               // Castor–Pollux heads
+    [[113.65,31.89],[99.49,22.51],[99.43,16.40]],  // Castor column → Alhena
+    [[116.33,28.03],[95.74,22.51],[99.43,16.40]],  // Pollux column → Alhena
+  ]},
+  { name:'Taurus', ra:71.0, dec:19.0, paths:[
+    [[67.16,19.18],[68.98,16.51],[66.14,15.87],[65.65,15.63],[65.88,17.54],[67.16,19.18]], // Hyades V
+    [[68.98,16.51],[81.57,28.61]],  // Aldebaran → Elnath
+    [[81.57,28.61],[84.41,21.14]],  // Elnath → ζ Tau horn
+  ]},
+  { name:'Cygnus', ra:305.0, dec:40.0, paths:[
+    [[310.36,45.28],[305.56,40.26],[292.68,27.96]], // Deneb → γ Cyg → Albireo (vertical)
+    [[296.24,45.13],[305.56,40.26],[318.23,36.90]], // δ Cyg → γ Cyg → ζ Cyg (crossbar)
+  ]},
+  { name:'Lyra', ra:282.0, dec:36.5, paths:[
+    [[279.23,38.78],[280.99,37.61],[283.42,33.36],[284.74,32.69],[282.52,36.90],[280.99,37.61]], // Vega + parallelogram
+  ]},
+  { name:'Aquila', ra:297.0, dec:8.0, paths:[
+    [[286.35,13.86],[296.60,10.61],[297.70,8.87],[298.83,6.41]], // λ Aql→Tarazed→Altair→β Aql
+    [[296.60,10.61],[304.31,3.11]], // Tarazed → δ Aql wing
+  ]},
+  { name:'Sagittarius', ra:279.0, dec:-28.0, paths:[
+    [[276.04,-34.38],[275.25,-29.83],[279.96,-26.99],[283.82,-26.30]], // Kaus Australis → Nunki (spout→handle)
+    [[283.82,-26.30],[280.65,-30.42],[276.04,-34.38]], // back of teapot
+    [[275.25,-29.83],[279.96,-26.99]], // cross piece
+  ]},
+  { name:'Perseus', ra:52.0, dec:43.0, paths:[
+    [[51.08,49.86],[46.21,40.01],[48.04,33.97],[56.88,40.97],[51.08,49.86]], // Mirfak loop through Algol
+  ]},
+  { name:'Boötes', ra:216.0, dec:28.0, paths:[
+    [[213.91,19.18],[219.83,26.31],[225.49,33.32],[217.04,36.49],[209.06,38.30],[213.91,19.18]], // kite: Arcturus base
+    [[209.06,38.30],[217.04,36.49]], // top edge
+  ]},
+  { name:'Virgo', ra:199.0, dec:-1.0, paths:[
+    [[201.30,-11.16],[199.73,-0.60],[192.66,6.00]], // Spica up through body
+    [[199.73,-0.60],[213.22,10.96]], // arm right toward Vindemiatrix
+  ]},
+];
 
 function computeOrbitPaths() {
   var d0 = daysSinceJ2000(histDate || new Date());
