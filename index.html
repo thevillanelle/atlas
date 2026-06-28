@@ -1041,9 +1041,7 @@ async function lookupCity() {
       _pendingGeo = null;
     } else {
       _pendingGeo = geo;
-      // Build a clean short name from the geocode display
-      var shortName = input.charAt(0).toUpperCase() + input.slice(1);
-      _pendingGeo.name = shortName;
+      var shortName = geo.display.split(',')[0].trim();
       _pendingCities.push({name: shortName, lat: geo.lat, lng: geo.lng});
       document.getElementById('city-input').value = '';
       resolvedEl.textContent = '';
