@@ -449,7 +449,6 @@ body.hist-open #panel{top:92px}body.hist-open #detail{top:92px}body.hist-open #l
 @media(max-width:767px){
   .t-summary{display:none}
   #t-clock{display:none}
-  #solar-btn,#solar-sep{display:none}
   #detail{top:auto;bottom:36px;left:0;right:0;width:100%;max-height:70vh;border-left:none;border-top:1px solid var(--border);transform:translateY(110%)}
   #detail.open{transform:translateY(0)}
   body.hist-open #detail{top:auto}
@@ -519,8 +518,6 @@ body.hist-open #panel{top:92px}body.hist-open #detail{top:92px}body.hist-open #l
   <div class="t-sep"></div>
   <div class="t-summary" id="t-summary">Loading intelligence feed…</div>
   <div class="t-spacer"></div>
-  <button class="t-btn" id="solar-btn" onclick="snapToSolar()">☀ SOLAR</button>
-  <div class="t-sep" id="solar-sep"></div>
   <button class="t-btn" id="hist-btn" onclick="toggleHistBar()">⏱ HISTORY</button>
   <div class="t-sep"></div>
   <button class="t-btn" id="connect-btn" onclick="toggleConnect()">⟷ CONNECT</button>
@@ -2995,6 +2992,7 @@ function applyThemeMode() {
     globe.globeImageUrl(DAY_IMG).atmosphereColor('#5bb8ff').atmosphereAltitude(0.22);
     updateTerminator();
     tickSunOrb();
+    snapToSolar();
   }
 }
 function setTheme(val) {
