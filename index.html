@@ -408,6 +408,7 @@ body.hist-open #panel{top:92px}body.hist-open #detail{top:92px}body.hist-open #l
 .anc-lookup:hover{background:rgba(239,68,68,.22);border-color:rgba(239,68,68,.5)}
 .anc-lookup:disabled{opacity:.4;cursor:not-allowed}
 .anc-resolved{font-size:9px;color:#a3e635;font-family:'Space Mono',monospace;letter-spacing:1px;min-height:14px;margin-bottom:12px}
+.anc-opt{font-size:7.5px;opacity:.55;text-transform:none;letter-spacing:0;font-weight:400}
 .anc-err{font-size:9px;color:#f87171;font-family:'Space Mono',monospace;min-height:14px;margin-bottom:10px}
 .anc-btns{display:flex;gap:8px;margin-top:4px}
 #anc-save{flex:1;padding:11px;background:#ef4444;border:none;border-radius:8px;color:#000;font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;cursor:pointer;font-family:'Space Mono',monospace;transition:opacity .2s}
@@ -652,26 +653,23 @@ body.hist-open #panel{top:92px}body.hist-open #detail{top:92px}body.hist-open #l
 <div id="anchor-modal" onclick="if(event.target===this)closeAnchorModal()">
   <div id="anchor-card">
     <div class="anc-logo">⊕ Personal Anchor</div>
-    <div class="anc-sub">Where and when were you born?</div>
+    <div class="anc-sub">Pin a location — and a moment in time</div>
     <div id="anc-form">
-      <div class="anc-label">Birth month &amp; year</div>
-      <div class="anc-row">
-        <select id="anc-month" class="anc-select">
-          <option value="1">January</option><option value="2">February</option>
-          <option value="3">March</option><option value="4">April</option>
-          <option value="5">May</option><option value="6">June</option>
-          <option value="7">July</option><option value="8">August</option>
-          <option value="9">September</option><option value="10">October</option>
-          <option value="11">November</option><option value="12">December</option>
-        </select>
-        <input id="anc-year" class="anc-select" type="number" min="1900" max="2025" placeholder="Year" style="width:80px;flex:none">
+      <div class="anc-label">Name <span style="color:var(--text)">*</span></div>
+      <div style="margin-bottom:16px">
+        <input id="anc-title" class="anc-geo-input" type="text" placeholder="e.g. My birthplace, Apollo 11 launch, Treaty of Paris" style="width:100%;box-sizing:border-box">
       </div>
-      <div class="anc-label">Birthplace</div>
+      <div class="anc-label">Location <span style="color:var(--text)">*</span></div>
       <div class="anc-geo-row">
         <input id="anc-city" class="anc-geo-input" type="text" placeholder="City, Country" onkeydown="if(event.key==='Enter')lookupAnchorGeo()">
         <button id="anc-lookup" class="anc-lookup" onclick="lookupAnchorGeo()">LOOK UP</button>
       </div>
       <div class="anc-resolved" id="anc-resolved"></div>
+      <div class="anc-label" style="margin-top:8px">Date &amp; time <span class="anc-opt">(optional — enables historical event overlay)</span></div>
+      <div class="anc-row">
+        <input id="anc-date" class="anc-select" type="date" min="0100-01-01" max="2100-12-31">
+        <input id="anc-time" class="anc-select" type="time" style="width:110px;flex:none">
+      </div>
       <div class="anc-err" id="anc-err"></div>
       <div class="anc-btns">
         <button id="anc-save" onclick="submitAnchor()">DROP ANCHOR</button>
@@ -680,7 +678,7 @@ body.hist-open #panel{top:92px}body.hist-open #detail{top:92px}body.hist-open #l
     </div>
     <div id="anc-upsell" class="anc-upsell" style="display:none">
       <strong>Personal Anchor is a Pro feature.</strong><br>
-      Upgrade to drop your birthdate on the globe and see every concurrent event in history drawn back to you.
+      Upgrade to drop any location and moment on the globe and trace historical throughlines back to it.
     </div>
   </div>
 </div>
@@ -862,11 +860,15 @@ function renderProfileModal() {
   // Anchor
   var anchorEl = document.getElementById('prof-anchor-content');
   if (anchorData) {
-    var d = new Date(anchorData.birthDate + '-02'); // +02 avoids UTC rollback to prev month
-    var mon = d.toLocaleString('default', { month: 'long', year: 'numeric' });
+    var dateStr = '';
+    if (anchorData.date) {
+      var d = new Date(anchorData.date + 'T12:00:00');
+      dateStr = d.toLocaleDateString('en-US', {year:'numeric', month:'long', day:'numeric'});
+      if (anchorData.time) dateStr += ' · ' + anchorData.time;
+    }
     anchorEl.innerHTML =
-      '<div class="prof-anchor-place">' + anchorData.birthPlace + '</div>' +
-      '<div class="prof-anchor-date">' + mon + '</div>';
+      '<div class="prof-anchor-place">' + (anchorData.title || anchorData.place) + '</div>' +
+      '<div class="prof-anchor-date">' + anchorData.place + (dateStr ? ' · ' + dateStr : '') + '</div>';
   } else {
     anchorEl.innerHTML = '<span class="prof-empty">No anchor set — available on Pro &amp; Team</span>';
   }
@@ -1256,8 +1258,8 @@ var activeEngine = 'guardian';
 var engineCache = {};
 var histEvents = [];
 var histDate = null; // set when history mode is active — planets render at this date
-var anchorData = null;       // {birthDate, birthPlace, lat, lng} — null until saved
-var anchorEvents = [];       // historical Wikipedia events for birth month/year
+var anchorData = null;       // {title, place, lat, lng, date?, time?} — null until saved
+var anchorEvents = [];       // historical Wikipedia events for anchor date (if set)
 var anchorActive = false;
 var anchorGeoResolved = null; // {lat, lng, display} from Nominatim
 var currentUserTier = 'free';
@@ -3980,8 +3982,8 @@ function clearStringView() {
 // PERSONAL ANCHOR
 // =============================================================================
 function anchorPinEvent() {
-  return {id:'__anchor__',type:'anchor',title:'⊕ '+anchorData.birthPlace,
-    location:anchorData.birthPlace,lat:anchorData.lat,lng:anchorData.lng,severity:5,_live:false};
+  return {id:'__anchor__',type:'anchor',title:'⊕ '+(anchorData.title||anchorData.place),
+    location:anchorData.place,lat:anchorData.lat,lng:anchorData.lng,severity:5,_live:false};
 }
 
 async function fetchUserTier(userId) {
@@ -4007,19 +4009,29 @@ function updateAnchorBtn() {
 async function loadAnchorFromDB(userId) {
   var { data } = await sb.from('user_anchors').select('*').eq('user_id', userId).single();
   if (!data) { updateAnchorBtnVisibility(); return; }
-  anchorData = {birthDate:data.birth_date, birthPlace:data.birth_place, lat:data.birth_lat, lng:data.birth_lng};
+  anchorData = {
+    title: data.anchor_title || data.birth_place,
+    place: data.birth_place,
+    lat: data.birth_lat,
+    lng: data.birth_lng,
+    date: data.birth_date || null,
+    time: data.anchor_time || null
+  };
   await activateAnchor();
   updateAnchorBtnVisibility();
 }
 
 async function activateAnchor() {
   if (!anchorData) return;
-  var parts = anchorData.birthDate.split('-');
-  var month = parseInt(parts[1]), year = parseInt(parts[0]);
-  try {
-    var evs = await fetchHistoricalEvents(month, year);
-    anchorEvents = evs.map(function(e){ return Object.assign({}, e, {id:'anc_'+e.id}); });
-  } catch(e) { anchorEvents = []; }
+  anchorEvents = [];
+  if (anchorData.date) {
+    var parts = anchorData.date.split('-');
+    var month = parseInt(parts[1]), year = parseInt(parts[0]);
+    try {
+      var evs = await fetchHistoricalEvents(month, year);
+      anchorEvents = evs.map(function(e){ return Object.assign({}, e, {id:'anc_'+e.id}); });
+    } catch(e) {}
+  }
   anchorActive = true;
   updateAnchorBtn();
   refreshGlobe();
@@ -4061,25 +4073,26 @@ async function lookupAnchorGeo() {
 async function submitAnchor() {
   var saveBtn = document.getElementById('anc-save');
   var errEl = document.getElementById('anc-err');
-  var month = document.getElementById('anc-month').value;
-  var year = document.getElementById('anc-year').value.trim();
-  if (!month || !year || isNaN(parseInt(year))) { errEl.textContent = 'Enter a valid month and year.'; return; }
-  var yr = parseInt(year);
-  if (yr < 1900 || yr > 2025) { errEl.textContent = 'Year must be between 1900 and 2025.'; return; }
-  if (!anchorGeoResolved) { errEl.textContent = 'Look up your birthplace first.'; return; }
-  var birthDate = yr + '-' + String(parseInt(month)).padStart(2,'0') + '-01';
+  var title = document.getElementById('anc-title').value.trim();
+  var city = document.getElementById('anc-city').value.trim();
+  var dateVal = document.getElementById('anc-date').value;
+  var timeVal = document.getElementById('anc-time').value;
+  if (!title) { errEl.textContent = 'Enter a name for this anchor.'; return; }
+  if (!anchorGeoResolved) { errEl.textContent = 'Look up a location first.'; return; }
   saveBtn.disabled = true; errEl.textContent = '';
   try {
     var { error } = await sb.from('user_anchors').upsert({
       user_id: currentUser.id,
-      birth_date: birthDate,
-      birth_place: document.getElementById('anc-city').value.trim(),
+      anchor_title: title,
+      birth_date: dateVal || null,
+      birth_place: city,
       birth_lat: anchorGeoResolved.lat,
-      birth_lng: anchorGeoResolved.lng
+      birth_lng: anchorGeoResolved.lng,
+      anchor_time: timeVal || null
     }, {onConflict:'user_id'});
     if (error) throw error;
-    anchorData = {birthDate:birthDate, birthPlace:document.getElementById('anc-city').value.trim(),
-      lat:anchorGeoResolved.lat, lng:anchorGeoResolved.lng};
+    anchorData = {title:title, place:city, lat:anchorGeoResolved.lat, lng:anchorGeoResolved.lng,
+      date:dateVal||null, time:timeVal||null};
     await activateAnchor();
     closeAnchorModal();
   } catch(e) {
@@ -4100,13 +4113,16 @@ function openAnchorModal() {
   } else {
     form.style.display = ''; upsell.style.display = 'none';
     if (anchorData) {
-      var parts = anchorData.birthDate.split('-');
-      document.getElementById('anc-month').value = parseInt(parts[1]);
-      document.getElementById('anc-year').value = parts[0];
-      document.getElementById('anc-city').value = anchorData.birthPlace;
-      if (!anchorGeoResolved) anchorGeoResolved = {lat:anchorData.lat, lng:anchorData.lng, display:anchorData.birthPlace};
-      document.getElementById('anc-resolved').textContent = '✓ ' + anchorData.birthPlace;
+      document.getElementById('anc-title').value = anchorData.title || '';
+      document.getElementById('anc-city').value = anchorData.place || '';
+      document.getElementById('anc-date').value = anchorData.date || '';
+      document.getElementById('anc-time').value = anchorData.time || '';
+      if (!anchorGeoResolved) anchorGeoResolved = {lat:anchorData.lat, lng:anchorData.lng, display:anchorData.place};
+      document.getElementById('anc-resolved').textContent = '✓ ' + anchorData.place;
     } else {
+      document.getElementById('anc-title').value = '';
+      document.getElementById('anc-date').value = '';
+      document.getElementById('anc-time').value = '';
       document.getElementById('anc-resolved').textContent = anchorGeoResolved ? '✓ ' + anchorGeoResolved.display : '';
     }
   }
