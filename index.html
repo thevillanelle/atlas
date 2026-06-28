@@ -446,9 +446,21 @@ body.hist-open #panel{top:92px}body.hist-open #detail{top:92px}body.hist-open #l
 .sc-copy:hover{background:rgba(245,158,11,.25)}
 .sc-cta{font-size:8px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;cursor:pointer;font-family:'Space Mono',monospace;transition:color .15s}
 .sc-cta:hover{color:var(--text)}
+#mob-menu-btn{display:none;background:none;border:none;color:var(--text);font-size:22px;cursor:pointer;padding:0 10px;line-height:1;flex-shrink:0;outline:none}
+#mob-nav{display:none;position:fixed;top:48px;left:0;right:0;z-index:299;background:var(--glass2);border-bottom:1px solid var(--border);backdrop-filter:blur(28px) saturate(180%)}
+#mob-nav.open{display:block}
+.mob-nav-item{display:block;width:100%;padding:15px 20px;font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--muted);cursor:pointer;border:none;border-bottom:1px solid var(--border);font-family:'Space Mono',monospace;transition:color .15s;text-align:left;background:none;box-sizing:border-box}
+.mob-nav-item:last-child{border-bottom:none}
+.mob-nav-item:active{color:var(--text)}
+#mob-theme-sel{display:block;width:100%;padding:15px 20px;background:none;border:none;border-bottom:1px solid var(--border);color:var(--muted);font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;font-family:'Space Mono',monospace;cursor:pointer;outline:none;-webkit-appearance:none;appearance:none;box-sizing:border-box}
+#mob-theme-sel option{background:#070b18;color:var(--text);font-size:12px;letter-spacing:0;font-weight:400}
 @media(max-width:767px){
   .t-summary{display:none}
   #t-clock{display:none}
+  #topbar .t-sep{display:none}
+  #topbar .t-btn{display:none}
+  #auth-btn{display:none}
+  #mob-menu-btn{display:flex;align-items:center}
   #detail{top:auto;bottom:36px;left:0;right:0;width:100%;max-height:70vh;border-left:none;border-top:1px solid var(--border);transform:translateY(110%)}
   #detail.open{transform:translateY(0)}
   body.hist-open #detail{top:auto}
@@ -536,6 +548,17 @@ body.hist-open #panel{top:92px}body.hist-open #detail{top:92px}body.hist-open #l
     <img id="auth-avatar" alt="">
     <span id="auth-label">SIGN IN</span>
   </button>
+  <button id="mob-menu-btn" onclick="toggleMobNav()">≡</button>
+</div>
+<div id="mob-nav">
+  <button class="mob-nav-item" onclick="toggleHistBar();closeMobNav()">⏱ History</button>
+  <button class="mob-nav-item" onclick="toggleConnect();closeMobNav()">⟷ Connect</button>
+  <select id="mob-theme-sel" onchange="setTheme(this.value);closeMobNav()">
+    <option value="0">🌙 Night</option>
+    <option value="1">☀️ Day</option>
+    <option value="2">🌍 IRL</option>
+  </select>
+  <button class="mob-nav-item" id="mob-auth-item" onclick="handleAuthClick();closeMobNav()">Sign In</button>
 </div>
 <!-- Auth modal (sign-in) -->
 <div id="auth-modal" onclick="if(event.target===this)this.classList.remove('open')">
@@ -910,6 +933,7 @@ function updateAuthUI(user) {
   var btn = document.getElementById('auth-btn');
   var label = document.getElementById('auth-label');
   var avatar = document.getElementById('auth-avatar');
+  var mobAuth = document.getElementById('mob-auth-item');
   if (user) {
     var meta = user.user_metadata || {};
     var name = meta.full_name || meta.name || user.email.split('@')[0];
@@ -919,11 +943,13 @@ function updateAuthUI(user) {
     document.getElementById('aup-name').textContent = name;
     document.getElementById('aup-email').textContent = user.email;
     btn.style.borderColor = 'rgba(163,230,53,.4)';
+    if (mobAuth) mobAuth.textContent = name.split(' ')[0].toUpperCase();
   } else {
     label.textContent = 'SIGN IN';
     avatar.style.display = 'none';
     avatar.src = '';
     btn.style.borderColor = '';
+    if (mobAuth) mobAuth.textContent = 'Sign In';
   }
 }
 
@@ -1052,7 +1078,14 @@ document.addEventListener('click', function(e) {
   var btn = document.getElementById('auth-btn');
   if (panel && panel.classList.contains('open') && !panel.contains(e.target) && !btn.contains(e.target))
     panel.classList.remove('open');
+  var nav = document.getElementById('mob-nav');
+  var mbtn = document.getElementById('mob-menu-btn');
+  if (nav && nav.classList.contains('open') && !nav.contains(e.target) && !mbtn.contains(e.target))
+    nav.classList.remove('open');
 });
+
+function toggleMobNav() { document.getElementById('mob-nav').classList.toggle('open'); }
+function closeMobNav() { document.getElementById('mob-nav').classList.remove('open'); }
 
 // auth state listener — runs once on load and on every sign-in/out
 sb.auth.onAuthStateChange(function(event, session) {
@@ -1559,7 +1592,7 @@ async function lookupNatalCity() {
 function editNatalChart() {
   natalData = null;
   localStorage.removeItem('atlas_natal');
-  renderEventList();
+  renderList();
 }
 
 function saveNatalChart() {
@@ -1575,7 +1608,7 @@ function saveNatalChart() {
   };
   localStorage.setItem('atlas_natal', JSON.stringify(natalData));
   _natalGeo = null;
-  renderEventList();
+  renderList();
 }
 
 function renderAstrologyTab() {
@@ -2976,6 +3009,7 @@ function applyThemeMode() {
   dayMode = (themeMode === 1);
   irlMode = (themeMode === 2);
   document.getElementById('theme-btn').value = themeMode;
+  var mts = document.getElementById('mob-theme-sel'); if (mts) mts.value = themeMode;
   if (sunOrbRAF) { cancelAnimationFrame(sunOrbRAF); sunOrbRAF = null; }
   if (themeMode === 0) {
     if (irlBlobUrl) { URL.revokeObjectURL(irlBlobUrl); irlBlobUrl = null; }
@@ -4112,7 +4146,7 @@ async function init() {
       var slug = new URLSearchParams(location.search).get('s');
       if (slug) { loadThroughlineFromURL(slug); }
       else if (sessionStorage.getItem('atlas_visited')) { selectMode('all'); }
-      else { document.getElementById('mode-select').classList.add('open'); }
+      else { var _ms = document.getElementById('mode-select'); _ms.scrollTop = 0; _ms.classList.add('open'); }
     }, 700);
   }, 500);
   loadNatalData();
