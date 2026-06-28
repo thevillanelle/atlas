@@ -2257,6 +2257,7 @@ function planetGeogLatLng(pEl, d) {
   var ph = keplerXYZ(pEl, d);
   var eh = keplerXYZ(EARTH_ELEMS, d);
   var gx = ph.x - eh.x, gy = ph.y - eh.y, gz = ph.z - eh.z;
+  var au = Math.sqrt(gx*gx + gy*gy + gz*gz);
   var eps = (23.4393 - 3.563e-7*d) * DEG;
   var xe = gx;
   var ye = gy*Math.cos(eps) - gz*Math.sin(eps);
@@ -2265,7 +2266,12 @@ function planetGeogLatLng(pEl, d) {
   var Dec = Math.atan2(ze, Math.sqrt(xe*xe + ye*ye)) * RAD;
   var GMST = norm360(280.46061837 + 360.98564736629*d);
   var lng = norm180(RA - GMST);
-  return {lat: Dec, lng: lng};
+  return {lat: Dec, lng: lng, au: au};
+}
+
+// Map geocentric AU distance → sky projection units (log scale, 400–800)
+function planetSkyDist(au) {
+  return 400 + 400 * Math.log(1 + au) / Math.log(33);
 }
 
 function initPlanetOrbs() {
@@ -2381,7 +2387,8 @@ function tickPlanets() {
     if (!el) return;
     if (opacity <= 0) { el.style.display = 'none'; return; }
     var pos = planetGeogLatLng(p, d);
-    var lat = pos.lat * DEG, lng = pos.lng * DEG, dist = 620;
+    var lat = pos.lat * DEG, lng = pos.lng * DEG;
+    var dist = planetSkyDist(pos.au);
     var sp = projectToScreen(dist*Math.cos(lat)*Math.sin(lng), dist*Math.sin(lat), dist*Math.cos(lat)*Math.cos(lng), true);
     if (!sp) { el.style.display = 'none'; return; }
     el.style.display = 'block';
@@ -2410,7 +2417,8 @@ function tickPlanets() {
         var started = false;
         for (var i = 0; i <= pts.length; i++) {
           var pos = pts[i % pts.length];
-          var lat = pos.lat * DEG, lng = pos.lng * DEG, dist = 620;
+          var lat = pos.lat * DEG, lng = pos.lng * DEG;
+          var dist = planetSkyDist(pos.au || 5);
           var sp = projectToScreen(dist*Math.cos(lat)*Math.sin(lng), dist*Math.sin(lat), dist*Math.cos(lat)*Math.cos(lng), true);
           if (!sp) { started = false; continue; }
           if (!started) { ctx.moveTo(sp.x, sp.y); started = true; } else ctx.lineTo(sp.x, sp.y);
