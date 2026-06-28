@@ -362,9 +362,21 @@ body.hist-open #panel{top:92px}body.hist-open #detail{top:92px}body.hist-open #l
 .marker.sev5 .m-dot{width:11px;height:11px;box-shadow:0 0 14px var(--mc)}
 .marker.sev5 .m-ring{width:28px;height:28px}
 #ticker{position:fixed;bottom:0;left:0;right:0;z-index:300;height:36px;background:var(--glass);border-top:1px solid var(--border);backdrop-filter:blur(24px);display:flex;align-items:center;overflow:hidden}
-.tk-label{flex-shrink:0;padding:0 13px;font-size:8px;font-weight:700;letter-spacing:2px;color:#f59e0b;text-transform:uppercase;border-right:1px solid var(--border);height:100%;display:flex;align-items:center}
+.tk-label{flex-shrink:0;padding:0 13px;font-size:8px;font-weight:700;letter-spacing:2px;color:#f59e0b;text-transform:uppercase;border-right:1px solid var(--border);height:100%;display:flex;align-items:center;gap:6px}
+#tk-gear{display:none;background:none;border:none;color:var(--muted);font-size:13px;cursor:pointer;line-height:1;padding:0;transition:color .15s;flex-shrink:0}
+#tk-gear:hover{color:#f59e0b}
 .tk-track{flex:1;overflow:hidden;height:100%;position:relative}
 .tk-inner{display:flex;align-items:center;height:100%;white-space:nowrap;position:absolute;left:0;animation:tscroll 60s linear infinite}
+#ticker-settings{display:none;position:fixed;bottom:36px;right:0;z-index:400;background:var(--glass2);border:1px solid var(--border);border-bottom:none;backdrop-filter:blur(28px) saturate(180%);padding:14px 16px;width:240px}
+#ticker-settings.open{display:block}
+.tk-set-title{font-size:9px;font-weight:700;letter-spacing:2px;color:var(--muted);text-transform:uppercase;margin-bottom:10px}
+.tk-feed-opt{display:flex;align-items:flex-start;gap:10px;padding:7px 0;border-bottom:1px solid rgba(255,255,255,.05);cursor:pointer}
+.tk-feed-opt:last-child{border-bottom:none}
+.tk-feed-check{width:14px;height:14px;border-radius:3px;border:1px solid var(--border);background:rgba(255,255,255,.04);flex-shrink:0;margin-top:1px;display:flex;align-items:center;justify-content:center;font-size:9px;transition:all .15s}
+.tk-feed-check.on{background:#f59e0b;border-color:#f59e0b;color:#000}
+.tk-feed-info{flex:1}
+.tk-feed-name{font-size:10px;font-weight:700;color:var(--text);margin-bottom:1px}
+.tk-feed-desc{font-size:9px;color:var(--muted)}
 @keyframes tscroll{from{left:0}to{left:-50%}}
 .tk-item{display:inline-flex;align-items:center;gap:4px;padding:0 18px;font-size:10.5px;font-family:'Space Mono',monospace}
 .tk-sym{font-weight:700;color:var(--text)}
@@ -785,8 +797,9 @@ body.hist-open #panel{top:92px}body.hist-open #detail{top:92px}body.hist-open #l
   <button id="d-close" onclick="closeDetail()">&#x2715;</button>
   <div id="d-body"></div>
 </div>
+<div id="ticker-settings"></div>
 <div id="ticker">
-  <div class="tk-label">Markets</div>
+  <div class="tk-label"><span id="tk-label-text">Markets</span><button id="tk-gear" onclick="toggleTickerSettings()" title="Customize ticker">⚙</button></div>
   <div class="tk-track"><div class="tk-inner" id="tk-inner"></div></div>
 </div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
@@ -1099,6 +1112,8 @@ sb.auth.onAuthStateChange(function(event, session) {
     currentUserTier = 'free';
     anchorData = null; anchorEvents = []; anchorActive = false; anchorGeoResolved = null;
     updateAnchorBtnVisibility();
+    updateTickerGearVisibility();
+    document.getElementById('ticker-settings').classList.remove('open');
     refreshGlobe(); refreshArcs();
   }
 });
@@ -1962,9 +1977,129 @@ async function fetchMarkets() {
     if (r.CNY) items.push({sym:'USD/CNY',px:r.CNY.toFixed(4),chg:'',up:true});
   }
   items.push({sym:'GOLD',px:'2,341',chg:'+0.64%',up:true},{sym:'OIL',px:'82.14',chg:'-1.20%',up:false});
-  tickerData = items;
-  renderTicker();
+  return items;
 }
+
+// =============================================================================
+// TICKER CUSTOMIZATION
+// =============================================================================
+var TICKER_FEEDS = [
+  {id:'markets',  label:'Markets',    desc:'Crypto, forex & commodities'},
+  {id:'news',     label:'Headlines',  desc:'Breaking news from Guardian'},
+  {id:'science',  label:'Science',    desc:'Science & technology news'},
+  {id:'quakes',   label:'Seismic',    desc:'M4.5+ earthquakes worldwide'},
+  {id:'space',    label:'Space',      desc:'Launches & astronomy events'},
+];
+var activeTickerFeeds = (function(){
+  try { return JSON.parse(localStorage.getItem('atlas_ticker_feeds') || '["markets"]'); } catch(_){ return ['markets']; }
+})();
+
+async function fetchTickerHeadlines() {
+  try {
+    var r = await apiFetch('https://content.guardianapis.com/search?page-size=12&order-by=newest&api-key=test', 6000);
+    if (r.response && r.response.results) {
+      return r.response.results.map(function(a) {
+        var t = a.webTitle.replace(/\s*\|.*$/, '').substring(0, 42);
+        return {sym:'NEWS', px:t, chg:'', up:true};
+      });
+    }
+  } catch(_) {}
+  return [];
+}
+
+async function fetchTickerScience() {
+  try {
+    var r = await apiFetch('https://content.guardianapis.com/technology?show-fields=headline&page-size=10&order-by=newest&api-key=test', 6000);
+    if (r.response && r.response.results) {
+      return r.response.results.map(function(a) {
+        var t = a.webTitle.replace(/\s*\|.*$/, '').substring(0, 42);
+        return {sym:'TECH', px:t, chg:'', up:true};
+      });
+    }
+  } catch(_) {}
+  return [];
+}
+
+async function fetchTickerQuakes() {
+  try {
+    var r = await apiFetch('https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/4.5_day.geojson', 6000);
+    if (r.features) {
+      return r.features.slice(0, 10).map(function(f) {
+        var p = f.properties;
+        var place = (p.place || '').replace(/^\d+km \w+ of /, '').substring(0, 28);
+        return {sym:'M'+p.mag.toFixed(1), px:place, chg:'', up:false};
+      });
+    }
+  } catch(_) {}
+  return [];
+}
+
+function getTickerSpace() {
+  return allEvents.filter(function(e){return e.type==='astronomy'||e.type==='launch';})
+    .slice(0, 8).map(function(e){
+      return {sym:e.type==='launch'?'LAUNCH':'SPACE', px:e.title.substring(0, 40), chg:'', up:true};
+    });
+}
+
+async function refreshTicker() {
+  var all = [];
+  var active = activeTickerFeeds;
+  var fetches = [];
+  if (active.indexOf('markets')  !== -1) fetches.push(fetchMarkets().then(function(r){all.push.apply(all,r||[]);}));
+  if (active.indexOf('news')     !== -1) fetches.push(fetchTickerHeadlines().then(function(r){all.push.apply(all,r);}));
+  if (active.indexOf('science')  !== -1) fetches.push(fetchTickerScience().then(function(r){all.push.apply(all,r);}));
+  if (active.indexOf('quakes')   !== -1) fetches.push(fetchTickerQuakes().then(function(r){all.push.apply(all,r);}));
+  if (active.indexOf('space')    !== -1) all.push.apply(all, getTickerSpace());
+  await Promise.allSettled(fetches);
+  tickerData = all.length ? all : [{sym:'—', px:'No feeds active', chg:'', up:true}];
+  renderTicker();
+  var labels = active.map(function(id){
+    var f = TICKER_FEEDS.find(function(x){return x.id===id;});
+    return f ? f.label : id;
+  });
+  var labelEl = document.getElementById('tk-label-text');
+  if (labelEl) labelEl.textContent = labels.join(' · ');
+}
+
+function toggleTickerFeed(id) {
+  var idx = activeTickerFeeds.indexOf(id);
+  if (idx === -1) activeTickerFeeds.push(id);
+  else if (activeTickerFeeds.length > 1) activeTickerFeeds.splice(idx, 1);
+  try { localStorage.setItem('atlas_ticker_feeds', JSON.stringify(activeTickerFeeds)); } catch(_) {}
+  renderTickerSettings();
+  refreshTicker();
+}
+
+function toggleTickerSettings() {
+  var el = document.getElementById('ticker-settings');
+  if (el.classList.toggle('open')) renderTickerSettings();
+}
+
+function renderTickerSettings() {
+  var el = document.getElementById('ticker-settings');
+  if (!el) return;
+  el.innerHTML = '<div class="tk-set-title">Customize Ticker</div>' +
+    TICKER_FEEDS.map(function(f) {
+      var on = activeTickerFeeds.indexOf(f.id) !== -1;
+      return '<div class="tk-feed-opt" onclick="toggleTickerFeed(\''+f.id+'\')">' +
+        '<div class="tk-feed-check'+(on?' on':'')+'">'+( on?'✓':''  )+'</div>' +
+        '<div class="tk-feed-info"><div class="tk-feed-name">'+f.label+'</div>' +
+        '<div class="tk-feed-desc">'+f.desc+'</div></div></div>';
+    }).join('');
+}
+
+function updateTickerGearVisibility() {
+  var gear = document.getElementById('tk-gear');
+  if (gear) gear.style.display = (currentUserTier==='pro'||currentUserTier==='team') ? 'block' : 'none';
+}
+
+// Close ticker settings on outside click
+document.addEventListener('click', function(e) {
+  var ts = document.getElementById('ticker-settings');
+  var gear = document.getElementById('tk-gear');
+  if (ts && ts.classList.contains('open') && !ts.contains(e.target) && gear && !gear.contains(e.target))
+    ts.classList.remove('open');
+});
 
 // Money / financial news — Guardian business + money sections
 async function fetchMoneyNews() {
@@ -3850,6 +3985,7 @@ async function fetchUserTier(userId) {
   var { data } = await sb.from('users').select('tier').eq('id', userId).single();
   currentUserTier = (data && data.tier) || 'free';
   updateAnchorBtnVisibility();
+  updateTickerGearVisibility();
 }
 
 function updateAnchorBtnVisibility() {
@@ -4001,7 +4137,7 @@ async function loadLiveData() {
 
   splash(72, 'Sky data + Astronomy + Markets…');
   var phase4 = await Promise.allSettled([fetchSkyData(), fetchAstronomyNews()]);
-  try { await fetchMarkets(); } catch(_) {}
+  try { await refreshTicker(); } catch(_) {}
 
   var usgs     = phase1[0], launches = phase1[1];
   var newsR    = phase2[0], conflR   = phase2[1], stormR = phase2[2], hnR = phase2[3], fashR = phase2[4];
@@ -4193,7 +4329,7 @@ async function init() {
   });
   tickClock();
   setInterval(tickClock, 1000);
-  setInterval(fetchMarkets, 60000);
+  setInterval(refreshTicker, 60000);
   setInterval(refreshGlobe, 30000);
   setInterval(async function(){await loadLiveData();renderList();refreshGlobe();}, 5*60*1000);
 }
