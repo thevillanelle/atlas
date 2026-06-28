@@ -186,6 +186,8 @@ select#theme-btn option{background:#070b18;color:var(--text);font-size:12px;lett
 #ph{padding:11px 13px 9px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px}
 #ph-title{font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--muted)}
 #ph-count{font-size:10px;font-family:'Space Mono',monospace;color:var(--accent);margin-left:auto}
+#ph-clear{background:none;border:none;color:var(--muted);font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;cursor:pointer;padding:2px 6px;border-radius:4px;font-family:'Space Mono',monospace;transition:color .15s;flex-shrink:0}
+#ph-clear:hover{color:#ef4444}
 #ps{padding:7px 10px;border-bottom:1px solid var(--border)}
 #ps input{width:100%;background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:7px;padding:6px 11px;font-size:11px;color:var(--text);outline:none;font-family:'Inter',sans-serif;transition:border .2s}
 #ps input:focus{border-color:rgba(59,130,246,.4)}
@@ -723,7 +725,7 @@ body.hist-open #panel{top:92px}body.hist-open #detail{top:92px}body.hist-open #l
 </div>
 <button id="ptoggle" onclick="togglePanel()">&#8249;</button>
 <div id="panel">
-  <div id="ph"><span id="ph-title">Intelligence Feed</span><span id="ph-count">–</span></div>
+  <div id="ph"><span id="ph-title">Intelligence Feed</span><span id="ph-count">–</span><button id="ph-clear" onclick="clearFeed()" title="Clear feed">✕ CLEAR</button></div>
   <div id="ps"><input type="text" id="sinput" placeholder="Search events, locations, tags…" oninput="onSearch()"></div>
   <div id="tabs">
     <div class="tab on" data-tab="news"         onclick="setTab(this)">Breaking News</div>
@@ -3094,6 +3096,7 @@ function togglePanel(){panelOpen=!panelOpen;document.getElementById('panel').cla
 function renderWatchlist(){document.getElementById('wl-tags').innerHTML=watchTags.map(function(t){return '<div class="wl-tag" onclick="watchFilter(\''+t+'\')">'+t+'<span class="wl-tag-x" onclick="event.stopPropagation();removeWatchTag(\''+t+'\')">×</span></div>';}).join('');}
 function removeWatchTag(t){watchTags=watchTags.filter(function(x){return x!==t;});if(searchQ===t){searchQ='';document.getElementById('sinput').value='';if(currentTab==='watchlist'){currentTab='all';document.querySelectorAll('.tab').forEach(function(el){el.classList.toggle('on',el.dataset.tab==='all');});}}renderWatchlist();renderList();refreshGlobe();}
 function clearWatchlist(){watchTags=[];searchQ='';document.getElementById('sinput').value='';if(currentTab==='watchlist'){currentTab='all';document.querySelectorAll('.tab').forEach(function(el){el.classList.toggle('on',el.dataset.tab==='all');});}renderWatchlist();renderList();refreshGlobe();}
+function clearFeed(){allEvents=[];renderList();refreshGlobe();}
 function watchFilter(tag){
   var active = watchTags.indexOf(tag) !== -1 && currentTab === 'watchlist' && searchQ === tag;
   if (active) {
