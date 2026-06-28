@@ -1559,7 +1559,7 @@ async function lookupNatalCity() {
 function editNatalChart() {
   natalData = null;
   localStorage.removeItem('atlas_natal');
-  renderEventList();
+  renderList();
 }
 
 function saveNatalChart() {
@@ -1575,7 +1575,7 @@ function saveNatalChart() {
   };
   localStorage.setItem('atlas_natal', JSON.stringify(natalData));
   _natalGeo = null;
-  renderEventList();
+  renderList();
 }
 
 function renderAstrologyTab() {
@@ -4112,7 +4112,7 @@ async function init() {
       var slug = new URLSearchParams(location.search).get('s');
       if (slug) { loadThroughlineFromURL(slug); }
       else if (sessionStorage.getItem('atlas_visited')) { selectMode('all'); }
-      else { document.getElementById('mode-select').classList.add('open'); }
+      else { var _ms = document.getElementById('mode-select'); _ms.scrollTop = 0; _ms.classList.add('open'); }
     }, 700);
   }, 500);
   loadNatalData();
