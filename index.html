@@ -446,6 +446,15 @@ body.hist-open #panel{top:92px}body.hist-open #detail{top:92px}body.hist-open #l
 .sc-copy:hover{background:rgba(245,158,11,.25)}
 .sc-cta{font-size:8px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;cursor:pointer;font-family:'Space Mono',monospace;transition:color .15s}
 .sc-cta:hover{color:var(--text)}
+@media(max-width:767px){
+  .t-summary{display:none}
+  #t-clock{display:none}
+  #solar-btn,#solar-sep{display:none}
+  #detail{top:auto;bottom:36px;left:0;right:0;width:100%;max-height:70vh;border-left:none;border-top:1px solid var(--border);transform:translateY(110%)}
+  #detail.open{transform:translateY(0)}
+  body.hist-open #detail{top:auto}
+  .ms-fn-grid{grid-template-columns:1fr}
+}
 </style>
 </head>
 <body>
@@ -510,6 +519,8 @@ body.hist-open #panel{top:92px}body.hist-open #detail{top:92px}body.hist-open #l
   <div class="t-sep"></div>
   <div class="t-summary" id="t-summary">Loading intelligence feed…</div>
   <div class="t-spacer"></div>
+  <button class="t-btn" id="solar-btn" onclick="snapToSolar()">☀ SOLAR</button>
+  <div class="t-sep" id="solar-sep"></div>
   <button class="t-btn" id="hist-btn" onclick="toggleHistBar()">⏱ HISTORY</button>
   <div class="t-sep"></div>
   <button class="t-btn" id="connect-btn" onclick="toggleConnect()">⟷ CONNECT</button>
@@ -1184,7 +1195,7 @@ var flightPoints = [];
 var currentTab = 'all';
 var searchQ = '';
 var selectedId = null;
-var panelOpen = true;
+var panelOpen = window.innerWidth >= 768;
 var watchTags = ['Gaza','Ukraine','AI','Markets','Fashion','Climate'];
 var userCities = [{name:'New York City', lat:40.7128, lng:-74.006}];
 var layerVis = {news:true,conflict:true,disaster:true,storm:true,humanitarian:true,flight:true,launch:true,tech:true,fashion:true,astrology:true,astronomy:true,connection:true,history:false,money:true,world:true,nyc:true,usnews:true,science:true,culture:true,party:true,fraud:true};
@@ -3471,6 +3482,11 @@ function projectToScreen(wx, wy, wz, occlude) {
   return { x:(nx+1)/2*window.innerWidth, y:(-ny+1)/2*window.innerHeight };
 }
 
+function snapToSolar() {
+  var sun = sunSubpoint(new Date());
+  globe.pointOfView({lat:-sun.lat, lng:sun.lng+180, altitude:2.2}, 800);
+}
+
 function tickSunOrb() {
   sunOrbRAF = null;
   var el = document.getElementById('sun-orb');
@@ -4084,6 +4100,7 @@ function selectMode(mode) {
 async function init() {
   splash(5, 'Initializing 3D globe…');
   initGlobe();
+  if (!panelOpen) { var _p=document.getElementById('panel');_p.classList.add('hidden');var _t=document.getElementById('ptoggle');_t.innerHTML='&#8250;';_t.classList.add('closed');_t.style.left='0'; }
   tickSunOrb();
   checkAPIs();
   await loadLiveData();
