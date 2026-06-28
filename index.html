@@ -2309,6 +2309,7 @@ function buildMarker(d) {
 
 function refreshGlobe() {
   if (!globe || !globe.htmlElementsData) return;
+  if (feedHidden) return;
   var histBarOpen = document.getElementById('hist-bar').classList.contains('open');
   if (histBarOpen) {
     globe.htmlElementsData(histEvents.concat(anchorActive && anchorData ? [anchorPinEvent()] : []));
