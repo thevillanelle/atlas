@@ -4195,7 +4195,6 @@ async function init() {
   setInterval(tickClock, 1000);
   setInterval(fetchMarkets, 60000);
   setInterval(refreshGlobe, 30000);
-  setInterval(async function(){await loadLiveData();renderList();refreshGlobe();}, 5*60*1000);
 }
 
 init();
