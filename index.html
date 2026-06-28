@@ -1044,9 +1044,9 @@ async function lookupCity() {
       // Build a clean short name from the geocode display
       var shortName = input.charAt(0).toUpperCase() + input.slice(1);
       _pendingGeo.name = shortName;
-      resolvedEl.textContent = '✓ ' + geo.display;
       _pendingCities.push({name: shortName, lat: geo.lat, lng: geo.lng});
       document.getElementById('city-input').value = '';
+      resolvedEl.textContent = '';
       _pendingGeo = null;
       renderCityList();
     }
@@ -1065,6 +1065,11 @@ async function saveCities() {
   updateLocalTabLabel();
   closeCitiesModal();
   if (currentUser) await saveHomeCities();
+  // Swap local news in-place so the feed reflects the new cities immediately
+  var fresh = await fetchLocalNews(userCities);
+  allEvents = allEvents.filter(function(e){ return e.type !== 'nyc'; }).concat(fresh);
+  renderList();
+  refreshGlobe();
 }
 
 async function saveThemePref(themeName) {
