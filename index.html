@@ -1758,10 +1758,10 @@ async function fetchUSGS() {
   });
 }
 
-// Guardian Open Platform — CORS *, api-key=test works for low volume
+// Guardian Open Platform — proxied via /api/guardian (key lives in GUARDIAN_API_KEY)
 function guardianUrl(section, query, pageSize) {
   pageSize = pageSize || 10;
-  var base = 'https://content.guardianapis.com/search?api-key=test&show-fields=trailText,shortUrl&page-size=' + pageSize + '&order-by=newest&format=json';
+  var base = '/api/guardian?path=search&show-fields=trailText,shortUrl&page-size=' + pageSize + '&order-by=newest&format=json';
   if (section) base += '&section=' + encodeURIComponent(section);
   if (query)   base += '&q=' + encodeURIComponent(query);
   return base;
@@ -2003,7 +2003,7 @@ var activeTickerFeeds = (function(){
 
 async function fetchTickerHeadlines() {
   try {
-    var r = await apiFetch('https://content.guardianapis.com/search?page-size=12&order-by=newest&api-key=test', 6000);
+    var r = await apiFetch('/api/guardian?path=search&page-size=12&order-by=newest', 6000);
     if (r.response && r.response.results) {
       return r.response.results.map(function(a) {
         var t = a.webTitle.replace(/\s*\|.*$/, '').substring(0, 42);
@@ -2016,7 +2016,7 @@ async function fetchTickerHeadlines() {
 
 async function fetchTickerScience() {
   try {
-    var r = await apiFetch('https://content.guardianapis.com/technology?show-fields=headline&page-size=10&order-by=newest&api-key=test', 6000);
+    var r = await apiFetch('/api/guardian?path=technology&show-fields=headline&page-size=10&order-by=newest', 6000);
     if (r.response && r.response.results) {
       return r.response.results.map(function(a) {
         var t = a.webTitle.replace(/\s*\|.*$/, '').substring(0, 42);
@@ -4242,18 +4242,18 @@ async function checkAPIs() {
     { id: 'launch',    url: 'https://ll.thespacedevs.com/2.2.0/launch/upcoming/?format=json&limit=1&mode=list' },
     { id: 'astronomy', url: 'https://services.swpc.noaa.gov/products/noaa-planetary-k-index-forecast.json' },
     // Guardian — one check per vertical that uses it
-    { id: 'news',      url: 'https://content.guardianapis.com/search?api-key=test&page-size=1&format=json' },
-    { id: 'world',     url: 'https://content.guardianapis.com/search?api-key=test&page-size=1&section=world&format=json' },
-    { id: 'usnews',    url: 'https://content.guardianapis.com/search?api-key=test&page-size=1&section=us-news&format=json' },
-    { id: 'nyc',       url: 'https://content.guardianapis.com/search?api-key=test&page-size=1&q=New+York+City&format=json' },
-    { id: 'money',     url: 'https://content.guardianapis.com/search?api-key=test&page-size=1&section=business&format=json' },
-    { id: 'science',   url: 'https://content.guardianapis.com/search?api-key=test&page-size=1&section=science&format=json' },
-    { id: 'culture',   url: 'https://content.guardianapis.com/search?api-key=test&page-size=1&section=culture&format=json' },
-    { id: 'fashion',   url: 'https://content.guardianapis.com/search?api-key=test&page-size=1&section=fashion&format=json' },
-    { id: 'conflict',  url: 'https://content.guardianapis.com/search?api-key=test&page-size=1&q=conflict&format=json' },
-    { id: 'storm',     url: 'https://content.guardianapis.com/search?api-key=test&page-size=1&section=environment&format=json' },
-    { id: 'party',     url: 'https://content.guardianapis.com/search?api-key=test&page-size=1&section=food&format=json' },
-    { id: 'fraud',     url: 'https://content.guardianapis.com/search?api-key=test&page-size=1&q=fraud+OR+scam+OR+corruption&format=json' },
+    { id: 'news',      url: '/api/guardian?path=search&page-size=1&format=json' },
+    { id: 'world',     url: '/api/guardian?path=search&page-size=1&section=world&format=json' },
+    { id: 'usnews',    url: '/api/guardian?path=search&page-size=1&section=us-news&format=json' },
+    { id: 'nyc',       url: '/api/guardian?path=search&page-size=1&q=New+York+City&format=json' },
+    { id: 'money',     url: '/api/guardian?path=search&page-size=1&section=business&format=json' },
+    { id: 'science',   url: '/api/guardian?path=search&page-size=1&section=science&format=json' },
+    { id: 'culture',   url: '/api/guardian?path=search&page-size=1&section=culture&format=json' },
+    { id: 'fashion',   url: '/api/guardian?path=search&page-size=1&section=fashion&format=json' },
+    { id: 'conflict',  url: '/api/guardian?path=search&page-size=1&q=conflict&format=json' },
+    { id: 'storm',     url: '/api/guardian?path=search&page-size=1&section=environment&format=json' },
+    { id: 'party',     url: '/api/guardian?path=search&page-size=1&section=food&format=json' },
+    { id: 'fraud',     url: '/api/guardian?path=search&page-size=1&q=fraud+OR+scam+OR+corruption&format=json' },
   ];
 
   // Always-on: static/computed — light immediately
