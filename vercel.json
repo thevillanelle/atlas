@@ -1,5 +1,5 @@
 {
-  "rewrites": [{ "source": "/((?!health.json|api/).*)", "destination": "/index.html" }],
+  "rewrites": [{ "source": "/((?!api/|src/|server/)[^.]*)", "destination": "/index.html" }],
   "headers": [
     {
       "source": "/(.*)",
@@ -8,6 +8,10 @@
         { "key": "X-Frame-Options", "value": "DENY" },
         { "key": "Referrer-Policy", "value": "strict-origin-when-cross-origin" }
       ]
+    },
+    {
+      "source": "/src/(.*)",
+      "headers": [{ "key": "Cache-Control", "value": "public, max-age=0, must-revalidate" }]
     }
   ]
 }

@@ -1,0 +1,10 @@
+{
+  "name": "atlas",
+  "private": true,
+  "type": "module",
+  "engines": { "node": ">=20" },
+  "scripts": {
+    "dev": "node scripts/dev.js",
+    "test": "node --test test/*.test.js"
+  }
+}
